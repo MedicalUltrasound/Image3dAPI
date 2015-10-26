@@ -3,7 +3,4 @@
   <ItemGroup>
     <Midl Include="IImage3d.idl" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
-  </ItemGroup>
 </Project>
