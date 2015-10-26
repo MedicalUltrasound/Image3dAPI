@@ -1,0 +1,136 @@
+/* "3D API" interface header.
+   Designed by Fredrik Orderud <fredrik.orderud@ge.com>.
+   Copyright (c) 2015, GE Healthcare, Ultrasound.
+   
+Design goals:
+* Avoid direct file I/O in loader to avoid file locking problems and enable sandboxing. Provide byte arrays containing file content instead of filename as input.
+* COM interface to ensure a stable ABI between compilers, support multiple programming languages natively and enable out-of-process loaders (for sandboxing).
+
+*/
+
+/* Interfaces and data structures for exchanging image data. */
+import "oaidl.idl";
+
+typedef [
+  v1_enum, // 32bit enum size
+  uuid(A45D637B-0D4A-4797-9949-2039D963C41C),
+  helpstring("Enum of supported image formats (extended upon demand).")]
+enum ImageFormat {
+    FORMAT_INVALID  = 0, ///< make sure that "cleared" state is invalid
+    FORMAT_U8       = 1, ///< unsigned 8bit grayscale
+} ImageFormat;
+
+
+typedef [
+  v1_enum, // 32bit enum size
+  uuid(8157DC93-DBC4-4BEC-922C-B197237CCF34),
+  helpstring("Probe type enum (extended upon demand).")]
+enum ProbeType {
+    PROBE_UNKNOWN   = 0,
+    PROBE_THORAX    = 1, ///< transthoracic probe (for imaging between ribs)
+    PROBE_ESOPHAGUS = 2  ///< transesophageal probe
+} ProbeType;
+
+
+typedef [
+  uuid(1A31C197-3E53-4820-98E0-CE47941E19EF),
+  helpstring("Probe information.")]
+struct ProbeInfo {
+    [helpstring("Can be useful for initializing renderings and quantification tools.")]
+    ProbeType type;
+
+    [helpstring("short name describing probe")]
+    BSTR      name; 
+} ProbeInfo;
+
+
+typedef [
+  uuid(74355329-DFEF-4BC0-9103-CF9579536FE3),
+  helpstring("3D image data struct.")]
+struct Image3d {
+    [helpstring("")]                                                          double          time;
+    [helpstring("")]                                                          ImageFormat     format;
+    [helpstring("resolution (width, height, planes)")]                        unsigned short  dims[3];
+    [helpstring("distance between each row [bytes] (>= width*element_size)")] unsigned short  stride0;
+    [helpstring("distance between each plane [bytes] (>= height*stride0)")]   unsigned short  stride1;
+    [helpstring("underlying 1D image buffer")]                                SAFEARRAY(byte) data;
+} Image3d;
+
+
+typedef [
+  uuid(2ABE0726-3AB5-44F6-8FB3-04F22796EAA9),
+  helpstring("Cartesian 3D image geometry description. All units are in meter [m].\n"
+             "Coordinates are relative to the tip of the probe, with origin at the center of the aperture. The X- & Y-axes follow the 1st and 2nd probe aperture axes, and the Z-axis points into the imaged body.")]
+struct Cart3dGeom {
+    // coordinates are not arrays to avoid "warning MIDL2492: structure containing array of float/double might not be marshalled correctly when using type library marshalling"
+    float origin_x; ///< coordinate of 1st sample
+    float origin_y;
+    float origin_z;
+
+    float dir1_x;   ///< 1st direction vector (from first to last column)
+    float dir1_y;
+    float dir1_z;
+
+    float dir2_x;   ///< 2nd direction vector (from first to last row)
+    float dir2_y;
+    float dir2_z;
+
+    float dir3_x;   ///< 3rd direction vector (from first to last plane)
+    float dir3_y;
+    float dir3_z;
+} Cart3dGeom;
+
+
+typedef [
+  uuid(47B6CCBF-6D52-4615-B086-9D809D24E34B),
+  helpstring("ECG time series. QRS trig times have to be calculated based on the samples.")]
+struct EcgSeries {
+    [helpstring("time of 1st sample")]
+    double           start_time;
+
+    [helpstring("time difference between each sample")]
+    double           delta_time;
+
+    [helpstring("ECG sample waveform")]
+    SAFEARRAY(float) samples;
+} EcgSeries;
+
+
+[ object,
+  oleautomation, // use "automation" marshaler (oleaut32.dll)
+  uuid(D483D815-52DD-4750-8CA2-5C6C489588B6),
+  helpstring("Interface for retrieving 3D image data.")]
+interface IImage3dSource : IUnknown {
+    [helpstring("Get the number of images available")]
+    HRESULT GetFrameCount ([out,retval] unsigned int * size);
+
+    [helpstring("Get image data (const) for a given frame within a specified geometry")]
+    HRESULT GetFrame ([in] unsigned int index, [in] Cart3dGeom geom, [out,retval] Image3d * data);
+
+    [helpstring("Get a bounding box encapsulating all image data. Can be used as intput to GetFrame to avoid cropping.")]
+    HRESULT GetBoundingBox ([out,retval] Cart3dGeom * geom);
+
+    [helpstring("Retrieve color-map table for mapping image intensities to RGBx values.")]
+    HRESULT GetColorMap ([out,retval] unsigned int[256]);
+
+    [helpstring("")]
+    HRESULT GetECG ([out,retval] EcgSeries * ecg);
+
+    [helpstring("")]
+    HRESULT GetProbeInfo ([out,retval] ProbeInfo * probe);
+
+    [helpstring("Get per-file DICOM UID string (to be matched against corresponding file)")]
+    HRESULT GetSopInstanceUID ([out,retval] BSTR * uid_str);
+};
+
+
+[ object,
+  oleautomation, // use "automation" marshaler (oleaut32.dll)
+  uuid(CD30759B-EB38-4469-9CA5-4DF75737A31B),
+  helpstring("Factory for loading 3D image data from a file.")]
+interface IImage3dFileLoader : IUnknown {
+    [helpstring("Load proprietary image file. Returns an error message with details in case of failure.")]
+    HRESULT LoadFile ([in] BSTR file_name, [out, retval] BSTR * error_message);
+
+    HRESULT GetImageSource ([out,retval] IImage3dSource ** img_src);
+};
