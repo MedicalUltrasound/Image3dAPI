@@ -1,2 +1,2 @@
 # Image3dAPI
-API for inter-vendor exchange of 3D ultrasound data
+Draft version of API for inter-vendor exchange of 3D ultrasound data.
