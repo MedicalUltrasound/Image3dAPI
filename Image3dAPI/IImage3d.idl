@@ -48,7 +48,7 @@ typedef [
   uuid(74355329-DFEF-4BC0-9103-CF9579536FE3),
   helpstring("3D image data struct.")]
 struct Image3d {
-    [helpstring("")]                                                          double          time;
+    [helpstring("time [seconds]")]                                            double          time;
     [helpstring("")]                                                          ImageFormat     format;
     [helpstring("resolution (width, height, planes)")]                        unsigned short  dims[3];
     [helpstring("distance between each row [bytes] (>= width*element_size)")] unsigned short  stride0;
@@ -85,10 +85,10 @@ typedef [
   uuid(47B6CCBF-6D52-4615-B086-9D809D24E34B),
   helpstring("ECG time series. QRS trig times have to be calculated based on the samples.")]
 struct EcgSeries {
-    [helpstring("time of 1st sample")]
+    [helpstring("time of 1st sample [seconds]")]
     double           start_time;
 
-    [helpstring("time difference between each sample")]
+    [helpstring("time difference between each sample [seconds]")]
     double           delta_time;
 
     [helpstring("ECG sample waveform")]
