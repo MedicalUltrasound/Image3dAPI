@@ -101,8 +101,11 @@ struct EcgSeries {
   uuid(D483D815-52DD-4750-8CA2-5C6C489588B6),
   helpstring("Interface for retrieving 3D image data.")]
 interface IImage3dSource : IUnknown {
-    [helpstring("Get the number of images available")]
+    [helpstring("Get the number of frames available")]
     HRESULT GetFrameCount ([out,retval] unsigned int * size);
+
+    [helpstring("Get the time of all frames (useful for matching frame indices to ECG before retrieving image data) ")]
+    HRESULT GetFrameTimes ([out, retval] SAFEARRAY(double) * frame_times);
 
     [helpstring("Get image data (const) for a given frame within a specified geometry")]
     HRESULT GetFrame ([in] unsigned int index, [in] Cart3dGeom geom, [out,retval] Image3d * data);
