@@ -83,7 +83,7 @@ struct Cart3dGeom {
 
 typedef [
   uuid(47B6CCBF-6D52-4615-B086-9D809D24E34B),
-  helpstring("ECG time series. QRS trig times have to be calculated based on the samples.")]
+  helpstring("ECG time series.")]
 struct EcgSeries {
     [helpstring("time of 1st sample [seconds]")]
     double           start_time;
@@ -93,6 +93,9 @@ struct EcgSeries {
 
     [helpstring("ECG sample waveform")]
     SAFEARRAY(float) samples;
+
+    [helpstring("QRS trig time(s) within series [optional]")]
+    SAFEARRAY(double) trig_times;
 } EcgSeries;
 
 
@@ -116,7 +119,7 @@ interface IImage3dSource : IUnknown {
     [helpstring("Retrieve color-map table for mapping image intensities to RGBx values.")]
     HRESULT GetColorMap ([out,retval] unsigned int[256]);
 
-    [helpstring("Get ECG data if available (optional)")]
+    [helpstring("Get ECG data if available [optional]")]
     HRESULT GetECG ([out,retval] EcgSeries * ecg);
 
     [helpstring("")]
