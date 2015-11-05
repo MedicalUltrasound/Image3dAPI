@@ -3,8 +3,10 @@
    Copyright (c) 2015, GE Healthcare, Ultrasound.
    
 Design goals:
-* Avoid direct file I/O in loader to avoid file locking problems and enable sandboxing. Provide byte arrays containing file content instead of filename as input.
-* COM interface to ensure a stable ABI between compilers, support multiple programming languages natively and enable out-of-process loaders (for sandboxing).
+* Stable compiler-independent ABI.
+* Transfer of image data ownership across API (to avoid copying).
+* Support out-of-process loaders (for sandboxing).
+* Support multiple programming languages natively.
 
 */
 
