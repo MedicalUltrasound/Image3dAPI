@@ -134,10 +134,11 @@ interface IImage3dSource : IUnknown {
   oleautomation, // use "automation" marshaler (oleaut32.dll)
   uuid(CD30759B-EB38-4469-9CA5-4DF75737A31B),
   helpstring("Factory for loading 3D image data from a file.\n"
-             "Implementors are responsible for also providing details on DICOM tags that indicate that the loader might support the file.")]
+             "Implementors are responsible for also providing details on relevant DICOM tags that indicate that the loader might support the file.")]
 interface IImage3dFileLoader : IUnknown {
     [helpstring("Load proprietary image file.\n"
-                "Shall return quickly with an informative error message (for debugging) in case of failure.")]
+                "The file might already by opened elsewhere, so no exclusive locks can be taken.\n"
+                "The function shall return quickly with an informative error message (for debugging) in case of failure.")]
     HRESULT LoadFile ([in] BSTR file_name, [out, retval] BSTR * error_message);
 
     HRESULT GetImageSource ([out,retval] IImage3dSource ** img_src);
