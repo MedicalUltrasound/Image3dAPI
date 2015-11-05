@@ -116,7 +116,7 @@ interface IImage3dSource : IUnknown {
     [helpstring("Retrieve color-map table for mapping image intensities to RGBx values.")]
     HRESULT GetColorMap ([out,retval] unsigned int[256]);
 
-    [helpstring("")]
+    [helpstring("Get ECG data if available (optional)")]
     HRESULT GetECG ([out,retval] EcgSeries * ecg);
 
     [helpstring("")]
