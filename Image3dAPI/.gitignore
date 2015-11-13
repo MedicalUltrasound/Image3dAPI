@@ -1,2 +1,6 @@
 /x64
 /Win32
+/IImage3d.h
+/IImage3d_i.c
+/IImage3d_p.c
+/dlldata.c
