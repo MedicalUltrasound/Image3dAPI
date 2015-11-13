@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Image3dSource.hpp" />
+  </ItemGroup>
 </Project>
