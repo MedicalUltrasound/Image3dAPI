@@ -3,4 +3,7 @@
   <ItemGroup>
     <Midl Include="IImage3d.idl" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ComSupport.hpp" />
+  </ItemGroup>
 </Project>

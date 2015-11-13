@@ -1,3 +1,5 @@
 /.vs
 /Image3dAPI.sdf
 /*.opensdf
+/x64
+/Win32

@@ -140,6 +140,9 @@
   <ItemGroup>
     <Midl Include="IImage3d.idl" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ComSupport.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
