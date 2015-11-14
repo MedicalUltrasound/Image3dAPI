@@ -17,7 +17,7 @@ public:
     Image3dSource() {
     }
 
-    ~Image3dSource() {
+    /*NOT virtual*/ ~Image3dSource() {
     }
 
     HRESULT STDMETHODCALLTYPE GetFrameCount(/*[out]*/ unsigned int *size) {
