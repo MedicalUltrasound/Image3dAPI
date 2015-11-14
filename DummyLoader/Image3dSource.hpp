@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
 
@@ -14,7 +15,8 @@ uuid(6FA82ED5-6332-4344-8417-DEA55E72098C), ///< class ID (must be unique)
 helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
-    Image3dSource () : m_frame_count(1) {
+    Image3dSource () {
+        m_frame_times.push_back(3.14);
     }
 
     /*NOT virtual*/ ~Image3dSource () {
@@ -24,12 +26,22 @@ public:
         if (!size)
             return E_INVALIDARG;
 
-        *size = m_frame_count;
+        *size = static_cast<unsigned int>(m_frame_times.size());
         return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE GetFrameTimes (/*[out]*/ SAFEARRAY * *frame_times) {
-        return E_NOTIMPL;
+        if (!frame_times)
+            return E_INVALIDARG;
+
+        const unsigned int N = static_cast<unsigned int>(m_frame_times.size());
+        CComSafeArray<double> result(N);
+        double * time_arr = static_cast<double*>(result.m_psa->pvData);
+        for (unsigned int i = 0; i < N; ++i)
+            time_arr[i] = m_frame_times[i];
+
+        *frame_times = result.Detach();
+        return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, /*[out]*/ Image3d *data) {
@@ -57,5 +69,5 @@ public:
     }
 
 private:
-    unsigned int m_frame_count;
+    std::vector<double> m_frame_times;
 };
