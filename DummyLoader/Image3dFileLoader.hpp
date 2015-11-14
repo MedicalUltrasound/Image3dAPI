@@ -24,6 +24,11 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetImageSource(/*[out]*/ IImage3dSource **img_src) {
-        return E_NOTIMPL;
+        if (!img_src)
+            return E_INVALIDARG;
+        
+        CComPtr<Image3dSource> obj = CreateLocalInstance<Image3dSource>();
+        *img_src = obj.Detach();
+        return S_OK;
     }
 };
