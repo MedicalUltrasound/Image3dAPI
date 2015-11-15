@@ -80,10 +80,10 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, /*[out]*/ Image3d *data) {
-        if (index >= m_frames.size())
-            return E_BOUNDS;
         if (!data)
             return E_INVALIDARG;
+        if (index >= m_frames.size())
+            return E_BOUNDS;
 
         // return a copy
         *data = Image3dObj(m_frames[index]).Detach();
