@@ -76,7 +76,7 @@ struct Image3dObj : public Image3d {
         data = tmp.Detach();
     }
 
-    Image3dObj (Image3dObj && other) {
+    Image3dObj (const Image3dObj & other) {
         time    = other.time;
         format  = other.format;
         dims[0] = other.dims[0];
@@ -84,8 +84,7 @@ struct Image3dObj : public Image3d {
         dims[2] = other.dims[2];
         stride0 = other.stride0;
         stride1 = other.stride1;
-        data       = other.data;
-        other.data = nullptr;
+        data       = CComSafeArray<byte>(other.data).Detach();
     }
 
     ~Image3dObj () {
@@ -96,8 +95,13 @@ struct Image3dObj : public Image3d {
         }
     }
 
+    Image3d Detach () {
+        Image3d img = {time, format, dims[0], dims[1], dims[2], stride0, stride1, data};
+        data = nullptr;
+        return img;
+    }
+
 private:
-    Image3dObj (const Image3dObj &);              ///< non-copyable
     Image3dObj & operator = (const Image3dObj &); ///< non-assignable
 };
 

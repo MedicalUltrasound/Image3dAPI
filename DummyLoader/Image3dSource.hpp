@@ -57,7 +57,14 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, /*[out]*/ Image3d *data) {
-        return E_NOTIMPL;
+        if (index >= m_frames.size())
+            return E_BOUNDS;
+        if (!data)
+            return E_INVALIDARG;
+
+        // return a copy
+        *data = Image3dObj(m_frames[index]).Detach();
+        return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE GetBoundingBox (/*[out]*/ Cart3dGeom *geom) {
