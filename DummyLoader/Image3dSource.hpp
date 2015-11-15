@@ -17,10 +17,18 @@ helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
     Image3dSource () : m_probe(PROBE_THORAX, L"4V") {
-        unsigned short dims[] = { 12, 14, 16 };
-        std::vector<byte> img_buf(dims[0]*dims[1]*dims[2], 0);
-        Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
-        m_frames.push_back(std::move(tmp));
+        {
+            std::vector<float> samples;
+            std::vector<double> trig_times;
+            EcgSeriesObj ecg(0.0, 1e-3, samples, trig_times);
+            m_ecg = ecg;
+        }
+        {
+            unsigned short dims[] = { 12, 14, 16 };
+            std::vector<byte> img_buf(dims[0]*dims[1]*dims[2], 0);
+            Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
+            m_frames.push_back(std::move(tmp));
+        }
     }
 
     /*NOT virtual*/ ~Image3dSource () {
@@ -61,7 +69,12 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetECG (/*[out]*/ EcgSeries *ecg) {
-        return E_NOTIMPL;
+        if (!ecg)
+            return E_INVALIDARG;
+
+        // return a copy
+        *ecg = EcgSeriesObj(m_ecg).Detach();
+        return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE GetProbeInfo (/*[out]*/ ProbeInfo *probe) {
@@ -79,5 +92,6 @@ public:
 
 private:
     ProbeInfoObj            m_probe;
+    EcgSeriesObj            m_ecg;
     std::vector<Image3dObj> m_frames;
 };

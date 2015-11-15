@@ -110,6 +110,12 @@ struct EcgSeriesObj : public EcgSeries {
         trig_times = nullptr;
     }
 
+    EcgSeriesObj (const EcgSeriesObj & other) {
+        samples    = nullptr;
+        trig_times = nullptr;
+        operator = (other);
+    }
+
     EcgSeriesObj (double start, double delta, const std::vector<float> & _samples, const std::vector<double> & _trigs) {
         start_time = start;
         delta_time = delta;
@@ -143,7 +149,21 @@ struct EcgSeriesObj : public EcgSeries {
         }
     }
 
-private:
-    EcgSeriesObj (const EcgSeriesObj &);              ///< non-copyable
-    EcgSeriesObj & operator = (const EcgSeriesObj &); ///< non-assignable
+    EcgSeriesObj & operator = (const EcgSeriesObj & other) {
+        EcgSeriesObj::~EcgSeriesObj();
+
+        start_time = other.start_time;
+        delta_time = other.delta_time;
+        samples    = CComSafeArray<float>(other.samples).Detach();
+        trig_times = CComSafeArray<double>(other.trig_times).Detach();
+
+        return *this;
+    }
+
+    EcgSeries Detach() {
+        EcgSeries ecg = {start_time, delta_time, samples, trig_times};
+        samples    = nullptr;
+        trig_times = nullptr;
+        return ecg;
+    }
 };
