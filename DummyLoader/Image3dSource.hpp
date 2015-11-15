@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.hpp"
@@ -16,7 +17,10 @@ helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
     Image3dSource () {
-        m_frame_times.push_back(3.14);
+        unsigned short dims[] = { 12, 14, 16 };
+        std::vector<byte> img_buf(dims[0]*dims[1]*dims[2], 0);
+        Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
+        m_frames.push_back(std::move(tmp));
     }
 
     /*NOT virtual*/ ~Image3dSource () {
@@ -26,7 +30,7 @@ public:
         if (!size)
             return E_INVALIDARG;
 
-        *size = static_cast<unsigned int>(m_frame_times.size());
+        *size = static_cast<unsigned int>(m_frames.size());
         return S_OK;
     }
 
@@ -34,11 +38,11 @@ public:
         if (!frame_times)
             return E_INVALIDARG;
 
-        const unsigned int N = static_cast<unsigned int>(m_frame_times.size());
+        const unsigned int N = static_cast<unsigned int>(m_frames.size());
         CComSafeArray<double> result(N);
         double * time_arr = &result.GetAt(0);
         for (unsigned int i = 0; i < N; ++i)
-            time_arr[i] = m_frame_times[i];
+            time_arr[i] = m_frames[i].time;
 
         *frame_times = result.Detach();
         return S_OK;
@@ -69,5 +73,5 @@ public:
     }
 
 private:
-    std::vector<double> m_frame_times;
+    std::vector<Image3dObj> m_frames;
 };

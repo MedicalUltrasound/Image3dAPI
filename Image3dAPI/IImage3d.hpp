@@ -50,8 +50,8 @@ struct Image3dObj : public Image3d {
     }
 
     Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const std::vector<byte> & packed_input) {
-        time   = _time;
-        format = _format;
+        time    = _time;
+        format  = _format;
         dims[0] = _dims[0];
         dims[1] = _dims[1];
         dims[2] = _dims[2];
@@ -63,6 +63,18 @@ struct Image3dObj : public Image3d {
         for (size_t i = 0; i < packed_input.size(); ++i)
             buf[0] = packed_input[i];
         data = tmp.Detach();
+    }
+
+    Image3dObj (Image3dObj && other) {
+        time    = other.time;
+        format  = other.format;
+        dims[0] = other.dims[0];
+        dims[1] = other.dims[1];
+        dims[2] = other.dims[2];
+        stride0 = other.stride0;
+        stride1 = other.stride1;
+        data       = other.data;
+        other.data = nullptr;
     }
 
     ~Image3dObj () {
