@@ -16,7 +16,7 @@ uuid(6FA82ED5-6332-4344-8417-DEA55E72098C), ///< class ID (must be unique)
 helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
-    Image3dSource () {
+    Image3dSource () : m_probe(PROBE_THORAX, L"4V") {
         unsigned short dims[] = { 12, 14, 16 };
         std::vector<byte> img_buf(dims[0]*dims[1]*dims[2], 0);
         Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
@@ -65,7 +65,12 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetProbeInfo (/*[out]*/ ProbeInfo *probe) {
-        return E_NOTIMPL;
+        if (!probe)
+            return E_INVALIDARG;
+
+        // return a copy
+        *probe = ProbeInfoObj(m_probe).Detatch();
+        return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE GetSopInstanceUID (/*[out] */ BSTR *uid_str) {
@@ -73,5 +78,6 @@ public:
     }
 
 private:
+    ProbeInfoObj            m_probe;
     std::vector<Image3dObj> m_frames;
 };

@@ -25,6 +25,11 @@ struct ProbeInfoObj : public ProbeInfo {
         name = CComBSTR(static_cast<int>(_name.length()), _name.c_str()).Detach();
     }
 
+    ProbeInfoObj (const ProbeInfoObj & other) {
+        type = other.type;
+        name = CComBSTR(other.name).Detach();
+    }
+
     ~ProbeInfoObj () {
         if (name) {
             CComBSTR tmp;
@@ -33,8 +38,14 @@ struct ProbeInfoObj : public ProbeInfo {
         }
     }
 
+    ProbeInfo Detatch () {
+        ProbeInfo info = {type, name};
+        type = PROBE_UNKNOWN;
+        name = nullptr;
+        return info;
+    }
+
 private:
-    ProbeInfoObj (const ProbeInfoObj &);              ///< non-copyable
     ProbeInfoObj & operator = (const ProbeInfoObj &); ///< non-assignable
 };
 
