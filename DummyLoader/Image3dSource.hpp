@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
-#include "../Image3dAPI/IImage3d.h"
+#include "../Image3dAPI/IImage3d.hpp"
 
 
 

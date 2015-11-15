@@ -162,6 +162,7 @@ xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComSupport.hpp" />
+    <ClInclude Include="IImage3d.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
