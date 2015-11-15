@@ -36,7 +36,7 @@ public:
 
         const unsigned int N = static_cast<unsigned int>(m_frame_times.size());
         CComSafeArray<double> result(N);
-        double * time_arr = static_cast<double*>(result.m_psa->pvData);
+        double * time_arr = &result.GetAt(0);
         for (unsigned int i = 0; i < N; ++i)
             time_arr[i] = m_frame_times[i];
 
