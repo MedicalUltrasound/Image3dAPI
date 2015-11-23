@@ -47,8 +47,17 @@ public:
             }
         }
         {
-            unsigned short dims[] = {12, 14, 16};
-            std::vector<byte> img_buf(dims[0]*dims[1]*dims[2], 0);
+            // geometry          X     Y    Z
+            Cart3dGeom geom = {-0.1f,-0.1f, 0,     // origin
+                                0.2f, 0,    0,     // dir1
+                                0,    0.2f, 0,     // dir2
+                                0,    0,    0.2f };// dir2
+            m_geom = geom;
+        }
+        {
+            // image data
+            unsigned short dims[] = { 12, 14, 16 };
+            std::vector<byte> img_buf(dims[0] * dims[1] * dims[2], 0);
             Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
             m_frames.push_back(std::move(tmp));
         }
@@ -85,17 +94,23 @@ public:
         if (index >= m_frames.size())
             return E_BOUNDS;
 
+        // \todo: Implement cropping of output image, based on input geom
+
         // return a copy
         *data = Image3dObj(m_frames[index]).Detach();
         return S_OK;
     }
 
     HRESULT STDMETHODCALLTYPE GetBoundingBox (/*[out]*/ Cart3dGeom *geom) {
-        return E_NOTIMPL;
+        if (!geom)
+            return E_INVALIDARG;
+
+        *geom = m_geom;
+        return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE GetColorMap (/*[out]*/ unsigned int __MIDL__IImage3dSource0000[256]) {
-        memcpy(__MIDL__IImage3dSource0000, m_color_map, sizeof(m_color_map));
+    HRESULT STDMETHODCALLTYPE GetColorMap (/*[out]*/ unsigned int color_map[256]) {
+        memcpy(color_map, m_color_map, sizeof(m_color_map));
         return S_OK;
     }
 
@@ -125,5 +140,6 @@ private:
     ProbeInfoObj            m_probe;
     EcgSeriesObj            m_ecg;
     unsigned int            m_color_map[256];
+    Cart3dGeom              m_geom;
     std::vector<Image3dObj> m_frames;
 };
