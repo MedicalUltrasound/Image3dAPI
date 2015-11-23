@@ -112,8 +112,13 @@ public:
 
         // \todo: Implement cropping of output image, based on input geom
 
-        // return a copy
-        *data = Image3dObj(m_frames[index]).Detach();
+        // return image data
+#ifdef _WINDLL
+        bool deep_copy = false; // don't copy when running in-process
+#else
+        bool deep_copy = true; // copy when communicating out-of-process
+#endif
+        *data = Image3dObj(m_frames[index], deep_copy).Detach();
         return S_OK;
     }
 

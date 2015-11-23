@@ -76,7 +76,7 @@ struct Image3dObj : public Image3d {
         data = tmp.Detach();
     }
 
-    Image3dObj (const Image3dObj & other) {
+    Image3dObj (const Image3dObj & other, bool deep_copy = true) {
         time    = other.time;
         format  = other.format;
         dims[0] = other.dims[0];
@@ -84,7 +84,18 @@ struct Image3dObj : public Image3d {
         dims[2] = other.dims[2];
         stride0 = other.stride0;
         stride1 = other.stride1;
-        data       = CComSafeArray<byte>(other.data).Detach();
+
+        if (deep_copy) {
+            // do a full copy of the image data
+            data = CComSafeArray<byte>(other.data).Detach();
+        } else {
+            // make shallow copy that accesses the same data
+            // this means that object lifetime is controlled by the parent "other" object
+            CHECK(SafeArrayAllocDescriptorEx(VT_UI1, 1, &data));
+            data = other.data;
+            // prevent data from being deleted
+            data->fFeatures |= (FADF_AUTO | FADF_FIXEDSIZE);
+        }
     }
 
     ~Image3dObj () {
