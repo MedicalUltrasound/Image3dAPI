@@ -65,7 +65,7 @@ public:
                         bool even_y = (y/2 % 2) == 0;
                         bool even_z = (z/2 % 2) == 0;
 
-                        byte & out_sample = img_buf[x + y*dims[0] + y*dims[0]*dims[1]];
+                        byte & out_sample = img_buf[x + y*dims[0] + z*dims[0]*dims[1]];
                         if (even_x ^ even_y ^ even_z)
                             out_sample = 255;
                         else
