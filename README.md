@@ -3,3 +3,4 @@ Draft version of API for inter-vendor exchange of 3D ultrasound data.
 
 ## Backlog
 * Extend IImage3dSource::GetFrame() with an extra "max_res" argument.
+* Add sanity check for frame time spacing to detect missing frames.
