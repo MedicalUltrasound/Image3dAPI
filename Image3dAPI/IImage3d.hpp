@@ -144,12 +144,12 @@ struct EcgSeriesObj : public EcgSeries {
 
     ~EcgSeriesObj () {
         if (samples) {
-            CComSafeArray<byte> tmp;
+            CComSafeArray<float> tmp;
             CHECK(tmp.Attach(samples));
             samples = nullptr;
         }
         if (trig_times) {
-            CComSafeArray<byte> tmp;
+            CComSafeArray<double> tmp;
             CHECK(tmp.Attach(trig_times));
             trig_times = nullptr;
         }
