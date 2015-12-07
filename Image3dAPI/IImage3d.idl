@@ -113,7 +113,7 @@ interface IImage3dSource : IUnknown {
     HRESULT GetFrameTimes ([out, retval] SAFEARRAY(double) * frame_times);
 
     [helpstring("Get image data (const) for a given frame within a specified geometry")]
-    HRESULT GetFrame ([in] unsigned int index, [in] Cart3dGeom geom, [out,retval] Image3d * data);
+    HRESULT GetFrame ([in] unsigned int index, [in] Cart3dGeom geom, [in] unsigned short max_resolution[3], [out,retval] Image3d * data);
 
     [helpstring("Get a bounding box encapsulating all image data. Can be used as intput to GetFrame to avoid cropping.")]
     HRESULT GetBoundingBox ([out,retval] Cart3dGeom * geom);

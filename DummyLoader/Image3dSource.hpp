@@ -104,7 +104,7 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, /*[out]*/ Image3d *data) {
+    HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*[out]*/ Image3d *data) {
         if (!data)
             return E_INVALIDARG;
         if (index >= m_frames.size())
