@@ -103,6 +103,10 @@ struct Image3dObj : public Image3d {
         }
     }
 
+    const byte * DataPtr () const {
+        return (const byte*)data->pvData;
+    }
+
     Image3d Detach () {
         Image3d img = {time, format, dims[0], dims[1], dims[2], stride0, stride1, data};
         data = nullptr;
