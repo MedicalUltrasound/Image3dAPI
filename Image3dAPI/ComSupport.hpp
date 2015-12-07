@@ -52,10 +52,11 @@ extern "C" void SetOaNoCache();
 /** RAII class for COM initialization. */
 class ComInitialize {
 public:
-    ComInitialize(COINIT apartment /*= COINIT_MULTITHREADED*/) {
+    ComInitialize (COINIT apartment /*= COINIT_MULTITHREADED*/) : m_initialized(false) {
+        // REF: https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279.aspx
         HRESULT hr = CoInitializeEx(NULL, apartment);
-        if (FAILED(hr))
-            throw std::logic_error("COM initialization failed.");
+        if (SUCCEEDED(hr))
+            m_initialized = true;
 
 #ifdef _DEBUG
         SetOaNoCache();
@@ -63,8 +64,12 @@ public:
     }
 
     ~ComInitialize() {
-        CoUninitialize();
+        if (m_initialized)
+            CoUninitialize();
     }
+
+private:
+    bool m_initialized; ///< must uninitialize in dtor
 };
 
 
