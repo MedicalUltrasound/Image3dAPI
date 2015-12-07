@@ -86,8 +86,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>regsvr32 /s $(TargetPath)</Command>
-      <Message>echo Registering DLL</Message>
+      <Command>IF $(ConfigurationType) == DynamicLibrary (
+  echo Registering DLL...
+  regsvr32 /s $(TargetPath)
+) ELSE (
+  echo Registering EXE...
+  $(TargetPath) /regserver
+)
+</Command>
+      <Message>echo Registering component</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -100,8 +107,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>regsvr32 /s $(TargetPath)</Command>
-      <Message>echo Registering DLL</Message>
+      <Command>IF $(ConfigurationType) == DynamicLibrary (
+  echo Registering DLL...
+  regsvr32 /s $(TargetPath)
+) ELSE (
+  echo Registering EXE...
+  $(TargetPath) /regserver
+)
+</Command>
+      <Message>echo Registering component</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,8 +132,15 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>regsvr32 /s $(TargetPath)</Command>
-      <Message>echo Registering DLL</Message>
+      <Command>IF $(ConfigurationType) == DynamicLibrary (
+  echo Registering DLL...
+  regsvr32 /s $(TargetPath)
+) ELSE (
+  echo Registering EXE...
+  $(TargetPath) /regserver
+)
+</Command>
+      <Message>echo Registering component</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,8 +157,15 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>regsvr32 /s $(TargetPath)</Command>
-      <Message>echo Registering DLL</Message>
+      <Command>IF $(ConfigurationType) == DynamicLibrary (
+  echo Registering DLL...
+  regsvr32 /s $(TargetPath)
+) ELSE (
+  echo Registering EXE...
+  $(TargetPath) /regserver
+)
+</Command>
+      <Message>echo Registering component</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
