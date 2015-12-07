@@ -69,10 +69,7 @@ struct Image3dObj : public Image3d {
         stride0 = dims[0]*ImageFormatSize(_format);
         stride1 = stride0*dims[1];
 
-        CComSafeArray<byte> tmp(static_cast<unsigned long>(packed_input.size()));
-        byte * buf = &tmp.GetAt(0);
-        for (size_t i = 0; i < packed_input.size(); ++i)
-            buf[0] = packed_input[i];
+        CComSafeArray<byte> tmp = ConvertToSafeArray(packed_input);
         data = tmp.Detach();
     }
 
@@ -136,17 +133,11 @@ struct EcgSeriesObj : public EcgSeries {
         delta_time = delta;
         
         {
-            CComSafeArray<float> tmp(static_cast<unsigned int>(_samples.size()));
-            float * buf = &tmp.GetAt(0);
-            for (size_t i = 0; i < _samples.size(); ++i)
-                buf[i] = _samples[i];
+            CComSafeArray<float> tmp = ConvertToSafeArray(_samples);
             samples = tmp.Detach();
         }
         {
-            CComSafeArray<double> tmp(static_cast<unsigned int>(_trigs.size()));
-            double * buf = &tmp.GetAt(0);
-            for (size_t i = 0; i < _trigs.size(); ++i)
-                buf[i] = _trigs[i];
+            CComSafeArray<double> tmp = ConvertToSafeArray(_trigs);
             trig_times = tmp.Detach();
         }
     }

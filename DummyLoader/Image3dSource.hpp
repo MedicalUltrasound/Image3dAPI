@@ -96,9 +96,11 @@ public:
 
         const unsigned int N = static_cast<unsigned int>(m_frames.size());
         CComSafeArray<double> result(N);
-        double * time_arr = &result.GetAt(0);
-        for (unsigned int i = 0; i < N; ++i)
-            time_arr[i] = m_frames[i].time;
+        if (N > 0) {
+            double * time_arr = &result.GetAt(0);
+            for (unsigned int i = 0; i < N; ++i)
+                time_arr[i] = m_frames[i].time;
+        }
 
         *frame_times = result.Detach();
         return S_OK;

@@ -14,7 +14,7 @@ Copyright (c) 2015, GE Vingmed Ultrasound.           */
 
 
 /** Converts unicode string to ASCII */
-static inline std::string ToAscii(const std::wstring& w_str) {
+static inline std::string ToAscii (const std::wstring& w_str) {
 #pragma warning(push)
 #pragma warning(disable: 4996) // function or variable may be unsafe
     size_t N = w_str.size();
@@ -29,7 +29,7 @@ static inline std::string ToAscii(const std::wstring& w_str) {
 
 
 /** Translate COM HRESULT failure into exceptions. */
-static void CHECK(HRESULT hr) {
+static void CHECK (HRESULT hr) {
     if (FAILED(hr)) {
         _com_error err(hr);
 #ifdef _UNICODE
@@ -84,4 +84,29 @@ static CComPtr<T> CreateLocalInstance() {
 
     // move into smart-ptr (will incr. ref. count to one)
     return CComPtr<T>(tmp);
+}
+
+
+/** Convert SafeArray to a std::vector. */
+template <class T>
+static std::vector<T> ConvertToVector (const CComSafeArray<T> & input) {
+    std::vector<T> result(input.GetCount());
+    if (result.size() > 0) {
+        const T * in_ptr = &input.GetAt(0); // will fail if empty
+        for (size_t i = 0; i < result.size(); ++i)
+            result[i] = in_ptr[i];
+    }
+    return result;
+}
+
+/** Convert std::vector to  SafeArray. */
+template <class T>
+static CComSafeArray<T> ConvertToSafeArray (const std::vector<T> & input) {
+    CComSafeArray<T> result(static_cast<unsigned long>(input.size()));
+    if (input.size() > 0) {
+        T * out_ptr = &result.GetAt(0); // will fail if empty
+        for (size_t i = 0; i < input.size(); ++i)
+            out_ptr[i] = input[i];
+    }
+    return result;
 }
