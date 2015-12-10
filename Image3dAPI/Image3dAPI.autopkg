@@ -1,0 +1,35 @@
+nuget {
+    nuspec {
+        id: Image3dAPI;
+        tags: { image3dapi, native };
+        title: Image3dAPI;
+        authors: "GE Ultrasound (GE Healthcare)";
+        projectUrl: "<<SOURCE-URL>>";
+
+        licenseUrl: "http://PROPRIETARY_LICENSE" ;
+        iconUrl: "ttp://www.ge.com/sites/all/themes/ge_2012/favicon.ico" ;
+        requireLicenseAcceptance: false;
+        summary: "Cross-vendor APIs for 3D ultrasound image data." ;
+        description: "COM APIs for cross-vendor exchange of 3D ultrasound image data.";
+        
+        // information that changes with each release
+        owners: "Fredrik Orderud";
+        version: <<VERSION>>;
+
+        releaseNotes: "changelog in docs/changelog.txt";
+        copyright: Copyright 2015;
+    };
+
+    files {
+        // header files (nestedInclude to deal with "Image3dAPI" subfolder)
+        nestedInclude: {
+            #destination = ${d_include}Image3dAPI;
+            ComSupport.hpp,
+            IImage3d.idl,    IImage3d.h, IImage3d_i.c, IImage3d_p.c,
+            IImage3d.hpp
+        };
+
+        // documentation files
+        docs: changelog.txt;
+    };
+};
