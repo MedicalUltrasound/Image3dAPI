@@ -1,4 +1,6 @@
 #pragma once
+#define _USE_MATH_DEFINES // for M_PI
+#include <cmath>
 #include <memory>
 #include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
@@ -34,9 +36,18 @@ class Image3dSource : public IImage3dSource {
 public:
     Image3dSource () : m_probe(PROBE_THORAX, L"4V") {
         {
-            std::vector<float> samples;
+            // simulate sine-wave ECG
+            const size_t N = 128;
+            std::vector<float> samples(N);
+            for (size_t i = 0; i < N; ++i)
+                samples.push_back(sin(4*i*M_PI/N));
+
             std::vector<double> trig_times;
-            EcgSeriesObj ecg(0.0, 1e-3, samples, trig_times);
+            trig_times.push_back(0.0); // trig every 1/2 sec
+            trig_times.push_back(0.5);
+            trig_times.push_back(1.0);
+
+            EcgSeriesObj ecg(0.0, 1.0, samples, trig_times); // 1 sec interval
             m_ecg = ecg;
         }
         {
