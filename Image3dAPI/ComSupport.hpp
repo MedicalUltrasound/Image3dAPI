@@ -1,6 +1,6 @@
 /* "Plugin API" convenience functions.
 Designed by Fredrik Orderud <fredrik.orderud@ge.com>.
-Copyright (c) 2015, GE Vingmed Ultrasound.           */
+Copyright (c) 2016, GE Healthcare, Ultrasound.           */
 #pragma once
 
 #include <stdexcept>

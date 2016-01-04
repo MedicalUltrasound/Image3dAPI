@@ -1,3 +1,7 @@
+/* Dummy test loader for the "3D API".
+Designed by Fredrik Orderud <fredrik.orderud@ge.com>.
+Copyright (c) 2016, GE Healthcare, Ultrasound.      */
+
 #include "Image3dSource.hpp"
 #include "Image3dFileLoader.hpp"
 

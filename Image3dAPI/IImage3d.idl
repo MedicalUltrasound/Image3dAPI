@@ -1,13 +1,12 @@
 /* "3D API" interface header.
    Designed by Fredrik Orderud <fredrik.orderud@ge.com>.
-   Copyright (c) 2015, GE Healthcare, Ultrasound.
+   Copyright (c) 2016, GE Healthcare, Ultrasound.
    
 Design goals:
-* Stable compiler-independent ABI.
-* Transfer of image data ownership across API (to avoid copying).
+* Stable compiler-independent ABI (binary API).
+* Support transfer of image data ownership across API (to avoid copying).
 * Support out-of-process loaders (for sandboxing).
 * Support multiple programming languages natively.
-
 */
 
 /* Interfaces and data structures for exchanging image data. */

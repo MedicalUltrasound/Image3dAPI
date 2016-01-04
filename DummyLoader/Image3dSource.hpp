@@ -1,4 +1,8 @@
+/* Dummy test loader for the "3D API".
+Designed by Fredrik Orderud <fredrik.orderud@ge.com>.
+Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 #pragma once
+
 #define _USE_MATH_DEFINES // for M_PI
 #include <cmath>
 #include <memory>
