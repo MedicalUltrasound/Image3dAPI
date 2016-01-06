@@ -3,7 +3,9 @@ set NUGET_REPO=%1
 
 set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
-set AUTOPKG_FILE=Image3dAPI.autopkg
+set AUTOPKG_FILE=..\PackagingGE\Image3dAPI.autopkg
+
+cd ..\Image3dAPI
 
 echo Building project:
 msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" Image3dAPI.vcxproj
@@ -14,7 +16,7 @@ git describe --abbrev=0 --tags > PREV_TAG.txt
 set /p PREV_TAG=< PREV_TAG.txt
 
 echo Creating new GIT tag:
-python.exe DetermineNextTag.py minor > NEW_TAG.txt
+python.exe ..\PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 set /p NEW_TAG=< NEW_TAG.txt
 git tag %NEW_TAG%
@@ -27,7 +29,7 @@ git log %PREV_TAG%..%NEW_TAG% --decorate --graph --stat > changelog.txt
 
 
 echo Update NuGet package version and project URL:
-python.exe SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.build.ge.com/CardiovascularUltrasound/Image3dAPI/tree/%NEW_TAG%
+python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.build.ge.com/CardiovascularUltrasound/Image3dAPI/tree/%NEW_TAG%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 
