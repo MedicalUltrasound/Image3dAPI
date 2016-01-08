@@ -38,7 +38,9 @@ echo Package NuGet package
 powershell -NonInteractive Write-NuGetPackage %AUTOPKG_FILE%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
-if NOT DEFINED NUGET_REPO exit /B 1
+:: Skip server push when no NuGet repo is provided
+if NOT DEFINED NUGET_REPO exit /B 0
+
 echo Publish NuGet package
 %LOCALAPPDATA%\NuGet\Nuget.exe push *.nupkg -Source %NUGET_REPO% -Timeout 601
 IF %ERRORLEVEL% NEQ 0 exit /B 1
