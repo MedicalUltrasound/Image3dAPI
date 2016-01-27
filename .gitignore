@@ -3,3 +3,5 @@
 /*.opensdf
 /x64
 /Win32
+/DummyLoader/vc110.tlb
+/DummyLoader/vc110.idl
