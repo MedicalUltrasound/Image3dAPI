@@ -89,6 +89,14 @@ public:
                 }
             }
 
+            for (unsigned int y = 0; y < dims[1]; ++y) {
+                for (unsigned int x = 0; x < dims[0]; ++x) {
+                    unsigned int z = 0;
+                    byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
+                    out_sample = 255; // Plane closest to probe is gray.
+                }
+            }
+
             Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
             m_frames.push_back(std::move(tmp));
         }
