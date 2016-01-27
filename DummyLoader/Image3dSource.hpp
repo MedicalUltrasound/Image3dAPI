@@ -63,10 +63,10 @@ public:
         }
         {
             // geometry          X     Y    Z
-            Cart3dGeom geom = {-0.2f,-0.1f, 0,     // origin
-                                0.4f, 0,    0,     // dir1
-                                0,    0.2f, 0,     // dir2
-                                0,    0,    0.1f };// dir2
+            Cart3dGeom geom = {-0.1f,-0.075f,  0,     // origin
+                                0.2f, 0,       0,     // dir1
+                                0,    0.15f,   0,     // dir2
+                                0,    0,       0.1f };// dir2
             m_geom = geom;
         }
         {
