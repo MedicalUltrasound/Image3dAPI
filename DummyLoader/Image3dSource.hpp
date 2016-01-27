@@ -63,10 +63,10 @@ public:
         }
         {
             // geometry          X     Y    Z
-            Cart3dGeom geom = {-0.1f,-0.1f, 0,     // origin
-                                0.2f, 0,    0,     // dir1
-                                0,    0.2f, 0,     // dir2
-                                0,    0,    0.2f };// dir2
+            Cart3dGeom geom = {-0.1f,-0.075f,  0,     // origin
+                                0.2f, 0,       0,     // dir1
+                                0,    0.15f,   0,     // dir2
+                                0,    0,       0.1f };// dir2
             m_geom = geom;
         }
         {
@@ -86,6 +86,14 @@ public:
                         else
                             out_sample = 0;
                     }
+                }
+            }
+
+            for (unsigned int y = 0; y < dims[1]; ++y) {
+                for (unsigned int x = 0; x < dims[0]; ++x) {
+                    unsigned int z = 0;
+                    byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
+                    out_sample = 255; // Plane closest to probe is gray.
                 }
             }
 
