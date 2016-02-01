@@ -47,11 +47,11 @@ struct ProbeInfo {
 
 typedef [
   uuid(74355329-DFEF-4BC0-9103-CF9579536FE3),
-  helpstring("3D image data struct. Data buffer might not be packed.")]
+  helpstring("3D image data struct. Stored in row-major order. The data buffer might be padded between rows due to alignment needs.")]
 struct Image3d {
     [helpstring("time [seconds]")]                                            double          time;
     [helpstring("")]                                                          ImageFormat     format;
-    [helpstring("resolution (width, height, planes)")]                        unsigned short  dims[3];
+    [helpstring("resolution (width/columns, height/rows, planes)")]           unsigned short  dims[3];
     [helpstring("distance between each row [bytes] (>= width*element_size)")] unsigned short  stride0;
     [helpstring("distance between each plane [bytes] (>= height*stride0)")]   unsigned short  stride1;
     [helpstring("underlying 1D image buffer (size >= planes*stride1)")]       SAFEARRAY(byte) data;
