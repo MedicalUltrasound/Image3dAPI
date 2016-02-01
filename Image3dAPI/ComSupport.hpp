@@ -3,6 +3,7 @@ Designed by Fredrik Orderud <fredrik.orderud@ge.com>.
 Copyright (c) 2016, GE Healthcare, Ultrasound.           */
 #pragma once
 
+#include <vector>
 #include <stdexcept>
 #include <cassert>
 #include <comdef.h>
