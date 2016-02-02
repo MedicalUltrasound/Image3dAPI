@@ -3,12 +3,12 @@ set NUGET_REPO=%1
 
 set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
-set AUTOPKG_FILE=..\PackagingGE\Image3dAPI.autopkg
+set AUTOPKG_FILE=..\PackagingGE\DummyLoader.autopkg
 
-cd ..\Image3dAPI
+cd ..\DummyLoader
 
 echo Building project:
-msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" Image3dAPI.vcxproj
+msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" DummyLoader.vcxproj
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 echo Determine previous tag:
@@ -29,7 +29,7 @@ git log %PREV_TAG%..%NEW_TAG% --decorate --graph --stat > changelog.txt
 
 
 echo Update NuGet package version and project URL:
-python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.com/MedicalUltrasound/Image3dAPI/tree/%NEW_TAG%
+python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.com/MedicalUltrasound/DummyLoader/tree/%NEW_TAG%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 
