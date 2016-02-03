@@ -32,5 +32,12 @@ nuget {
 
         // documentation files
         docs: ../DummyLoader/changelog.txt;
+
+        // binaries
+        [x86,v110,debug] { 
+            lib:     ..\Win32\Debug\DummyLoaderD.lib;
+            symbols: ..\Win32\Debug\DummyLoaderD.pdb;
+            bin:     ..\Win32\Debug\DummyLoaderD.dll;
+        };
     };
 };
