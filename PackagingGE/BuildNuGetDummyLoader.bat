@@ -29,7 +29,7 @@ git log %PREV_TAG%..%NEW_TAG% --decorate --graph --stat > changelog.txt
 
 
 echo Update NuGet package version and project URL:
-python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.com/MedicalUltrasound/DummyLoader/tree/%NEW_TAG%
+python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.com/MedicalUltrasound/Image3dApi/tree/%NEW_TAG%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 
