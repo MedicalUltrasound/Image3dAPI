@@ -10,6 +10,12 @@ cd ..\DummyLoader
 echo Building project:
 msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" DummyLoader.vcxproj
 IF %ERRORLEVEL% NEQ 0 exit /B 1
+msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Release";Platform="x64" DummyLoader.vcxproj
+IF %ERRORLEVEL% NEQ 0 exit /B 1
+msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="Win32" DummyLoader.vcxproj
+IF %ERRORLEVEL% NEQ 0 exit /B 1
+msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Release";Platform="Win32" DummyLoader.vcxproj
+IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 echo Determine previous tag:
 git describe --abbrev=0 --tags > PREV_TAG.txt

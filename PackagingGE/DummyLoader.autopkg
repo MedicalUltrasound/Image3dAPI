@@ -39,5 +39,23 @@ nuget {
             symbols: ..\Win32\Debug\DummyLoaderD.pdb;
             bin:     ..\Win32\Debug\DummyLoaderD.dll;
         };
+
+        [x86,v110,release] { 
+            lib:     ..\Win32\Release\DummyLoader.lib;
+            symbols: ..\Win32\Release\DummyLoader.pdb;
+            bin:     ..\Win32\Release\DummyLoader.dll;
+        };
+
+        [x64,v110,debug] { 
+            lib:     ..\x64\Debug\DummyLoaderD.lib;
+            symbols: ..\x64\Debug\DummyLoaderD.pdb;
+            bin:     ..\x64\Debug\DummyLoaderD.dll;
+        };
+
+        [x64,v110,release] { 
+            lib:     ..\x64\Release\DummyLoader.lib;
+            symbols: ..\x64\Release\DummyLoader.pdb;
+            bin:     ..\x64\Release\DummyLoader.dll;
+        };
     };
 };
