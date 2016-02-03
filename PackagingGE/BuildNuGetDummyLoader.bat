@@ -1,7 +1,7 @@
 @echo off
 set NUGET_REPO=%1
 
-set PATH=%PATH%;C:\Python27
+set PATH=C:\Python27;%PATH%
 set PATH=%PATH%;"C:\Program Files\Git\bin"
 set AUTOPKG_FILE=..\PackagingGE\DummyLoader.autopkg
 
