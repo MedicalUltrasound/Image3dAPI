@@ -5,3 +5,9 @@
 /Win32
 /DummyLoader/vc110.tlb
 /DummyLoader/vc110.idl
+DummyLoader/DummyLoader.redist.0.2.nupkg
+DummyLoader/DummyLoader.symbols.0.2.nupkg
+DummyLoader/NEW_TAG.txt
+DummyLoader/PREV_TAG.txt
+DummyLoader/changelog.txt
+DummyLoader/DummyLoader.0.2.nupkg
