@@ -97,7 +97,7 @@ public:
                 }
             }
 
-            Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf);
+            Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf.data(), img_buf.size());
             m_frames.push_back(std::move(tmp));
         }
     }

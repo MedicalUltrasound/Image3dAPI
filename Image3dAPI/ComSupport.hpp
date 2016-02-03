@@ -100,13 +100,13 @@ static std::vector<T> ConvertToVector (const CComSafeArray<T> & input) {
     return result;
 }
 
-/** Convert std::vector to  SafeArray. */
+/** Convert raw array to SafeArray. */
 template <class T>
-static CComSafeArray<T> ConvertToSafeArray (const std::vector<T> & input) {
-    CComSafeArray<T> result(static_cast<unsigned long>(input.size()));
-    if (input.size() > 0) {
+static CComSafeArray<T> ConvertToSafeArray (const T * input, size_t element_count) {
+    CComSafeArray<T> result(static_cast<unsigned long>(element_count));
+    if (element_count > 0) {
         T * out_ptr = &result.GetAt(0); // will fail if empty
-        for (size_t i = 0; i < input.size(); ++i)
+        for (size_t i = 0; i < element_count; ++i)
             out_ptr[i] = input[i];
     }
     return result;

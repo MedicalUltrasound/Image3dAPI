@@ -63,7 +63,7 @@ struct Image3dObj : public Image3d {
         data    = nullptr;
     }
 
-    Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const std::vector<byte> & packed_input) {
+    Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const byte * in_buf, size_t buf_size) {
         time    = _time;
         format  = _format;
         dims[0] = _dims[0];
@@ -72,7 +72,7 @@ struct Image3dObj : public Image3d {
         stride0 = dims[0]*ImageFormatSize(_format);
         stride1 = stride0*dims[1];
 
-        CComSafeArray<byte> tmp = ConvertToSafeArray(packed_input);
+        CComSafeArray<byte> tmp = ConvertToSafeArray(in_buf, buf_size);
         data = tmp.Detach();
     }
 
@@ -140,11 +140,11 @@ struct EcgSeriesObj : public EcgSeries {
         delta_time = delta;
         
         {
-            CComSafeArray<float> tmp = ConvertToSafeArray(_samples);
+            CComSafeArray<float> tmp = ConvertToSafeArray(_samples.data(), _samples.size());
             samples = tmp.Detach();
         }
         {
-            CComSafeArray<double> tmp = ConvertToSafeArray(_trigs);
+            CComSafeArray<double> tmp = ConvertToSafeArray(_trigs.data(), _trigs.size());
             trig_times = tmp.Detach();
         }
     }
