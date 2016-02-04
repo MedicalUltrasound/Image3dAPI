@@ -1,5 +1,5 @@
 @echo off
-set NUGET_REPO=%1
+set PRIMARY_NUGET_REPO=%1
 
 set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
@@ -20,7 +20,7 @@ python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 set /p NEW_TAG=< NEW_TAG.txt
 git tag %NEW_TAG%
-if DEFINED NUGET_REPO (
+if DEFINED PRIMARY_NUGET_REPO (
   git push origin %NEW_TAG%
 )
 
@@ -28,7 +28,7 @@ echo Generating changelog (with tag decoration, graph and change stats):
 git log %PREV_TAG%..%NEW_TAG% --decorate --graph --stat > changelog.txt
 
 pushd Image3dApi
-CALL ..\PackagingGE\PackagePublishNuget.bat %AUTOPKG_FILE% %NEW_TAG% %NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat %AUTOPKG_FILE% %NEW_TAG% %PRIMARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
