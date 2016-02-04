@@ -27,22 +27,7 @@ if DEFINED NUGET_REPO (
 echo Generating changelog (with tag decoration, graph and change stats):
 git log %PREV_TAG%..%NEW_TAG% --decorate --graph --stat > changelog.txt
 
-
-echo Update NuGet package version and project URL:
-python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %NEW_TAG% https://github.com/MedicalUltrasound/Image3dAPI/tree/%NEW_TAG%
-IF %ERRORLEVEL% NEQ 0 exit /B 1
-
-
-echo Package NuGet package
-::powershell -NonInteractive Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-powershell -NonInteractive Write-NuGetPackage %AUTOPKG_FILE%
-IF %ERRORLEVEL% NEQ 0 exit /B 1
-
-:: Skip server push when no NuGet repo is provided
-if NOT DEFINED NUGET_REPO exit /B 0
-
-echo Publish NuGet package
-%LOCALAPPDATA%\NuGet\Nuget.exe push *.nupkg -Source %NUGET_REPO% -Timeout 601
+CALL ../PackagingGE/PackagePublishNuget.bat %AUTOPKG_FILE% %NEW_TAG% %NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 echo [done]
