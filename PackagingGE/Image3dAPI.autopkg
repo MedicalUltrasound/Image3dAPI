@@ -24,12 +24,12 @@ nuget {
         // header files (nestedInclude to deal with "Image3dAPI" subfolder)
         nestedInclude: {
             #destination = ${d_include}Image3dAPI;
-            ComSupport.hpp,
-            IImage3d.idl,    IImage3d.h, IImage3d_i.c, IImage3d_p.c,
-            IImage3d.hpp
+            ../Image3dApi/ComSupport.hpp,
+            ../Image3dApi/IImage3d.idl, ../Image3dApi/IImage3d.h, ../Image3dApi/IImage3d_i.c, ../Image3dApi/IImage3d_p.c,
+            ../Image3dApi/IImage3d.hpp
         };
 
         // documentation files
-        docs: changelog.txt;
+        docs: ../changelog.txt;
     };
 };
