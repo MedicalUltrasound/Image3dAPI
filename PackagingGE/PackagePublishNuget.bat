@@ -4,7 +4,7 @@ set VERSION_NUMBER=%2
 set NUGET_REPO=%3
 
 :: Change NuGet packaging version and project URL
-python.exe ..\nuget\SetAutopkgVersion.py %AUTOPKG_FILE% %VERSION_NUMBER% https://github.build.ge.com/Ultrasound/UsImage/tree/%VERSION_NUMBER% packages.config
+python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %VERSION_NUMBER% https://github.build.ge.com/Ultrasound/Image3dApi/tree/%VERSION_NUMBER% 
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 :: Package artifacts
