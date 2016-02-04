@@ -43,7 +43,7 @@ IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
 pushd DummyLoader
-CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.autopkg %NEW_TAG% %PRIMARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.autopkg %NEW_TAG% %SECONDARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
