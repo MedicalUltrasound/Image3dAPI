@@ -58,4 +58,11 @@ nuget {
             bin:     ..\DummyLoader\x64\Release\DummyLoader.dll;
         };
     };
+    
+    dependencies { 
+        packages : {
+            // depend on same version of Image3dAPI
+            Image3dAPI/<<VERSION>>,
+        };
+    }
 };
