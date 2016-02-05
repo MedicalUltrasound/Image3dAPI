@@ -1,0 +1,61 @@
+nuget {
+    nuspec {
+        id: DummyLoader;
+        tags: { DummyLoader, native };
+        title: DummyLoader;
+        authors: "GE Ultrasound (GE Healthcare)";
+        projectUrl: "<<SOURCE-URL>>";
+
+
+        licenseUrl: "http://PROPRIETARY_LICENSE" ;
+        iconUrl: "ttp://www.ge.com/sites/all/themes/ge_2012/favicon.ico" ;
+        requireLicenseAcceptance: false;
+        summary: "Dummy implementation of Cross-vendor APIs for 3D ultrasound image data." ;
+        description: "Dummy implementation of COM APIs for cross-vendor exchange of 3D ultrasound image data.";
+        
+        // information that changes with each release
+        owners: "Fredrik Orderud";
+        version: <<VERSION>>;
+
+
+        releaseNotes: "changelog in docs/changelog.txt";
+        copyright: Copyright 2015-2016;
+    };
+
+    files {
+        // header files (nestedInclude to deal with "DummyLoader" subfolder)
+        nestedInclude: {
+            #destination = ${d_include}DummyLoader;
+            ../DummyLoader/Image3dFileLoader.hpp,
+            ../DummyLoader/Image3dSource.hpp
+        };
+
+        // documentation files
+        docs: ../changelog.txt;
+
+        // binaries
+        [x86,v110,debug] { 
+            lib:     ..\DummyLoader\Win32\Debug\DummyLoaderD.lib;
+            symbols: ..\DummyLoader\Win32\Debug\DummyLoaderD.pdb;
+            bin:     ..\DummyLoader\Win32\Debug\DummyLoaderD.dll;
+        };
+
+        [x86,v110,release] { 
+            lib:     ..\DummyLoader\Win32\Release\DummyLoader.lib;
+            symbols: ..\DummyLoader\Win32\Release\DummyLoader.pdb;
+            bin:     ..\DummyLoader\Win32\Release\DummyLoader.dll;
+        };
+
+        [x64,v110,debug] { 
+            lib:     ..\DummyLoader\x64\Debug\DummyLoaderD.lib;
+            symbols: ..\DummyLoader\x64\Debug\DummyLoaderD.pdb;
+            bin:     ..\DummyLoader\x64\Debug\DummyLoaderD.dll;
+        };
+
+        [x64,v110,release] { 
+            lib:     ..\DummyLoader\x64\Release\DummyLoader.lib;
+            symbols: ..\DummyLoader\x64\Release\DummyLoader.pdb;
+            bin:     ..\DummyLoader\x64\Release\DummyLoader.dll;
+        };
+    };
+};

@@ -3,5 +3,9 @@
 /*.opensdf
 /x64
 /Win32
-/DummyLoader/vc110.tlb
-/DummyLoader/vc110.idl
+vc110.tlb
+vc110.idl
+*.nupkg
+NEW_TAG.txt
+PREV_TAG.txt
+changelog.txt
