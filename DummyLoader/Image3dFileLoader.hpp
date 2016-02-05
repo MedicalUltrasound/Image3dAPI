@@ -24,7 +24,7 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*[out]*/ BSTR *error_message) {
-        return E_NOTIMPL;
+        return S_OK; // no operation
     }
 
     HRESULT STDMETHODCALLTYPE GetImageSource(/*[out]*/ IImage3dSource **img_src) {
