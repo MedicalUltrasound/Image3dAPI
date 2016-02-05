@@ -63,16 +63,18 @@ struct Image3dObj : public Image3d {
         data    = nullptr;
     }
 
-    Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const byte * in_buf, size_t buf_size) {
+    Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const byte * in_buf, unsigned short  _stride0, unsigned short  _stride1) {
         time    = _time;
         format  = _format;
         dims[0] = _dims[0];
         dims[1] = _dims[1];
         dims[2] = _dims[2];
-        stride0 = dims[0]*ImageFormatSize(_format);
-        stride1 = stride0*dims[1];
+        stride0 = _stride0;
+        stride1 = _stride1;
+        assert(stride0 >= dims[0]*ImageFormatSize(_format));
+        assert(stride1 >= stride0*dims[1]);
 
-        CComSafeArray<byte> tmp = ConvertToSafeArray(in_buf, buf_size);
+        CComSafeArray<byte> tmp = ConvertToSafeArray(in_buf, stride1*dims[2]);
         data = tmp.Detach();
     }
 
