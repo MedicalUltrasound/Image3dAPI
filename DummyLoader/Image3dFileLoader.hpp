@@ -8,8 +8,8 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 
 
 [coclass,
-default(IImage3dSource),                ///< default interface
-threading(both),                        ///< "both" enables direct thread access without marshaling
+default(IImage3dFileLoader),                ///< default interface
+threading(both),                            ///< "both" enables direct thread access without marshaling
 vi_progid("DummyLoader.Image3dFileLoader"), ///< version-independent name
 progid("DummyLoader.Image3dFileLoader.1"),  ///< class name
 version(1.0),
