@@ -6,6 +6,7 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 #define _USE_MATH_DEFINES // for M_PI
 #include <cmath>
 #include <memory>
+#include <array>
 #include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.hpp"
@@ -56,10 +57,8 @@ public:
         }
         {
             // flat gray scale
-            for (size_t i = 0; i < ARRAYSIZE(m_color_map); ++i) {
-                R8G8B8A8 color(i, i, i, 0xFF);
-                m_color_map[i] = color;
-            }
+            for (size_t i = 0; i < m_color_map.size(); ++i)
+                m_color_map[i] = R8G8B8A8(i, i, i, 0xFF);
         }
         {
             // geometry          X     Y    Z
@@ -156,7 +155,7 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetColorMap (/*[out]*/ unsigned int color_map[256]) {
-        memcpy(color_map, m_color_map, sizeof(m_color_map));
+        memcpy(color_map, m_color_map.data(), sizeof(m_color_map));
         return S_OK;
     }
 
@@ -183,9 +182,9 @@ public:
     }
 
 private:
-    ProbeInfoObj            m_probe;
-    EcgSeriesObj            m_ecg;
-    unsigned int            m_color_map[256];
-    Cart3dGeom              m_geom;
-    std::vector<Image3dObj> m_frames;
+    ProbeInfoObj             m_probe;
+    EcgSeriesObj             m_ecg;
+    std::array<R8G8B8A8,256> m_color_map;
+    Cart3dGeom               m_geom;
+    std::vector<Image3dObj>  m_frames;
 };
