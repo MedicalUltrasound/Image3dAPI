@@ -69,35 +69,45 @@ public:
             m_geom = geom;
         }
         {
+
+            // One second loop starting at t = 10
+            const size_t numFrames = 60;
+            const double fps = 1.0 / numFrames; 
+            const double startTime = 10.0;
+            
             // checker board image data
             unsigned short dims[] = { 12, 14, 16 };
             std::vector<byte> img_buf(dims[0] * dims[1] * dims[2]);
-            for (unsigned int z = 0; z < dims[2]; ++z) {
-                for (unsigned int y = 0; y < dims[1]; ++y) {
-                    for (unsigned int x = 0; x < dims[0]; ++x) {
-                        bool even_x = (x / 2 % 2) == 0;
-                        bool even_y = (y / 2 % 2) == 0;
-                        bool even_z = (z / 2 % 2) == 0;
-
-                        byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                        if (even_x ^ even_y ^ even_z)
-                            out_sample = 255;
-                        else
-                            out_sample = 0;
+            for (size_t f = 0; f < numFrames; ++f) {
+                for (unsigned int z = 0; z < dims[2]; ++z) {
+                    for (unsigned int y = 0; y < dims[1]; ++y) {
+                        for (unsigned int x = 0; x < dims[0]; ++x) {
+                            bool even_f = (f / 2 % 2) == 0;
+                            bool even_x = (x / 2 % 2) == 0;
+                            bool even_y = (y / 2 % 2) == 0;
+                            bool even_z = (z / 2 % 2) == 0;
+                            byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
+                            if (even_f ^ even_x ^ even_y ^ even_z)
+                                out_sample = 255;
+                            else
+                                out_sample = 0;
+                        }
                     }
                 }
-            }
 
-            for (unsigned int y = 0; y < dims[1]; ++y) {
-                for (unsigned int x = 0; x < dims[0]; ++x) {
-                    unsigned int z = 0;
-                    byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                    out_sample = 255; // Plane closest to probe is gray.
+                for (unsigned int y = 0; y < dims[1]; ++y) {
+                    for (unsigned int x = 0; x < dims[0]; ++x) {
+                        unsigned int z = 0;
+                        byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
+                        out_sample = 255; // Plane closest to probe is gray.
+                    }
                 }
-            }
 
-            Image3dObj tmp(3.14, FORMAT_U8, dims, img_buf.data(), dims[0]*sizeof(byte), dims[0]*dims[1]*sizeof(byte));
-            m_frames.push_back(std::move(tmp));
+
+                double time = f * fps + startTime;
+                Image3dObj tmp(time, FORMAT_U8, dims, img_buf.data(), dims[0] * sizeof(byte), dims[0] * dims[1] * sizeof(byte));
+                m_frames.push_back(std::move(tmp));
+            }
         }
     }
 
