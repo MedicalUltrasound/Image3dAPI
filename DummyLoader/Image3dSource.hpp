@@ -43,7 +43,8 @@ public:
 
         // One second loop starting at t = 10
         const size_t numFrames = 60;
-        const double fps = 1.0 / numFrames;
+        const double duration = 1.0; // Seconds
+        const double fps = duration / numFrames;
         const double startTime = 10.0;
 
         {
@@ -54,11 +55,11 @@ public:
                 samples.push_back(sin(4*i*M_PI/N));
 
             std::vector<double> trig_times;
-            trig_times.push_back(0.0); // trig every 1/2 sec
-            trig_times.push_back(0.5);
-            trig_times.push_back(1.0);
+            trig_times.push_back(startTime); // trig every 1/2 sec
+            trig_times.push_back(startTime + duration/2);
+            trig_times.push_back(startTime + duration);
 
-            EcgSeriesObj ecg(0.0, 1.0, samples, trig_times); // 1 sec interval
+            EcgSeriesObj ecg(startTime, startTime + duration, samples, trig_times); // 1 sec interval
             m_ecg = ecg;
         }
         {
