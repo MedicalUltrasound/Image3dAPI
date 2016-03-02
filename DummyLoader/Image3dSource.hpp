@@ -50,7 +50,8 @@ public:
         {
             // simulate sine-wave ECG
             const size_t N = 128;
-            std::vector<float> samples(N);
+            std::vector<float> samples;
+            samples.reserve(N);
             for (size_t i = 0; i < N; ++i)
                 samples.push_back(sin(4*i*M_PI/N));
 
