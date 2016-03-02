@@ -60,7 +60,7 @@ public:
             trig_times.push_back(startTime + duration/2);
             trig_times.push_back(startTime + duration);
 
-            EcgSeriesObj ecg(startTime, startTime + duration, samples, trig_times); // 1 sec interval
+            EcgSeriesObj ecg(startTime, duration/N, samples, trig_times); 
             m_ecg = ecg;
         }
         {
