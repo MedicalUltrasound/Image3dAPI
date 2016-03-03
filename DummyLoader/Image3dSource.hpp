@@ -40,19 +40,27 @@ helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
     Image3dSource () : m_probe(PROBE_THORAX, L"4V") {
+
+        // One second loop starting at t = 10
+        const size_t numFrames = 60;
+        const double duration = 1.0; // Seconds
+        const double fps = duration / numFrames;
+        const double startTime = 10.0;
+
         {
             // simulate sine-wave ECG
             const size_t N = 128;
-            std::vector<float> samples(N);
+            std::vector<float> samples;
+            samples.reserve(N);
             for (size_t i = 0; i < N; ++i)
                 samples.push_back(sin(4*i*M_PI/N));
 
             std::vector<double> trig_times;
-            trig_times.push_back(0.0); // trig every 1/2 sec
-            trig_times.push_back(0.5);
-            trig_times.push_back(1.0);
+            trig_times.push_back(startTime); // trig every 1/2 sec
+            trig_times.push_back(startTime + duration/2);
+            trig_times.push_back(startTime + duration);
 
-            EcgSeriesObj ecg(0.0, 1.0, samples, trig_times); // 1 sec interval
+            EcgSeriesObj ecg(startTime, duration/N, samples, trig_times); 
             m_ecg = ecg;
         }
         {
@@ -69,12 +77,6 @@ public:
             m_geom = geom;
         }
         {
-
-            // One second loop starting at t = 10
-            const size_t numFrames = 60;
-            const double fps = 1.0 / numFrames; 
-            const double startTime = 10.0;
-            
             // checker board image data
             unsigned short dims[] = { 12, 14, 16 };
             std::vector<byte> img_buf(dims[0] * dims[1] * dims[2]);
