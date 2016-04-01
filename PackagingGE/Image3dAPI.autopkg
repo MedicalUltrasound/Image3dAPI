@@ -7,7 +7,7 @@ nuget {
         projectUrl: "<<SOURCE-URL>>";
 
         licenseUrl: "http://PROPRIETARY_LICENSE" ;
-        iconUrl: "ttp://www.ge.com/sites/all/themes/ge_2012/favicon.ico" ;
+        iconUrl: "http://www.ge.com/sites/all/themes/ge_2012/favicon.ico" ;
         requireLicenseAcceptance: false;
         summary: "Cross-vendor APIs for 3D ultrasound image data." ;
         description: "COM APIs for cross-vendor exchange of 3D ultrasound image data.";
