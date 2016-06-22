@@ -3,6 +3,6 @@ Interfaces for inter-vendor exchange of 3D ultrasound data, together with test c
 
 
 ## Getting started
-* Open Visual Studio with administrative priveledges. Any version >= 2012 is supported.
+* Open Visual Studio with administrative privileges. Any version >= 2012 is supported.
 * Open `Image3dAPI.sln`.
 * Build the solution.
