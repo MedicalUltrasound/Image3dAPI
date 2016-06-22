@@ -92,10 +92,10 @@
     <PostBuildEvent>
       <Command>IF $(ConfigurationType) == DynamicLibrary (
   echo Registering DLL...
-  regsvr32 /s $(TargetPath)
+  regsvr32 /s "$(TargetPath)"
 ) ELSE (
   echo Registering EXE...
-  $(TargetPath) /regserver
+  "$(TargetPath)" /regserver
 )
 </Command>
       <Message>echo Registering component</Message>
@@ -113,10 +113,10 @@
     <PostBuildEvent>
       <Command>IF $(ConfigurationType) == DynamicLibrary (
   echo Registering DLL...
-  regsvr32 /s $(TargetPath)
+  regsvr32 /s "$(TargetPath)"
 ) ELSE (
   echo Registering EXE...
-  $(TargetPath) /regserver
+  "$(TargetPath)" /regserver
 )
 </Command>
       <Message>echo Registering component</Message>
@@ -138,10 +138,10 @@
     <PostBuildEvent>
       <Command>IF $(ConfigurationType) == DynamicLibrary (
   echo Registering DLL...
-  regsvr32 /s $(TargetPath)
+  regsvr32 /s "$(TargetPath)"
 ) ELSE (
   echo Registering EXE...
-  $(TargetPath) /regserver
+  "$(TargetPath)" /regserver
 )
 </Command>
       <Message>echo Registering component</Message>
@@ -163,10 +163,10 @@
     <PostBuildEvent>
       <Command>IF $(ConfigurationType) == DynamicLibrary (
   echo Registering DLL...
-  regsvr32 /s $(TargetPath)
+  regsvr32 /s "$(TargetPath)"
 ) ELSE (
   echo Registering EXE...
-  $(TargetPath) /regserver
+  "$(TargetPath)" /regserver
 )
 </Command>
       <Message>echo Registering component</Message>

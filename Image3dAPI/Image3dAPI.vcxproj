@@ -87,8 +87,8 @@
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D $(IntDir)*.h  $(ProjectDir)
-xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
+      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -106,8 +106,8 @@ xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D $(IntDir)*.h  $(ProjectDir)
-xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
+      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -129,8 +129,8 @@ xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D $(IntDir)*.h  $(ProjectDir)
-xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
+      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -152,8 +152,8 @@ xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D $(IntDir)*.h  $(ProjectDir)
-xcopy /Y /D $(IntDir)*.c  $(ProjectDir)
+      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
