@@ -16,7 +16,7 @@ static unsigned short ImageFormatSize (ImageFormat format) {
         throw std::logic_error("ImageFormatSize: Unknown type.");
 }
 
-
+/** C++ RAII wrapper of ProbeInfo. */
 struct ProbeInfoObj : public ProbeInfo {
     ProbeInfoObj () {
         type = PROBE_UNKNOWN;
@@ -51,8 +51,10 @@ struct ProbeInfoObj : public ProbeInfo {
 private:
     ProbeInfoObj & operator = (const ProbeInfoObj &); ///< non-assignable
 };
+static_assert(sizeof(ProbeInfoObj) == sizeof(ProbeInfo), "ProbeInfoObj size mismatch");
 
 
+/** C++ RAII wrapper of Image3d. */
 struct Image3dObj : public Image3d {
     Image3dObj () {
         time    = 0;
@@ -121,8 +123,10 @@ struct Image3dObj : public Image3d {
 private:
     Image3dObj & operator = (const Image3dObj &); ///< non-assignable
 };
+static_assert(sizeof(Image3dObj) == sizeof(Image3d), "Image3dObj size mismatch");
 
 
+/** C++ RAII wrapper of EcgSeries. */
 struct EcgSeriesObj : public EcgSeries {
     EcgSeriesObj () {
         start_time = 0;
@@ -182,3 +186,4 @@ struct EcgSeriesObj : public EcgSeries {
         return ecg;
     }
 };
+static_assert(sizeof(EcgSeriesObj) == sizeof(EcgSeries), "EcgSeriesObj size mismatch");
