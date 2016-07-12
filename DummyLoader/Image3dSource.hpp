@@ -166,8 +166,16 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE GetColorMap (/*[out]*/ unsigned int color_map[256]) {
-        memcpy(color_map, m_color_map.data(), sizeof(m_color_map));
+    HRESULT STDMETHODCALLTYPE GetColorMap (/*out*/ SAFEARRAY ** map) {
+        if (!map)
+            return E_INVALIDARG;
+        if (*map)
+            return E_INVALIDARG;
+
+        // copy to new buffer
+        CComSafeArray<unsigned int> color_map(static_cast<unsigned int>(m_color_map.size()));
+        memcpy(&color_map.GetAt(0), m_color_map.data(), sizeof(m_color_map));
+        *map = color_map.Detach(); // transfer ownership
         return S_OK;
     }
 

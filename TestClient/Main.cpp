@@ -8,6 +8,14 @@ void ParseSource (IImage3dSource & source) {
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));
 
+    CComSafeArray<unsigned int> color_map;
+    {
+        SAFEARRAY * tmp = nullptr;
+        CHECK(source.GetColorMap(&tmp));
+        color_map.Attach(tmp);
+        tmp = nullptr;
+    }
+
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
         unsigned short max_res[] = {128, 128, 128};
 
