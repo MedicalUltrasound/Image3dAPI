@@ -29,10 +29,16 @@ echo Determine previous tag:
 git describe --abbrev=0 --tags > PREV_TAG.txt
 set /p PREV_TAG=< PREV_TAG.txt
 
-echo Creating new GIT tag:
-python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
+if DEFINED PRIMARY_NUGET_REPO (
+  python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
+) else (
+  :: Local nuget build. Not to be deployed.
+  python.exe PackagingGE\DetermineNextTag.py patch > NEW_TAG.txt
+)
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 set /p NEW_TAG=< NEW_TAG.txt
+
+echo Creating new GIT tag:
 git tag %NEW_TAG%
 if DEFINED PRIMARY_NUGET_REPO (
   git push origin %NEW_TAG%
