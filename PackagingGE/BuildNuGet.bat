@@ -13,6 +13,16 @@ set AUTOPKG_FILE=..\PackagingGE\Image3dAPI.autopkg
 
 pushd ..
 
+if DEFINED PRIMARY_NUGET_REPO (
+  python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
+) else (
+  :: Local nuget build. Not to be deployed.
+  python.exe PackagingGE\DetermineNextTag.py patch > NEW_TAG.txt
+)
+IF %ERRORLEVEL% NEQ 0 exit /B 1
+set /p VERSION=< NEW_TAG.txt
+
+
 echo Building projects:
 msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" Image3dApi\Image3dAPI.vcxproj
 IF %ERRORLEVEL% NEQ 0 exit /B 1
@@ -29,31 +39,23 @@ echo Determine previous tag:
 git describe --abbrev=0 --tags > PREV_TAG.txt
 set /p PREV_TAG=< PREV_TAG.txt
 
-if DEFINED PRIMARY_NUGET_REPO (
-  python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
-) else (
-  :: Local nuget build. Not to be deployed.
-  python.exe PackagingGE\DetermineNextTag.py patch > NEW_TAG.txt
-)
-IF %ERRORLEVEL% NEQ 0 exit /B 1
-set /p NEW_TAG=< NEW_TAG.txt
 
 echo Creating new GIT tag:
-git tag %NEW_TAG%
+git tag %VERSION%
 if DEFINED PRIMARY_NUGET_REPO (
-  git push origin %NEW_TAG%
+  git push origin %VERSION%
 )
 
 echo Generating changelog (with tag decoration, graph and change stats):
-git log %PREV_TAG%..%NEW_TAG% --decorate --graph --stat > changelog.txt
+git log %PREV_TAG%..%VERSION% --decorate --graph --stat > changelog.txt
 
 pushd Image3dApi
-CALL ..\PackagingGE\PackagePublishNuget.bat %AUTOPKG_FILE% %NEW_TAG% %PRIMARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat %AUTOPKG_FILE% %VERSION% %PRIMARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
 pushd DummyLoader
-CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.autopkg %NEW_TAG% %SECONDARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.autopkg %VERSION% %SECONDARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
