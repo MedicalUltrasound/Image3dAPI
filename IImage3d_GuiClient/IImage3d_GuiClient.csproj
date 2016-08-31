@@ -38,7 +38,7 @@
     <Reference Include="Image3dAPI, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>bin\Debug\Image3dAPI.dll</HintPath>
+      <HintPath>..\Image3dAPI\Image3dAPI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -107,7 +107,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(FrameworkSDKDir)bin\NETFX 4.6.1 Tools\TlbImp.exe" "$(SolutionDir)Image3dAPI\IImage3dTypeLibraryGenerator.tlb" /out:Image3dAPI.dll</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
