@@ -159,6 +159,7 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
   </ItemDefinitionGroup>
   <ItemGroup>
     <Midl Include="IImage3d.idl" />
+    <Midl Include="IImage3dTypeLibraryGenerator.idl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComSupport.hpp" />

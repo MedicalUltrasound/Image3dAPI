@@ -1,0 +1,290 @@
+﻿<Window x:Class="IImage3d_GuiClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IImage3d_GuiClient"
+        Title="MainWindow" Height="750" Width="1125">
+ 
+    <!-- Main grid -->
+    <Grid Background="Black" SnapsToDevicePixels="True">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350" /> <!-- Image description-->
+            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="350" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="350"/>
+            <RowDefinition Height ="350"/>
+        </Grid.RowDefinitions>
+
+        <!-- Image description Grid-->
+        <Grid Grid.Column="0" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <Label Grid.Row ="0" Grid.ColumnSpan="2" Style="{StaticResource TitleTextStyle}" Content="IImage3d Image Viewer" />
+            
+            <!-- Static Image Specs catagories -->
+            <StackPanel Grid.Column="0" Grid.Row="1" Margin="6,2,2,2">
+                <Label Style="{StaticResource headerTextStyle}" Content="Image Specifications" />
+                <ItemsControl x:Name="imageInfoCategoryItems" Style="{StaticResource specTextStyle}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <TextBlock Text="{Binding description}" /> <!-- Get info from Code Behind -->
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            <!-- Variable Image Specs catagories -->
+                <Label Style="{StaticResource headerTextStyle}" Content="Current Display" />
+                <ItemsControl x:Name="dimensionCategoryItems" Style="{StaticResource specTextStyle}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <TextBlock Text="{Binding description}" /> <!-- Get info from Code Behind -->
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            
+            <!-- Static image Specs -->
+            <StackPanel Grid.Column="1" Grid.Row="1" Margin="2,2,2,2" >
+                <Label Style="{StaticResource headerTextStyleBlack}" Content="Filler" /> <!-- Blank filler header -->
+                <ItemsControl x:Name="imageInfoValueItems" Style="{StaticResource specTextStyle}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <TextBlock Text="{Binding description}" /> <!-- Get info from Code Behind -->
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            <!-- Variable image Specs (change with user input) -->
+                <Label Style="{StaticResource headerTextStyleBlack}" Content="Filler" />
+                <ItemsControl x:Name="dimensionValueItems" Style="{StaticResource specTextStyle}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <TextBlock Text="{Binding description}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Frame Slider Grid-->
+            <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="110" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Canvas x:Name="noFrameCanvas" Grid.ColumnSpan="3" Grid.RowSpan="2" Background="Black" />
+                
+                <!-- Frame slider -->
+                <Slider x:Name="frameSlider" Grid.Row="0" Grid.ColumnSpan="3"
+                        Value="0" ValueChanged="frameSlider_ValueChanged" 
+                        Width="300" Margin="20,0,0,-10"  HorizontalAlignment="Left" />
+
+                <!-- Frame Slider Start Button and Animation (Animation "To" and "Duration" set in code) -->
+                <Button Grid.Row ="1" Grid.Column ="0" Content="Play" Width="50" HorizontalAlignment="left" Margin="5,20,0,0">
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                        x:Name="frameAnimation"
+                                        Storyboard.TargetName="frameSlider" 
+                                        Storyboard.TargetProperty="Value"
+                                        From="1.0"                                        
+                                        FillBehavior="HoldEnd"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!--Frame Rate selector -->
+                <Label Grid.Row ="1" Grid.Column="1" Style="{StaticResource specTextStyle}" 
+                       Content="Frame Rate (fps)" Margin="5,20,2,0"/>
+                <TextBox Grid.Row ="1" Grid.Column="2" x:Name="FrameTextBox" 
+                         PreviewTextInput="NumberValidationTextBox" TextChanged="FrameTextBox_TextChanged" 
+                         Text="20" Width="50" Margin="-80,20,0,0"/>
+            </Grid> <!-- End Frame grid -->
+        </Grid>  <!-- End Image info grid -->
+
+        <!-- Y plane image grid -->
+        <Grid Grid.Column="1" Margin="5,5,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- title -->
+                <RowDefinition Height="Auto"/> <!-- horizontal slider -->
+                <RowDefinition Height="Auto"/> <!-- image -->
+            </Grid.RowDefinitions>
+            
+            <Label Grid.Row="0" HorizontalAlignment="Left" Content="Y plane" Style="{StaticResource specTextStyle}" />
+            
+            <!-- Y plane Vertical slider and image grid -->
+            <Grid Grid.Row="2" Margin="5,5,5,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition  Width="Auto"/>
+                    <ColumnDefinition  Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- Image -->
+                <Grid Grid.Column="1" x:Name="yplane"/>
+                <!-- Virtical Slider -->
+                <Slider Grid.Column="0" x:Name="zSlider2" 
+                        ValueChanged="zSlider_ValueChanged" 
+                        Orientation="Vertical"
+                        Margin="0,0,-5.8,0" Style="{StaticResource blueSlider}">
+                    <Slider.LayoutTransform> <!-- Slider style. Additional style in App.xaml -->
+                        <ScaleTransform CenterX="0" CenterY="0" ScaleX="0.7" ScaleY="0.4"/>
+                    </Slider.LayoutTransform>
+                </Slider>
+            </Grid>
+            <!-- Horizontal Slider -->
+            <Slider Grid.Row="1" x:Name="xSlider" 
+                    ValueChanged="xSlider_ValueChanged" 
+                    Margin="20,0,0,-10"  
+                    HorizontalAlignment="Left" Style="{StaticResource yellowSlider}">
+                <Slider.LayoutTransform> <!-- Slider style. Additional style in App.xaml -->
+                    <ScaleTransform CenterX="0" CenterY="0" ScaleX="0.4" ScaleY="0.7"/>
+                </Slider.LayoutTransform>
+            </Slider>
+        </Grid> <!-- end Y plane image grid -->
+
+        <!-- X plane image grid -->
+        <Grid Grid.Column="2" Margin="5,5,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- title -->
+                <RowDefinition Height="Auto"/> <!-- horizontal slider -->
+                <RowDefinition Height="Auto"/> <!-- image -->
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" HorizontalAlignment="Left" Content="X plane" Style="{StaticResource specTextStyle}" />
+
+            <!-- x plane Vertical slider and image grid -->
+            <Grid Grid.Row="2" Margin="5,5,5,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition  Width="Auto"/>
+                    <ColumnDefinition  Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- Image -->
+                <Grid Grid.Column="1" x:Name="xplane" />
+                <!-- Vertical Slider-->
+                <Slider Grid.Column="0" x:Name="zSlider" 
+                        ValueChanged="zSlider_ValueChanged" 
+                        Orientation="Vertical"
+                        Margin="0,0,-5,0" Style="{StaticResource blueSlider}">
+                    <Slider.LayoutTransform> <!-- Slider style. Additional style in App.xaml -->
+                        <ScaleTransform CenterX="0" CenterY="0" ScaleX="0.7" ScaleY="0.4"/>
+                    </Slider.LayoutTransform>
+                </Slider>
+            </Grid>
+            <!-- Horizontal Slider-->
+            <Slider Grid.Row="1" x:Name="ySlider" 
+                    ValueChanged="ySlider_ValueChanged" 
+                    Margin="15,0,0,-10"
+                    HorizontalAlignment="Left" Style="{StaticResource redSliderH}">
+                <Slider.LayoutTransform> <!-- Slider style. Additional style in App.xaml -->
+                    <ScaleTransform CenterX="0" CenterY="0" ScaleX="0.4" ScaleY="0.7"/>
+                </Slider.LayoutTransform>
+            </Slider>
+        </Grid> <!-- End X plane image grid-->
+        
+        <!-- Z plane image grid -->
+        <Grid Grid.Column="1" Grid.Row="1" Margin="5,5,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- title -->
+                <RowDefinition Height="Auto"/> <!-- horizontal slider -->
+                <RowDefinition Height="Auto"/> <!-- image -->
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" HorizontalAlignment="Left" Content="Z plane" Style="{StaticResource specTextStyle}" />
+
+            <!-- z plane Vertical slider and image grid -->
+            <Grid Grid.Row="2" Margin="5,5,5,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition  Width="Auto"/>
+                    <ColumnDefinition  Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- Image -->
+                <Grid Grid.Column="1" x:Name="zplane" Margin="0,0,0,0"/>
+                <!-- Vertical Slider-->
+                <Slider Grid.Column="0" x:Name="ySlider2" 
+                        ValueChanged="ySlider_ValueChanged" 
+                        Orientation="Vertical" Margin="0,0,-5.8,0" Style="{StaticResource redSliderV}">
+                    <Slider.LayoutTransform> <!-- Slider style. Additional style in App.xaml -->
+                        <ScaleTransform CenterX="0" CenterY="0" ScaleX="0.7" ScaleY="0.4"/>
+                    </Slider.LayoutTransform>
+                </Slider>
+            </Grid>
+            <!-- Horizontal Slider-->
+            <Slider Grid.Row="1" Maximum="0" x:Name="xSlider2" 
+                    ValueChanged="xSlider_ValueChanged" 
+                    Margin="20,0,0,-10" HorizontalAlignment="Left" Style="{StaticResource yellowSlider}">
+                <Slider.LayoutTransform> <!-- Slider style. Additional style in App.xaml -->
+                    <ScaleTransform CenterX="0" CenterY="0" ScaleX="0.4" ScaleY="0.7"/>
+                </Slider.LayoutTransform>
+            </Slider>
+        </Grid>
+
+        <!-- Load File -->
+        <Grid x:Name ="loadGrid" Background="Black" Grid.Column="0" Grid.Row="0" Margin="5,5,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height ="Auto"/>
+                <RowDefinition Height ="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label x:Name="loadGridLabel" Grid.Row ="0" Grid.ColumnSpan="2" Style="{StaticResource TitleTextStyle}" Content="IImage3d Image Viewer" />
+
+            <StackPanel Grid.Row ="1" Grid.Column="0" Margin="15,0,0,0" Width="250" Style="{StaticResource specTextStyle}">
+
+                <TextBlock Text="Enter image file path" />
+                <Separator Opacity="0" Height="5"/>
+                <TextBox x:Name="ImageFileTextBox" />
+                <Separator Opacity="0" Height="15"/>
+                <TextBlock Text="Enter IImage3d Dll path" />
+                <Separator Opacity="0" Height="5"/>
+                <TextBox x:Name="DllTextBox" Text="{Binding dllProperty}"/>
+                <Separator Opacity="0" Height="15"/>
+                <TextBlock Text="Enter progid for IImage3dFileLoader" />
+                <Separator Opacity="0" Height="5"/>
+                <TextBox x:Name="ProgIdTextBox" Style="{StaticResource placeHolder}" Tag="eg YourDll.Image3dFileLoader" Text="{Binding progidProperty, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Separator Opacity="0" Height="15"/>
+                <Button x:Name="LoadImageButton" Content="Load Files" Click="LoadImageButton_Click" Width="80"/>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="0,54,0,-0.4" Style="{StaticResource specTextStyle}" Grid.RowSpan="2" Width="54">
+                <Separator Opacity="0" Height="17"/>
+                <Button Content="Browse" Click="imageFileBrowseButton_Click" />
+                <Separator Opacity="0" Height="38"/>
+                <Button Content="Browse" Click="dllBrowseButton_Click" />
+            </StackPanel>
+        </Grid>
+
+    </Grid> <!-- end of main grid-->
+</Window>
