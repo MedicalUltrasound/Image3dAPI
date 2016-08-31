@@ -4,3 +4,6 @@
 /IImage3d_i.c
 /IImage3d_p.c
 /dlldata.c
+/IImage3dTypeLibraryGenerator.h
+/IImage3dTypeLibraryGenerator_i.c
+/Image3dAPI.dll
