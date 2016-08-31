@@ -23,37 +23,26 @@ nuget {
     };
 
     files {
-        // header files (nestedInclude to deal with "DummyLoader" subfolder)
-        nestedInclude: {
-            #destination = ${d_include}DummyLoader;
-            ../DummyLoader/Image3dFileLoader.hpp,
-            ../DummyLoader/Image3dSource.hpp
-        };
-
         // documentation files
         docs: ../changelog.txt;
 
         // binaries
-        [x86,v110,debug] { 
-            lib:     ..\DummyLoader\Win32\Debug\DummyLoaderD.lib;
+        [x86,debug] {
             symbols: ..\DummyLoader\Win32\Debug\DummyLoaderD.pdb;
             bin:     ..\DummyLoader\Win32\Debug\DummyLoaderD.dll;
         };
 
-        [x86,v110,release] { 
-            lib:     ..\DummyLoader\Win32\Release\DummyLoader.lib;
+        [x86,release] {
             symbols: ..\DummyLoader\Win32\Release\DummyLoader.pdb;
             bin:     ..\DummyLoader\Win32\Release\DummyLoader.dll;
         };
 
-        [x64,v110,debug] { 
-            lib:     ..\DummyLoader\x64\Debug\DummyLoaderD.lib;
+        [x64,debug] {
             symbols: ..\DummyLoader\x64\Debug\DummyLoaderD.pdb;
             bin:     ..\DummyLoader\x64\Debug\DummyLoaderD.dll;
         };
 
-        [x64,v110,release] { 
-            lib:     ..\DummyLoader\x64\Release\DummyLoader.lib;
+        [x64,release] {
             symbols: ..\DummyLoader\x64\Release\DummyLoader.pdb;
             bin:     ..\DummyLoader\x64\Release\DummyLoader.dll;
         };
