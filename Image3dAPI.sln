@@ -19,6 +19,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestClient", "TestClient\Te
 		{277D8DBA-C8B3-423B-A707-B6435130BF4A} = {277D8DBA-C8B3-423B-A707-B6435130BF4A}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IImage3d_GuiClient", "IImage3d_GuiClient\IImage3d_GuiClient.csproj", "{B6F74F8B-D40F-41B5-B51D-AB7215073196}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3} = {4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -51,6 +56,12 @@ Global
 		{8ABF3DC3-6C48-439B-B3A1-DED84351B808}.Release|Win32.Build.0 = Release|Win32
 		{8ABF3DC3-6C48-439B-B3A1-DED84351B808}.Release|x64.ActiveCfg = Release|x64
 		{8ABF3DC3-6C48-439B-B3A1-DED84351B808}.Release|x64.Build.0 = Release|x64
+		{B6F74F8B-D40F-41B5-B51D-AB7215073196}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B6F74F8B-D40F-41B5-B51D-AB7215073196}.Debug|Win32.Build.0 = Debug|Any CPU
+		{B6F74F8B-D40F-41B5-B51D-AB7215073196}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B6F74F8B-D40F-41B5-B51D-AB7215073196}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B6F74F8B-D40F-41B5-B51D-AB7215073196}.Release|Win32.Build.0 = Release|Any CPU
+		{B6F74F8B-D40F-41B5-B51D-AB7215073196}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
