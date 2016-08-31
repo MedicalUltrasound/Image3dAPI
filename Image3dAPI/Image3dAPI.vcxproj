@@ -85,11 +85,12 @@
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
-</Command>
+      <Command>TlbImp.exe "$(IntDir)$(TargetName).tlb" /out:$(TargetName).dll
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,11 +105,12 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
-</Command>
+      <Command>TlbImp.exe "$(IntDir)$(TargetName).tlb" /out:$(TargetName).dll
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,11 +129,12 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
-</Command>
+      <Command>TlbImp.exe "$(IntDir)$(TargetName).tlb" /out:$(TargetName).dll
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,15 +153,17 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"
-</Command>
+      <Command>TlbImp.exe "$(IntDir)$(TargetName).tlb" /out:$(TargetName).dll
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Midl Include="IImage3d.idl" />
+    <Midl Include="IImage3dTypeLibraryGenerator.idl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComSupport.hpp" />
