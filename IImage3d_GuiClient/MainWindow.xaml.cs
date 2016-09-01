@@ -93,6 +93,7 @@ namespace IImage3d_GuiClient
                     dllInfoXml.Load(Environment.CurrentDirectory + "//IImage3dDllInfo.xml");
                     DllTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dllPath").InnerText;
                     ProgIdTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/progID").InnerText;
+                    ImageFileTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dcmFile").InnerText;
                     //If info exists, automatically push the load image buton
                     LoadImageButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
                 }
@@ -197,7 +198,8 @@ namespace IImage3d_GuiClient
 
                 //Create XML file with dll and progid info
                 string dllImageInfo = "<?xml version=\"1.0\"?>\n<dllImageInfo>\n\t<dllPath>" + dllPath +
-                    "</dllPath>\n\t<progID>" + progID + "</progID>\n</dllImageInfo>";
+                    "</dllPath>\n\t<progID>" + progID + "</progID>\n\t<dcmFile>" + ImageFileTextBox.Text + "</dcmFile>\n" +
+                    "</dllImageInfo>\n";
                 try
                 {
                     File.WriteAllText(Environment.CurrentDirectory + "//IImage3dDllInfo.xml", dllImageInfo);
