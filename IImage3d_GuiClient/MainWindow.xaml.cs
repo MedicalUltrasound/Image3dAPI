@@ -567,37 +567,45 @@ namespace IImage3d_GuiClient
             //General bitmap data            
             double dpiX = 96;
             double dpiY = 96;
-           
-            var pixelFormat = PixelFormats.Gray8; // 8 bit grayscale. 1 byte per pixel
-            BitmapSource bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imData, stride);
 
-/*          //Implement Color map
-            var pixelFormat = PixelFormats.Bgra32; // 32 bit color. 4 bytes per pixel
+            BitmapSource bitmap;
 
-            //Create Bitmap
-            byte[] imDataColor = new byte[imData.Length * 4];
-
-            //Apply color map
-            int counter = 0;
-            for (int i = 0; i < imData.Length; i++)
+            if (colorMap.Length != 256)
             {
-                uint k = colorMap[imData[i]];
-                int rem = 0;
-                byte A = (byte)(k / (Math.Pow(2, 24)));
-                rem = (int)(k % (Math.Pow(2, 24)));
-                byte B = (byte)(rem / (Math.Pow(2, 16)));
-                rem = (int)(k % (Math.Pow(2, 16)));
-                byte G = (byte)(rem / (Math.Pow(2, 8)));
-                rem = (int)(k % (Math.Pow(2, 8)));
-                byte R = (byte)rem;
-                imDataColor[counter] = R;
-                imDataColor[counter+1] = G;
-                imDataColor[counter+2] = B;
-                imDataColor[counter+3] = A;
-                counter += 4;
+                var pixelFormat = PixelFormats.Gray8; // 8 bit grayscale. 1 byte per pixel
+                bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imData, stride);
             }
-            BitmapSource bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
-*/              
+            else
+            {
+                //Implement Color map
+                var pixelFormat = PixelFormats.Bgra32; // 32 bit color. 4 bytes per pixel
+
+                //Create Bitmap
+                byte[] imDataColor = new byte[imData.Length * 4];
+
+                //Apply color map
+                int counter = 0;
+                for (int i = 0; i < imData.Length; i++)
+                {
+                    uint k = colorMap[imData[i]];
+                    int rem = 0;
+                    byte A = (byte)(k / (Math.Pow(2, 24)));
+                    rem = (int)(k % (Math.Pow(2, 24)));
+                    byte B = (byte)(rem / (Math.Pow(2, 16)));
+                    rem = (int)(k % (Math.Pow(2, 16)));
+                    byte G = (byte)(rem / (Math.Pow(2, 8)));
+                    rem = (int)(k % (Math.Pow(2, 8)));
+                    byte R = (byte)rem;
+                    imDataColor[counter] = R;
+                    imDataColor[counter + 1] = G;
+                    imDataColor[counter + 2] = B;
+                    imDataColor[counter + 3] = A;
+                    counter += 4;
+                }
+
+                bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
+            }
+             
             // Create Image and set its width and height  
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();
   
