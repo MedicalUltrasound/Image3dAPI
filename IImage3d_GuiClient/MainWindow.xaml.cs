@@ -259,7 +259,7 @@ namespace IImage3d_GuiClient
 
                 //get image data for first frame. 
                 uint frame = 0;
-                ushort[] max_res = { 800, 800, 800 };
+                ushort[] max_res = { 150, 150, 150 };
                 Image3dAPI.Image3d imageData = source.GetFrame(frame, geom, max_res);
 
                 //get pixel dimensions, stride lengths, and adjusted image dimensions based on real space.
