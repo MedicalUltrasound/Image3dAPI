@@ -93,6 +93,7 @@ namespace IImage3d_GuiClient
                     dllInfoXml.Load(Environment.CurrentDirectory + "//IImage3dDllInfo.xml");
                     DllTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dllPath").InnerText;
                     ProgIdTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/progID").InnerText;
+                    ImageFileTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dcmFile").InnerText;
                     //If info exists, automatically push the load image buton
                     LoadImageButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
                 }
@@ -197,7 +198,8 @@ namespace IImage3d_GuiClient
 
                 //Create XML file with dll and progid info
                 string dllImageInfo = "<?xml version=\"1.0\"?>\n<dllImageInfo>\n\t<dllPath>" + dllPath +
-                    "</dllPath>\n\t<progID>" + progID + "</progID>\n</dllImageInfo>";
+                    "</dllPath>\n\t<progID>" + progID + "</progID>\n\t<dcmFile>" + ImageFileTextBox.Text + "</dcmFile>\n" +
+                    "</dllImageInfo>\n";
                 try
                 {
                     File.WriteAllText(Environment.CurrentDirectory + "//IImage3dDllInfo.xml", dllImageInfo);
@@ -259,7 +261,7 @@ namespace IImage3d_GuiClient
 
                 //get image data for first frame. 
                 uint frame = 0;
-                ushort[] max_res = { 800, 800, 800 };
+                ushort[] max_res = { 150, 150, 150 };
                 Image3dAPI.Image3d imageData = source.GetFrame(frame, geom, max_res);
 
                 //get pixel dimensions, stride lengths, and adjusted image dimensions based on real space.
@@ -565,37 +567,45 @@ namespace IImage3d_GuiClient
             //General bitmap data            
             double dpiX = 96;
             double dpiY = 96;
-           
-            var pixelFormat = PixelFormats.Gray8; // 8 bit grayscale. 1 byte per pixel
-            BitmapSource bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imData, stride);
 
-/*          //Implement Color map
-            var pixelFormat = PixelFormats.Bgra32; // 32 bit color. 4 bytes per pixel
+            BitmapSource bitmap;
 
-            //Create Bitmap
-            byte[] imDataColor = new byte[imData.Length * 4];
-
-            //Apply color map
-            int counter = 0;
-            for (int i = 0; i < imData.Length; i++)
+            if (colorMap.Length != 256)
             {
-                uint k = colorMap[imData[i]];
-                int rem = 0;
-                byte A = (byte)(k / (Math.Pow(2, 24)));
-                rem = (int)(k % (Math.Pow(2, 24)));
-                byte B = (byte)(rem / (Math.Pow(2, 16)));
-                rem = (int)(k % (Math.Pow(2, 16)));
-                byte G = (byte)(rem / (Math.Pow(2, 8)));
-                rem = (int)(k % (Math.Pow(2, 8)));
-                byte R = (byte)rem;
-                imDataColor[counter] = R;
-                imDataColor[counter+1] = G;
-                imDataColor[counter+2] = B;
-                imDataColor[counter+3] = A;
-                counter += 4;
+                var pixelFormat = PixelFormats.Gray8; // 8 bit grayscale. 1 byte per pixel
+                bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imData, stride);
             }
-            BitmapSource bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
-*/              
+            else
+            {
+                //Implement Color map
+                var pixelFormat = PixelFormats.Bgra32; // 32 bit color. 4 bytes per pixel
+
+                //Create Bitmap
+                byte[] imDataColor = new byte[imData.Length * 4];
+
+                //Apply color map
+                int counter = 0;
+                for (int i = 0; i < imData.Length; i++)
+                {
+                    uint k = colorMap[imData[i]];
+                    int rem = 0;
+                    byte A = (byte)(k / (Math.Pow(2, 24)));
+                    rem = (int)(k % (Math.Pow(2, 24)));
+                    byte B = (byte)(rem / (Math.Pow(2, 16)));
+                    rem = (int)(k % (Math.Pow(2, 16)));
+                    byte G = (byte)(rem / (Math.Pow(2, 8)));
+                    rem = (int)(k % (Math.Pow(2, 8)));
+                    byte R = (byte)rem;
+                    imDataColor[counter] = R;
+                    imDataColor[counter + 1] = G;
+                    imDataColor[counter + 2] = B;
+                    imDataColor[counter + 3] = A;
+                    counter += 4;
+                }
+
+                bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
+            }
+             
             // Create Image and set its width and height  
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();
   
