@@ -44,7 +44,6 @@ namespace IImage3d_GuiClient
         private System.Windows.Controls.Image yImage;
         private System.Windows.Controls.Image zImage;
         private uint[] colorMap = new uint[256];
-        private string dllPath = "some path";
         private string progID = "some id";
 
        //Image Information Item Descriptions
@@ -148,8 +147,7 @@ namespace IImage3d_GuiClient
                 }
 
                 //Create XML file with dll and progid info
-                string dllImageInfo = "<?xml version=\"1.0\"?>\n<dllImageInfo>\n\t<dllPath>" + dllPath +
-                    "</dllPath>\n\t<progID>" + progID + "</progID>\n\t<dcmFile>" + ImageFileTextBox.Text + "</dcmFile>\n" +
+                string dllImageInfo = "<?xml version=\"1.0\"?>\n<dllImageInfo>\n\t<progID>" + progID + "</progID>\n\t<dcmFile>" + ImageFileTextBox.Text + "</dcmFile>\n" +
                     "</dllImageInfo>\n";
                 try
                 {
