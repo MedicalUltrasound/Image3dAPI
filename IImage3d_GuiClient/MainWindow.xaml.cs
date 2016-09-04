@@ -91,7 +91,6 @@ namespace IImage3d_GuiClient
                 try
                 {
                     dllInfoXml.Load(Environment.CurrentDirectory + "//IImage3dDllInfo.xml");
-                    DllTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dllPath").InnerText;
                     ProgIdTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/progID").InnerText;
                     ImageFileTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dcmFile").InnerText;
                     //If info exists, automatically push the load image buton
@@ -100,7 +99,6 @@ namespace IImage3d_GuiClient
                 catch
                 {
                     //File did not load correctly. Continue as if no file existed.
-                    DllTextBox.Text = "";
                     ProgIdTextBox.Text = "";
                 }
                 
@@ -117,53 +115,6 @@ namespace IImage3d_GuiClient
             {
                 IImage3dSource source = null;
                 IImage3dFileLoader loader = null;
-
-                //Load DLL
-                //Only attempt to load a new dll if the user changes the text box contents
-                if (DllTextBox.Text != dllPath)
-                {
-                    dllPath = DllTextBox.Text;
-                    IntPtr hModuleDLL = LoadLibrary(DllTextBox.Text);
-                    //if dll cannot be loaded, display error.
-                    if (hModuleDLL == IntPtr.Zero)
-                    {
-                        System.Windows.MessageBox.Show("Unable to load DLL: Please check the file path and try again.");
-                        return;
-                    }
-
-                    // Obtain the required exported API.
-                    IntPtr pExportedFunction = IntPtr.Zero;
-                    pExportedFunction = GetProcAddress(hModuleDLL, "DllRegisterServer");
-                    //if failed display message
-                    if (pExportedFunction == IntPtr.Zero)
-                    {
-                        System.Windows.MessageBox.Show("Unable to find DllRegisterServer method.  (Are you sure this is a COM DLL ?)");
-                        return;
-                    }
-
-                    // Obtain the delegate from the exported function and invoke it.
-                    DllRegUnRegAPI pDelegateRegUnReg;
-                    try
-                    {
-                        pDelegateRegUnReg =
-                            (DllRegUnRegAPI)(Marshal.GetDelegateForFunctionPointer(pExportedFunction, typeof(DllRegUnRegAPI)))
-                            as DllRegUnRegAPI;
-                        UInt32 hResult = pDelegateRegUnReg();
-
-                        if (hResult != 0)
-                        {
-                            System.Windows.MessageBox.Show("Error occurred: Unable to invoke the delegate.");
-                        }
-                    }
-                    catch (Exception ex1)
-                    {
-                        System.Windows.MessageBox.Show("Unable to load dll\n" + ex1.ToString());
-                        return;
-                    }
-                    //end of load DLL
-                    FreeLibrary(hModuleDLL);
-                    hModuleDLL = IntPtr.Zero;
-                }
 
                 //CoCreateInstance of loaded DLL
                 progID = ProgIdTextBox.Text;
@@ -619,28 +570,6 @@ namespace IImage3d_GuiClient
                                      * User Controls *
         *******************************************************************************/
         //Methods that respond to user controls (sliders, textbox, button)
-
-        //Dll path browse button
-        private void dllBrowseButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Create OpenFileDialog 
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
-            // Set filter for file extension and default file extension 
-            dlg.DefaultExt = ".dll";
-            dlg.Filter = "Dll Files (*.dll)|*.dll";
-
-            // Display OpenFileDialog by calling ShowDialog method 
-            bool? result = dlg.ShowDialog();
-
-            // Get the selected file name and display in a TextBox 
-            if (result == true)
-            {
-                // Open document 
-                string filename = dlg.FileName;
-                DllTextBox.Text = filename;
-            }
-        }
 
         //Image file browse button
         private void imageFileBrowseButton_Click(object sender, RoutedEventArgs e)

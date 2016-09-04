@@ -265,10 +265,6 @@
                 <Separator Opacity="0" Height="5"/>
                 <TextBox x:Name="ImageFileTextBox" />
                 <Separator Opacity="0" Height="15"/>
-                <TextBlock Text="Enter IImage3d Dll path" />
-                <Separator Opacity="0" Height="5"/>
-                <TextBox x:Name="DllTextBox" Text="{Binding dllProperty}"/>
-                <Separator Opacity="0" Height="15"/>
                 <TextBlock Text="Enter progid for IImage3dFileLoader" />
                 <Separator Opacity="0" Height="5"/>
                 <TextBox x:Name="ProgIdTextBox" Style="{StaticResource placeHolder}" Tag="eg YourDll.Image3dFileLoader" Text="{Binding progidProperty, UpdateSourceTrigger=PropertyChanged}" />
@@ -281,8 +277,6 @@
             <StackPanel Grid.Column="1" Margin="0,54,0,-0.4" Style="{StaticResource specTextStyle}" Grid.RowSpan="2" Width="54">
                 <Separator Opacity="0" Height="17"/>
                 <Button Content="Browse" Click="imageFileBrowseButton_Click" />
-                <Separator Opacity="0" Height="38"/>
-                <Button Content="Browse" Click="dllBrowseButton_Click" />
             </StackPanel>
         </Grid>
 
