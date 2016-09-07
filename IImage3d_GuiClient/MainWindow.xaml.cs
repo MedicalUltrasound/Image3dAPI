@@ -266,8 +266,8 @@ namespace IImage3d_GuiClient
 
                 //get pixel dimensions, stride lengths, and adjusted image dimensions based on real space.
                 dimValues = imageData.dims;
-                stride0 = imageData.stride0;
-                stride1 = imageData.stride1;
+                stride0 = (int)imageData.stride0;
+                stride1 = (int)imageData.stride1;
                 //Verify that all dims and stride are greater than 1.
                 if (dimValues[0] <= 1 || dimValues[1] <= 1 || dimValues[2] <= 1 || stride0 <= 1 || stride1 <= 1)
                 {
