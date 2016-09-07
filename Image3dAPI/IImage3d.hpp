@@ -65,7 +65,7 @@ struct Image3dObj : public Image3d {
         data    = nullptr;
     }
 
-    Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const byte * in_buf, unsigned short  _stride0, unsigned short  _stride1) {
+    Image3dObj (double _time, ImageFormat _format, unsigned short _dims[3], const byte * in_buf, unsigned int _stride0, unsigned int  _stride1) {
         time    = _time;
         format  = _format;
         dims[0] = _dims[0];

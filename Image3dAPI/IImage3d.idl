@@ -52,8 +52,8 @@ struct Image3d {
     [helpstring("time [seconds]")]                                            double          time;
     [helpstring("")]                                                          ImageFormat     format;
     [helpstring("resolution (width/columns, height/rows, planes)")]           unsigned short  dims[3];
-    [helpstring("distance between each row [bytes] (>= width*element_size)")] unsigned short  stride0;
-    [helpstring("distance between each plane [bytes] (>= height*stride0)")]   unsigned short  stride1;
+    [helpstring("distance between each row [bytes] (>= width*element_size)")] unsigned int    stride0;
+    [helpstring("distance between each plane [bytes] (>= height*stride0)")]   unsigned int    stride1;
     [helpstring("underlying 1D image buffer (size >= planes*stride1)")]       SAFEARRAY(byte) data;
 } Image3d;
 
