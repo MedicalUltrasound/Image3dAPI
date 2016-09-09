@@ -73,7 +73,7 @@ struct Image3dObj : public Image3d {
         dims[2] = _dims[2];
         stride0 = _stride0;
         stride1 = _stride1;
-        assert(stride0 >= dims[0]*ImageFormatSize(_format));
+        assert(stride0 >= static_cast<unsigned int>(dims[0])*ImageFormatSize(_format));
         assert(stride1 >= stride0*dims[1]);
 
         CComSafeArray<byte> tmp = ConvertToSafeArray(in_buf, stride1*dims[2]);
