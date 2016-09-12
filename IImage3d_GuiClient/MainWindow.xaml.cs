@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,23 +16,22 @@ namespace IImage3d_GuiClient
 {
     public partial class MainWindow : Window
     {
-              
+
 //      private variables
         private int x;              //current x,y,z pixel value
-        private int y;              
-        private int z;              
+        private int y;
+        private int z;
         private float x_bound;      //Real space image measurement in x,y,z dimension
-        private float y_bound;      
-        private float z_bound;     
+        private float y_bound;
+        private float z_bound;
         private float x_Length;     //Adjusted image dimensions based on real space bounds
         private float y_Length;
         private float z_Length;
         private ushort[] dimValues;         //Pixel dimensions of image. Array contains 3 values for x,y,z
-        private int currentFrame = 1;   
+        private int currentFrame = 1;
         private double frameTime;
         private double frameRate = 60;
         private uint frameCount;
-        private double duration;            //Duration of frame slider animation
         private double[] frameTimesArray;   //Array of all the individual frame times
         private byte[][] allDataArray;      //2D array for all image data. 1st dim is frame, 2nd is frameData arrays
         private byte[] frameDataArray;      //byte array of pixel image data for a frame
@@ -45,8 +44,9 @@ namespace IImage3d_GuiClient
         private System.Windows.Controls.Image zImage;
         private uint[] colorMap = new uint[256];
         private string progID = "some id";
+        private string imageFile = "some file";
 
-       //Image Information Item Descriptions
+        //Image Information Item Descriptions
         public class imageInfoItem
         {
             public string description { get; set; }
@@ -85,13 +85,14 @@ namespace IImage3d_GuiClient
 
             //If xml file with current dll information exists, load the info
             XmlDocument dllInfoXml = new XmlDocument();
-            if(File.Exists(Environment.CurrentDirectory + "//IImage3dDllInfo.xml"))           
+            if (File.Exists(Environment.CurrentDirectory + "//IImage3dDllInfo.xml"))
             {
                 try
                 {
                     dllInfoXml.Load(Environment.CurrentDirectory + "//IImage3dDllInfo.xml");
                     ProgIdTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/progID").InnerText;
                     ImageFileTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dcmFile").InnerText;
+                    
                     //If info exists, automatically push the load image buton
                     LoadImageButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
                 }
@@ -100,10 +101,9 @@ namespace IImage3d_GuiClient
                     //File did not load correctly. Continue as if no file existed.
                     ProgIdTextBox.Text = "";
                 }
-                
-            }           
+            }
         }
-        
+
         //Load Image Button
         //After user clicks this button, the program attempts to load the dll
         //and image files. If successfully loaded, the inital image information
@@ -114,6 +114,13 @@ namespace IImage3d_GuiClient
             {
                 IImage3dSource source = null;
                 IImage3dFileLoader loader = null;
+
+                // If all entries are the same, do not do anything more
+                if (progID == ProgIdTextBox.Text && imageFile == ImageFileTextBox.Text)
+                    return;
+
+                progID = ProgIdTextBox.Text;
+                imageFile = ImageFileTextBox.Text;
 
                 //CoCreateInstance of loaded DLL
                 progID = ProgIdTextBox.Text;
@@ -156,13 +163,7 @@ namespace IImage3d_GuiClient
                 catch (Exception ex) //Even if file writing fails, continue with program.
                 {
                     System.Windows.MessageBox.Show("Could not save dll information to file. \n\nError Details\n" + ex.ToString());
-                }
-
-                //If image is successfully loaded, move the load file text boxes
-                Grid.SetRow(loadGrid, 1);
-                Grid.SetColumn(loadGrid, 2);
-                loadGridLabel.Content = "Load Image File / DLL";
-
+                }              
 
                 //get frame information
                 frameCount = source.GetFrameCount();    //get frame count
@@ -178,9 +179,9 @@ namespace IImage3d_GuiClient
                 {
                     if (frameTimesArray[1] - frameTimesArray[0] > 0)
                     {
+                        Canvas.SetZIndex(noFrameCanvas, (int)0);
                         frameRate = 1 / (frameTimesArray[1] - frameTimesArray[0]); //get frameRate using difference between first two frames
-                        duration = ((frameTimesArray[1] - frameTimesArray[0]) * frameCount);  //get animation duration using difference between first two frames and total frames                                                                     //           this.durationProperty = new TimeSpan(0, 0, Convert.ToInt32(duration)).ToString("c");
-                        frameAnimation.Duration = new TimeSpan(0, 0, Convert.ToInt32((1 / frameRate * frameCount)));
+                        frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * (1 / frameRate * frameCount)));
                         frameAnimation.To = frameCount - 1;
                         frameSlider.Maximum = frameCount - 1;
                         FrameTextBox.Text = Convert.ToInt32(frameRate).ToString();
@@ -241,19 +242,17 @@ namespace IImage3d_GuiClient
                         y_Length = maxImageWidth * y_bound / x_bound;
                         z_Length = maxImageWidth * z_bound / x_bound;
                         xSlider.Width = xSlider2.Width = maxSliderLength;
-                        ySlider.Width = ySlider2.Height = (int)(maxSliderLength * y_bound / x_bound);
-                        zSlider.Height = zSlider2.Height = (int)(maxSliderLength * z_bound / x_bound);
-
+                        ySlider.Height = ySlider2.Height = (int)(maxSliderLength * y_bound / x_bound);
+                        zSlider.Width = zSlider2.Height = (int)(maxSliderLength * z_bound / x_bound);
                     }
                     else
                     {
                         z_Length = maxImageWidth;
                         y_Length = maxImageWidth * y_bound / z_bound;
                         x_Length = maxImageWidth * x_bound / z_bound;
-                        zSlider.Height = zSlider2.Height = maxSliderLength;
-                        ySlider.Width = ySlider2.Height = (int)(maxSliderLength * y_bound / z_bound);
+                        zSlider.Width = zSlider2.Height = maxSliderLength;
+                        ySlider.Height = ySlider2.Height = (int)(maxSliderLength * y_bound / z_bound);
                         xSlider.Width = xSlider2.Width = (int)(maxSliderLength * x_bound / z_bound);
-
                     }
                 }
                 else if (y_bound > z_bound)
@@ -261,20 +260,19 @@ namespace IImage3d_GuiClient
                     y_Length = maxImageWidth;
                     z_Length = maxImageWidth * z_bound / y_bound;
                     x_Length = maxImageWidth * x_bound / y_bound;
-                    ySlider.Width = ySlider2.Height = maxSliderLength;
-                    zSlider.Height = zSlider2.Height = (int)(maxSliderLength * z_bound / y_bound);
+                    ySlider.Height = ySlider2.Height = maxSliderLength;
+                    zSlider.Width = zSlider2.Height = (int)(maxSliderLength * z_bound / y_bound);
                     xSlider.Width = xSlider2.Width = (int)(maxSliderLength * x_bound / y_bound);
-
                 }
                 else
                 {
                     z_Length = maxImageWidth;
                     y_Length = maxImageWidth * y_bound / z_bound;
                     x_Length = maxImageWidth * x_bound / z_bound;
-                    zSlider.Height = zSlider2.Height = maxSliderLength;
-                    ySlider.Width = ySlider2.Height = (int)(maxSliderLength * y_bound / z_bound);
+                    zSlider.Width = zSlider2.Height = maxSliderLength;
+                    ySlider.Height = ySlider2.Height = (int)(maxSliderLength * y_bound / z_bound);
                     xSlider.Width = xSlider2.Width = (int)(maxSliderLength * x_bound / z_bound);
-                }            
+                }
 
                 //Create an array of byte arrays, one for each frame, stored in allDataArray
                 allDataArray = new byte[frameCount][];
@@ -288,9 +286,9 @@ namespace IImage3d_GuiClient
                 //get ColorMap
                 colorMap = source.GetColorMap();
 
-                //get ECG info
-                Image3dAPI.EcgSeries ecg = source.GetECG();
-                double startTime = ecg.start_time;
+                //get ECG info - NOT IMPLEMENTED YET
+//                Image3dAPI.EcgSeries ecg = source.GetECG();
+//                double startTime = ecg.start_time;
 
                 //get Probe info
                 Image3dAPI.ProbeInfo probe = source.GetProbeInfo();
@@ -298,7 +296,7 @@ namespace IImage3d_GuiClient
                 Image3dAPI.ProbeType pType = probe.type;
 
                 //get Sop instance 
-                string sop = "Some UID goes here";
+                string sop = source.GetSopInstanceUID();
 
                 //Display image information that will not change with frame or dimension sliders.
                 List<imageInfoItem> imageInfoCategory = new List<imageInfoItem>();
@@ -310,7 +308,12 @@ namespace IImage3d_GuiClient
                 imageInfoCategory.Add(new imageInfoItem() { description = "Bytes per pixel:" });
                 imageInfoCategory.Add(new imageInfoItem() { description = "Image resolution:" });
                 imageInfoCategory.Add(new imageInfoItem() { description = "Dispacement from probe tip:" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
+
                 imageInfoCategory.Add(new imageInfoItem() { description = "Total size of image:" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
                 imageInfoCategory.Add(new imageInfoItem() { description = "" });
 
                 imageInfoCategoryItems.ItemsSource = imageInfoCategory;
@@ -323,8 +326,12 @@ namespace IImage3d_GuiClient
                 imageInfoValue.Add(new imageInfoItem() { description = "" + imageData.format });
                 imageInfoValue.Add(new imageInfoItem() { description = "1" });
                 imageInfoValue.Add(new imageInfoItem() { description = "" + imageData.dims[0] + " x " + imageData.dims[1] + " x " + imageData.dims[2] + " pixels" });
-                imageInfoValue.Add(new imageInfoItem() { description = "" + "x = " + x_origin + ", y = " + y_origin + ", z= " + z_origin + " (m)" });
-                imageInfoValue.Add(new imageInfoItem() { description = "" + "x = " + x_bound + ", y = " + y_bound + ", z= " + z_bound + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "A = " + z_origin + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "B = " + x_origin + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "C = " + y_origin + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "A = " + z_bound + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "B = " + x_bound + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "C = " + y_bound + " (m)" });
 
                 imageInfoValueItems.ItemsSource = imageInfoValue;
 
@@ -360,8 +367,8 @@ namespace IImage3d_GuiClient
 
                 displayDynamicImageInfo();
                 displayImageX();    //Call displayImage to display the the rest of the info that changes with frame/sliders
-                displayImageY();    
-                displayImageZ();    
+                displayImageY();
+                displayImageZ();
             }
             catch (Exception exp)
             {
@@ -369,9 +376,14 @@ namespace IImage3d_GuiClient
                 return;
             }
 
+            //If image is successfully loaded, move the load file text boxes
+            Grid.SetRow(loadGrid, 1);
+            Grid.SetColumn(loadGrid, 2);
+            loadGridLabel.Content = "Load Image File / DLL";
+
         }
-        
-        
+
+
         /******************************************************************************
                              * Create and Display images *
         *******************************************************************************/
@@ -394,7 +406,6 @@ namespace IImage3d_GuiClient
             imageDimensionCategory.Add(new imageInfoItem() { description = "" });
             imageDimensionCategory.Add(new imageInfoItem() { description = "Current Frame = " });
             imageDimensionCategory.Add(new imageInfoItem() { description = "Current Frame Time = " });
-//For testing purposes:            imageDimensionCategory.Add(new imageInfoItem() { description = "duration = " + this.durationProperty });
             imageDimensionCategory.Add(new imageInfoItem() { description = "" });
 
             dimensionCategoryItems.ItemsSource = imageDimensionCategory;
@@ -402,12 +413,12 @@ namespace IImage3d_GuiClient
             //All dimValues have been verified to be > 1
             List<imageInfoItem> imageDimensionValue = new List<imageInfoItem>();
             imageDimensionValue.Add(new imageInfoItem() { description = "" });
-            imageDimensionValue.Add(new imageInfoItem() { description = "x = " + x });
-            imageDimensionValue.Add(new imageInfoItem() { description = "y = " + y });
-            imageDimensionValue.Add(new imageInfoItem() { description = "z = " + z });
-            imageDimensionValue.Add(new imageInfoItem() { description = "x = " + (x_bound * x / (dimValues[0]-1)) });
-            imageDimensionValue.Add(new imageInfoItem() { description = "y = " + (y_bound * y / (dimValues[1]-1)) });
-            imageDimensionValue.Add(new imageInfoItem() { description = "z = " + (z_bound * z / (dimValues[2]-1)) });
+            imageDimensionValue.Add(new imageInfoItem() { description = "a = " + z });
+            imageDimensionValue.Add(new imageInfoItem() { description = "b = " + x });
+            imageDimensionValue.Add(new imageInfoItem() { description = "c = " + y });
+            imageDimensionValue.Add(new imageInfoItem() { description = "a = " + (z_bound * z / (dimValues[2] - 1)) });
+            imageDimensionValue.Add(new imageInfoItem() { description = "b = " + (x_bound * x / (dimValues[0] - 1)) });
+            imageDimensionValue.Add(new imageInfoItem() { description = "c = " + (y_bound * y / (dimValues[1] - 1)) });
             imageDimensionValue.Add(new imageInfoItem() { description = "" + currentFrame });
             imageDimensionValue.Add(new imageInfoItem() { description = "" + frameTime });
 
@@ -436,14 +447,6 @@ namespace IImage3d_GuiClient
             zImage.Width = x_Length;            //stretch image to fit real space ratio
             zImage.Height = y_Length;
             zImage.Stretch = Stretch.Fill;
-
-            //Flip image for correct display orientation
-            zImage.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
-            ScaleTransform flipTrans = new ScaleTransform();
-            flipTrans.ScaleY = -1;
-            zImage.RenderTransform = flipTrans;
-
-            RenderOptions.SetBitmapScalingMode(zImage, BitmapScalingMode.NearestNeighbor); //for sharp pixel boundaries
             zplane.Children.Add(zImage);    //add image to zplane grid
 
         }
@@ -471,7 +474,13 @@ namespace IImage3d_GuiClient
             yImage.Width = x_Length;            //stretch image to fit real space ratio
             yImage.Height = z_Length;
             yImage.Stretch = Stretch.Fill;
-            RenderOptions.SetBitmapScalingMode(yImage, BitmapScalingMode.NearestNeighbor); //for sharp pixel boundaries
+            yImage.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+
+            //flip image for correct orientation
+            ScaleTransform flipTrans = new ScaleTransform();
+            flipTrans.ScaleY = -1;
+            yImage.RenderTransform = flipTrans;
+
             yplane.Children.Add(yImage);    //add image to zplane grid
 
         }
@@ -480,28 +489,28 @@ namespace IImage3d_GuiClient
         private void displayImageX()
         {
             //x plane dimensions
-            int width = dimValues[1]; // y dimension
-            int height = dimValues[2]; // z dimension
+            int height = dimValues[1]; // y dimension
+            int width = dimValues[2]; // z dimension
             int depth = dimValues[0]; // x dimension
             int stride = width;
 
-            //Create data array for single y plane
+            //Create data array for single x plane
             byte[] xImageData = new byte[width * height];
-            for (int i = 0; i < height; i++)        //Fill array with data at plane 'y'.
+
+            for (int i = 0; i < height; i++)        //Fill array with data at plane 'x'.
             {
-                for(int j = 0; j < width; j++)
+                for (int j = 0; j < width; j++)
                 {
-                    xImageData[width * i + j] = frameDataArray[j * stride0 + i * stride1 + x];
+                    xImageData[j + i * width] = frameDataArray[stride1 * j + x + i * stride0];
                 }
             }
 
             // Create bitmap and add to display
             xplane.Children.Remove(xImage);       //remove previous image               
             xImage = createImage(width, height, stride, xImageData);
-            xImage.Width = y_Length;            //stretch image to fit real space ratio
-            xImage.Height = z_Length;
+            xImage.Width = z_Length;            //stretch image to fit real space ratio
+            xImage.Height = y_Length;
             xImage.Stretch = Stretch.Fill;
-            RenderOptions.SetBitmapScalingMode(xImage, BitmapScalingMode.NearestNeighbor); //for sharp pixel boundaries
             xplane.Children.Add(xImage);     //add image to zplane grid           
         }
 
@@ -554,12 +563,12 @@ namespace IImage3d_GuiClient
 
                 bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
             }
-             
+
             // Create Image and set its width and height  
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-  
+
             image.Source = bitmap;
-                                  
+
             return image;
         }
 
@@ -664,21 +673,20 @@ namespace IImage3d_GuiClient
                 FrameTextBox.Text = textBox.Text;
                 if (frameRate == 0)
                     frameRate = oldFrameRate;
-                duration = (1 / frameRate * frameCount); //frameRate already determined as != 0
-                frameAnimation.Duration = new TimeSpan(0, 0, Convert.ToInt32((1 / frameRate * frameCount)));                
+                frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * (1 / frameRate * frameCount)));
             }
             else
             {
                 System.Windows.MessageBox.Show("Please input 1 to 70 only.");
             }
-           
-        }        
 
-       
+        }
 
-/******************************************************************************
-                            * Gradient Test *
-*******************************************************************************/
+
+
+        /******************************************************************************
+                                    * Gradient Test *
+        *******************************************************************************/
 
         //Temporary way to test image viewer with data. Locally created.       
         //Create gradient with values from 0 to 85 for each dimensions so total range is 0 to 255
@@ -686,7 +694,7 @@ namespace IImage3d_GuiClient
         {
             double pixel = 255 / (a + b + c - 3);
             int count = 0;
-            byte[] gradient = new byte[(int)a * (int)b * (int)c];             
+            byte[] gradient = new byte[(int)a * (int)b * (int)c];
             for (int z = 0; z < c; ++z)
             {
                 for (int y = 0; y < b; ++y)
