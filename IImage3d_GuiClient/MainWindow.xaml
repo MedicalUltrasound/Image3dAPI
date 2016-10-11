@@ -92,7 +92,7 @@
             <!-- Frame Slider Grid-->
             <Grid Grid.Row="2" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="130" />
                     <ColumnDefinition Width="110" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -109,22 +109,8 @@
                         Width="300" Margin="20,0,0,-10"  HorizontalAlignment="Left" />
 
                 <!-- Frame Slider Start Button and Animation (Animation "To" and "Duration" set in code) -->
-                <Button Grid.Row ="1" Grid.Column ="0" Content="Play" Width="50" HorizontalAlignment="left" Margin="5,20,0,0">
-                    <Button.Triggers>
-                        <EventTrigger RoutedEvent="Button.Click">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation
-                                        x:Name="frameAnimation"
-                                        Storyboard.TargetName="frameSlider" 
-                                        Storyboard.TargetProperty="Value"
-                                        From="1.0"                                        
-                                        FillBehavior="HoldEnd"/>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </Button.Triggers>
-                </Button>
+                <Button x:Name ="playButton" Grid.Row ="1" Grid.Column ="0" Content="Play" Width="50" HorizontalAlignment="left" Margin="5,20,0,0" Click="playButton_Click" />
+                <Button x:Name ="stopButton" Grid.Row ="1" Grid.Column ="0" Content="Stop" Width="50" HorizontalAlignment="left" Margin="65,20,0,0" Click="stopButton_Click" />
 
                 <!--Frame Rate selector -->
                 <Label Grid.Row ="1" Grid.Column="1" Style="{StaticResource specTextStyle}" 
@@ -295,15 +281,32 @@
 
                 <Separator Opacity="0" Height="15"/>
                 <Button x:Name="LoadImageButton" Content="Load Files" Click="LoadImageButton_Click" Width="80"/>
-
             </StackPanel>
-
+            
             <StackPanel Grid.Column="1" Margin="0,54,0,-0.4" Style="{StaticResource specTextStyle}" Grid.RowSpan="2" Width="54">
                 <Separator Opacity="0" Height="17"/>
                 <Button Content="Browse" Click="imageFileBrowseButton_Click" />
             </StackPanel>
+
         </Grid>
 
+        <Grid Grid.Row="1" Grid.Column="2" Width="350" Margin="5,5,5,5">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height ="Auto"/>
+                <RowDefinition Height ="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.ColumnSpan="2" HorizontalAlignment="Left" Content="ECG info" Style="{StaticResource specTextStyle}" />
+
+            <Canvas x:Name="ecgCanvas" Grid.Row="1" Grid.ColumnSpan="2" Width="350" Margin="0,40,0,0" />
+
+        </Grid>
     </Grid>
     <!-- end of main grid-->
 </Window>
