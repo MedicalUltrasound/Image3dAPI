@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,33 +11,37 @@ using Image3dAPI;
 using System.IO;
 using System.Xml;
 using System.Windows.Controls.Primitives;
+using System.Windows.Shapes;
+using System.Windows.Media.Animation;
+using System.Linq;
 
 namespace IImage3d_GuiClient
 {
     public partial class MainWindow : Window
     {
-              
+
 //      private variables
         private int x;              //current x,y,z pixel value
-        private int y;              
-        private int z;              
+        private int y;
+        private int z;
         private float x_bound;      //Real space image measurement in x,y,z dimension
-        private float y_bound;      
-        private float z_bound;     
+        private float y_bound;
+        private float z_bound;
         private float x_Length;     //Adjusted image dimensions based on real space bounds
         private float y_Length;
         private float z_Length;
         private ushort[] dimValues;         //Pixel dimensions of image. Array contains 3 values for x,y,z
-        private int currentFrame = 1;   
+        private int currentFrame = 1;
         private double frameTime;
         private double frameRate = 60;
         private uint frameCount;
-        private double duration;            //Duration of frame slider animation
         private double[] frameTimesArray;   //Array of all the individual frame times
         private byte[][] allDataArray;      //2D array for all image data. 1st dim is frame, 2nd is frameData arrays
         private byte[] frameDataArray;      //byte array of pixel image data for a frame
-        private int maxSliderLength = 750;  //750 slider is equivilent to 300 image width
-        private int maxImageWidth = 300;    //Based on screen size
+        private const int MAX_SLIDER_LENGTH = 750;  //750 slider is equivilent to 300 image width
+        private const int MAX_IMAGE_WIDTH = 300;    //Based on screen size
+        private const double ECG_MAX_HEIGHT = 35;
+        private const double ECG_MAX_LENGTH = 340;
         private int stride0;
         private int stride1;
         private System.Windows.Controls.Image xImage;   //Current xplane, yplane, zplane images
@@ -45,8 +49,17 @@ namespace IImage3d_GuiClient
         private System.Windows.Controls.Image zImage;
         private uint[] colorMap = new uint[256];
         private string progID = "some id";
+        private string imageFile = "some file";
+        private Image3dAPI.EcgSeries ecg;
+        private Storyboard animationStoryboard;
+        DoubleAnimation frameAnimation;
+        EllipseGeometry ecgTrackerEllipse;
+        double ecgYScale;
+        double ecgXScale;
+        bool isECG;
+ //       int currentFrame;
 
-       //Image Information Item Descriptions
+        //Image Information Item Descriptions
         public class imageInfoItem
         {
             public string description { get; set; }
@@ -85,13 +98,14 @@ namespace IImage3d_GuiClient
 
             //If xml file with current dll information exists, load the info
             XmlDocument dllInfoXml = new XmlDocument();
-            if(File.Exists(Environment.CurrentDirectory + "//IImage3dDllInfo.xml"))           
+            if (File.Exists(Environment.CurrentDirectory + "//IImage3dDllInfo.xml"))
             {
                 try
                 {
                     dllInfoXml.Load(Environment.CurrentDirectory + "//IImage3dDllInfo.xml");
                     ProgIdTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/progID").InnerText;
                     ImageFileTextBox.Text = dllInfoXml.DocumentElement.SelectSingleNode("/dllImageInfo/dcmFile").InnerText;
+                    
                     //If info exists, automatically push the load image buton
                     LoadImageButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
                 }
@@ -100,10 +114,10 @@ namespace IImage3d_GuiClient
                     //File did not load correctly. Continue as if no file existed.
                     ProgIdTextBox.Text = "";
                 }
-                
-            }           
+            }          
         }
-        
+
+
         //Load Image Button
         //After user clicks this button, the program attempts to load the dll
         //and image files. If successfully loaded, the inital image information
@@ -111,9 +125,12 @@ namespace IImage3d_GuiClient
         private void LoadImageButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             try
-            {
+            {                             
                 IImage3dSource source = null;
                 IImage3dFileLoader loader = null;
+
+                progID = ProgIdTextBox.Text;
+                imageFile = ImageFileTextBox.Text;
 
                 //CoCreateInstance of loaded DLL
                 progID = ProgIdTextBox.Text;
@@ -158,14 +175,92 @@ namespace IImage3d_GuiClient
                     System.Windows.MessageBox.Show("Could not save dll information to file. \n\nError Details\n" + ex.ToString());
                 }
 
-                //If image is successfully loaded, move the load file text boxes
-                Grid.SetRow(loadGrid, 1);
-                Grid.SetColumn(loadGrid, 2);
-                loadGridLabel.Content = "Load Image File / DLL";
+                //Set up frame animation
+                frameAnimation = new DoubleAnimation();
+                frameAnimation.RepeatBehavior = RepeatBehavior.Forever;
+                Storyboard.SetTargetName(frameAnimation, "frameSlider");
+                Storyboard.SetTargetProperty(frameAnimation, new PropertyPath("Value"));
+                animationStoryboard = new Storyboard();
+                animationStoryboard.RepeatBehavior = RepeatBehavior.Forever;
+                animationStoryboard.AutoReverse = true;
+                animationStoryboard.Children.Add(frameAnimation);
+                frameAnimation.From = 0;
+
+                //Get ECG data if it is present
+                isECG = false;
+                ecgCanvas.Children.Clear();
+
+                try
+                {
+                    ecg = source.GetECG();
+                    isECG = true;
+                }
+                catch { }//if getting ecg data fails, do not use it.
+
+                //Only use ecg if there is valid ecg data
+                if (!isECG || ecg.samples == null || ecg.samples.Length == 0 || ecg.delta_time <= 0)
+                    isECG = false;
+                if(isECG)
+                {
+                    // Create the EllipseGeometry to animate.
+                    ecgTrackerEllipse = new EllipseGeometry(new Point(0, ecg.samples[0]), 3, 3);
+
+                    // Create a Path element to display the geometry.
+                    System.Windows.Shapes.Path ellipsePath = new System.Windows.Shapes.Path();
+                    ellipsePath.Data = ecgTrackerEllipse;
+                    ellipsePath.Fill = Brushes.Yellow;
+
+                    ecgCanvas.Children.Add(ellipsePath);
+
+                    // Create the ecg path.
+                    PathGeometry ecgPathGeometry = new PathGeometry();
+                    PathFigure ecgPathFigure = new PathFigure();
+                    ecgPathFigure.StartPoint = new Point(0, 0);
+                    PolyBezierSegment pBezierSegment = new PolyBezierSegment();
+
+                    //set ecg scale so path fits in grid
+                    double ecgMin = ecg.samples.Min();
+                    ecgYScale = ECG_MAX_HEIGHT / (ecg.samples.Max() - ecgMin);
+                    ecgXScale = ECG_MAX_LENGTH / ecg.samples.Length;
+
+                    //add the ecgData to the path
+                    for (int i = 0; i < ecg.samples.Length; i++)
+                        pBezierSegment.Points.Add(new Point(i * ecgXScale, (-ecg.samples[i]) * ecgYScale));
+                    ecgPathFigure.Segments.Add(pBezierSegment);
+                    ecgPathGeometry.Figures.Add(ecgPathFigure);
+
+                    // Freeze the PathGeometry for performance benefits.
+                    ecgPathGeometry.Freeze();
+
+                    // Make path visible
+                    System.Windows.Shapes.Path ecgPath = new System.Windows.Shapes.Path();
+                    ecgPath.Stroke = Brushes.Yellow;
+                    ecgPath.StrokeThickness = 1;
+                    ecgPath.Data = ecgPathGeometry;
+                    ecgCanvas.Children.Add(ecgPath);
+                   
+                    //If trig lines exist, draw them 
+                    SolidColorBrush trigBrush = new SolidColorBrush();
+                    trigBrush.Color = Colors.HotPink;
+                    for (int i = 0; i < ecg.trig_times.Length; i++)
+                    {
+                        Line trigLine = new Line();
+                        trigLine.Stroke = trigBrush;
+                        trigLine.X1 = ecg.trig_times[i] * ecgXScale / ecg.delta_time;
+                        trigLine.Y1 = 5;
+                        trigLine.X2 = trigLine.X1;
+                        trigLine.Y2 = 15;
+                        trigLine.StrokeThickness = 4;
+                        ecgCanvas.Children.Add(trigLine);             
+                    }                    
+                } //end ECG
 
 
                 //get frame information
                 frameCount = source.GetFrameCount();    //get frame count
+                currentFrame = 1;
+                frameSlider.Maximum = 0;
+
                 if (frameCount < 1)
                 {
                     System.Windows.MessageBox.Show("Frame count < 1. Cannot display image");
@@ -178,12 +273,23 @@ namespace IImage3d_GuiClient
                 {
                     if (frameTimesArray[1] - frameTimesArray[0] > 0)
                     {
+                        Canvas.SetZIndex(noFrameCanvas, (int)0);
                         frameRate = 1 / (frameTimesArray[1] - frameTimesArray[0]); //get frameRate using difference between first two frames
-                        duration = ((frameTimesArray[1] - frameTimesArray[0]) * frameCount);  //get animation duration using difference between first two frames and total frames                                                                     //           this.durationProperty = new TimeSpan(0, 0, Convert.ToInt32(duration)).ToString("c");
-                        frameAnimation.Duration = new TimeSpan(0, 0, Convert.ToInt32((1 / frameRate * frameCount)));
-                        frameAnimation.To = frameCount - 1;
-                        frameSlider.Maximum = frameCount - 1;
+                        frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * (1 / frameRate) * frameCount));
+                        if (isECG && ecg.samples.Length > 0)
+                        {
+                            frameSlider.Maximum = ecg.samples.Length - 1;
+                            frameAnimation.To = ecg.samples.Length - 1;
+                        }
+                        else
+                        {
+                            frameSlider.Maximum = frameCount - 1;
+                            frameAnimation.To = frameCount - 1;
+                        }
                         FrameTextBox.Text = Convert.ToInt32(frameRate).ToString();
+                        
+                        //Add animation to storyboard
+                        animationStoryboard.Children.Add(frameAnimation);
                     }
                     else
                     {
@@ -194,6 +300,8 @@ namespace IImage3d_GuiClient
                 {
                     Canvas.SetZIndex(noFrameCanvas, (int)99);
                 }
+               
+
                 //get real space geometry - Cart3dGeom
                 Image3dAPI.Cart3dGeom geom = source.GetBoundingBox();
                 float x_origin = geom.origin_x; //Get the origin displacement
@@ -229,7 +337,8 @@ namespace IImage3d_GuiClient
                     System.Windows.MessageBox.Show("Invaled stride dimensions. Either stride0 < x or stride1 < x*y");
                     return;
                 }
-                //Find largest bound and set that dimension to the maxImageWidth.
+
+                //Find largest bound and set that dimension to the MAX_IMAGE_WIDTH.
                 //Use this ratio to determine the other image dimsions.
                 //Set Slider lengths to match the image dimensions.
                 //x_bound, y_bound, and z_bound have already been verified to be > 0.
@@ -237,68 +346,71 @@ namespace IImage3d_GuiClient
                 {
                     if (x_bound > z_bound)
                     {
-                        x_Length = maxImageWidth;
-                        y_Length = maxImageWidth * y_bound / x_bound;
-                        z_Length = maxImageWidth * z_bound / x_bound;
-                        xSlider.Width = xSlider2.Width = maxSliderLength;
-                        ySlider.Width = ySlider2.Height = (int)(maxSliderLength * y_bound / x_bound);
-                        zSlider.Height = zSlider2.Height = (int)(maxSliderLength * z_bound / x_bound);
-
+                        x_Length = MAX_IMAGE_WIDTH;
+                        y_Length = MAX_IMAGE_WIDTH * y_bound / x_bound;
+                        z_Length = MAX_IMAGE_WIDTH * z_bound / x_bound;
+                        xSlider.Width = xSlider2.Width = MAX_SLIDER_LENGTH;
+                        ySlider.Height = ySlider2.Height = (int)(MAX_SLIDER_LENGTH * y_bound / x_bound);
+                        zSlider.Width = zSlider2.Height = (int)(MAX_SLIDER_LENGTH * z_bound / x_bound);
                     }
                     else
                     {
-                        z_Length = maxImageWidth;
-                        y_Length = maxImageWidth * y_bound / z_bound;
-                        x_Length = maxImageWidth * x_bound / z_bound;
-                        zSlider.Height = zSlider2.Height = maxSliderLength;
-                        ySlider.Width = ySlider2.Height = (int)(maxSliderLength * y_bound / z_bound);
-                        xSlider.Width = xSlider2.Width = (int)(maxSliderLength * x_bound / z_bound);
-
+                        z_Length = MAX_IMAGE_WIDTH;
+                        y_Length = MAX_IMAGE_WIDTH * y_bound / z_bound;
+                        x_Length = MAX_IMAGE_WIDTH * x_bound / z_bound;
+                        zSlider.Width = zSlider2.Height = MAX_SLIDER_LENGTH;
+                        ySlider.Height = ySlider2.Height = (int)(MAX_SLIDER_LENGTH * y_bound / z_bound);
+                        xSlider.Width = xSlider2.Width = (int)(MAX_SLIDER_LENGTH * x_bound / z_bound);
                     }
                 }
                 else if (y_bound > z_bound)
                 {
-                    y_Length = maxImageWidth;
-                    z_Length = maxImageWidth * z_bound / y_bound;
-                    x_Length = maxImageWidth * x_bound / y_bound;
-                    ySlider.Width = ySlider2.Height = maxSliderLength;
-                    zSlider.Height = zSlider2.Height = (int)(maxSliderLength * z_bound / y_bound);
-                    xSlider.Width = xSlider2.Width = (int)(maxSliderLength * x_bound / y_bound);
-
+                    y_Length = MAX_IMAGE_WIDTH;
+                    z_Length = MAX_IMAGE_WIDTH * z_bound / y_bound;
+                    x_Length = MAX_IMAGE_WIDTH * x_bound / y_bound;
+                    ySlider.Height = ySlider2.Height = MAX_SLIDER_LENGTH;
+                    zSlider.Width = zSlider2.Height = (int)(MAX_SLIDER_LENGTH * z_bound / y_bound);
+                    xSlider.Width = xSlider2.Width = (int)(MAX_SLIDER_LENGTH * x_bound / y_bound);
                 }
                 else
                 {
-                    z_Length = maxImageWidth;
-                    y_Length = maxImageWidth * y_bound / z_bound;
-                    x_Length = maxImageWidth * x_bound / z_bound;
-                    zSlider.Height = zSlider2.Height = maxSliderLength;
-                    ySlider.Width = ySlider2.Height = (int)(maxSliderLength * y_bound / z_bound);
-                    xSlider.Width = xSlider2.Width = (int)(maxSliderLength * x_bound / z_bound);
-                }            
+                    z_Length = MAX_IMAGE_WIDTH;
+                    y_Length = MAX_IMAGE_WIDTH * y_bound / z_bound;
+                    x_Length = MAX_IMAGE_WIDTH * x_bound / z_bound;
+                    zSlider.Width = zSlider2.Height = MAX_SLIDER_LENGTH;
+                    ySlider.Height = ySlider2.Height = (int)(MAX_SLIDER_LENGTH * y_bound / z_bound);
+                    xSlider.Width = xSlider2.Width = (int)(MAX_SLIDER_LENGTH * x_bound / z_bound);
+                }
 
                 //Create an array of byte arrays, one for each frame, stored in allDataArray
+                if(allDataArray != null)
+                {
+                    allDataArray = null;
+                }
+
                 allDataArray = new byte[frameCount][];
                 for (uint i = 0; i < frameCount; i++)
                 {
                     Image3dAPI.Image3d im3dData = source.GetFrame(i, geom, max_res);
-                    allDataArray[i] = im3dData.data;
+                    allDataArray[i] = im3dData.data;                   
                 }
                 frameDataArray = allDataArray[0];
 
                 //get ColorMap
                 colorMap = source.GetColorMap();
 
-                //get ECG info
-                Image3dAPI.EcgSeries ecg = source.GetECG();
-                double startTime = ecg.start_time;
-
                 //get Probe info
                 Image3dAPI.ProbeInfo probe = source.GetProbeInfo();
                 string pName = probe.name;
                 Image3dAPI.ProbeType pType = probe.type;
-
+                
                 //get Sop instance 
-                string sop = "Some UID goes here";
+                string sop = source.GetSopInstanceUID();
+
+                Marshal.ReleaseComObject(loader);
+                Marshal.ReleaseComObject(source);
+
+
 
                 //Display image information that will not change with frame or dimension sliders.
                 List<imageInfoItem> imageInfoCategory = new List<imageInfoItem>();
@@ -310,7 +422,12 @@ namespace IImage3d_GuiClient
                 imageInfoCategory.Add(new imageInfoItem() { description = "Bytes per pixel:" });
                 imageInfoCategory.Add(new imageInfoItem() { description = "Image resolution:" });
                 imageInfoCategory.Add(new imageInfoItem() { description = "Dispacement from probe tip:" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
+
                 imageInfoCategory.Add(new imageInfoItem() { description = "Total size of image:" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
+                imageInfoCategory.Add(new imageInfoItem() { description = "" });
                 imageInfoCategory.Add(new imageInfoItem() { description = "" });
 
                 imageInfoCategoryItems.ItemsSource = imageInfoCategory;
@@ -323,8 +440,12 @@ namespace IImage3d_GuiClient
                 imageInfoValue.Add(new imageInfoItem() { description = "" + imageData.format });
                 imageInfoValue.Add(new imageInfoItem() { description = "1" });
                 imageInfoValue.Add(new imageInfoItem() { description = "" + imageData.dims[0] + " x " + imageData.dims[1] + " x " + imageData.dims[2] + " pixels" });
-                imageInfoValue.Add(new imageInfoItem() { description = "" + "x = " + x_origin + ", y = " + y_origin + ", z= " + z_origin + " (m)" });
-                imageInfoValue.Add(new imageInfoItem() { description = "" + "x = " + x_bound + ", y = " + y_bound + ", z= " + z_bound + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "A = " + z_origin + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "B = " + x_origin + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "C = " + y_origin + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "A = " + z_bound + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "B = " + x_bound + " (m)" });
+                imageInfoValue.Add(new imageInfoItem() { description = "" + "C = " + y_bound + " (m)" });
 
                 imageInfoValueItems.ItemsSource = imageInfoValue;
 
@@ -360,8 +481,8 @@ namespace IImage3d_GuiClient
 
                 displayDynamicImageInfo();
                 displayImageX();    //Call displayImage to display the the rest of the info that changes with frame/sliders
-                displayImageY();    
-                displayImageZ();    
+                displayImageY();
+                displayImageZ();
             }
             catch (Exception exp)
             {
@@ -369,9 +490,15 @@ namespace IImage3d_GuiClient
                 return;
             }
 
+            //If image is successfully loaded, move the load file text boxes
+            Grid.SetRow(loadGrid, 1);
+            Grid.SetColumn(loadGrid, 2);
+            loadGrid.Margin = new Thickness(5, 95, 5, 5);
+            loadGridLabel.Content = "Load Image File / DLL";
+
         }
-        
-        
+
+
         /******************************************************************************
                              * Create and Display images *
         *******************************************************************************/
@@ -394,7 +521,6 @@ namespace IImage3d_GuiClient
             imageDimensionCategory.Add(new imageInfoItem() { description = "" });
             imageDimensionCategory.Add(new imageInfoItem() { description = "Current Frame = " });
             imageDimensionCategory.Add(new imageInfoItem() { description = "Current Frame Time = " });
-//For testing purposes:            imageDimensionCategory.Add(new imageInfoItem() { description = "duration = " + this.durationProperty });
             imageDimensionCategory.Add(new imageInfoItem() { description = "" });
 
             dimensionCategoryItems.ItemsSource = imageDimensionCategory;
@@ -402,16 +528,20 @@ namespace IImage3d_GuiClient
             //All dimValues have been verified to be > 1
             List<imageInfoItem> imageDimensionValue = new List<imageInfoItem>();
             imageDimensionValue.Add(new imageInfoItem() { description = "" });
-            imageDimensionValue.Add(new imageInfoItem() { description = "x = " + x });
-            imageDimensionValue.Add(new imageInfoItem() { description = "y = " + y });
-            imageDimensionValue.Add(new imageInfoItem() { description = "z = " + z });
-            imageDimensionValue.Add(new imageInfoItem() { description = "x = " + (x_bound * x / (dimValues[0]-1)) });
-            imageDimensionValue.Add(new imageInfoItem() { description = "y = " + (y_bound * y / (dimValues[1]-1)) });
-            imageDimensionValue.Add(new imageInfoItem() { description = "z = " + (z_bound * z / (dimValues[2]-1)) });
+            imageDimensionValue.Add(new imageInfoItem() { description = "a = " + z });
+            imageDimensionValue.Add(new imageInfoItem() { description = "b = " + x });
+            imageDimensionValue.Add(new imageInfoItem() { description = "c = " + y });
+            imageDimensionValue.Add(new imageInfoItem() { description = "a = " + (z_bound * z / (dimValues[2] - 1)) });
+            imageDimensionValue.Add(new imageInfoItem() { description = "b = " + (x_bound * x / (dimValues[0] - 1)) });
+            imageDimensionValue.Add(new imageInfoItem() { description = "c = " + (y_bound * y / (dimValues[1] - 1)) });
             imageDimensionValue.Add(new imageInfoItem() { description = "" + currentFrame });
             imageDimensionValue.Add(new imageInfoItem() { description = "" + frameTime });
 
             dimensionValueItems.ItemsSource = imageDimensionValue;
+
+            
+            
+
         }
 
         // ----------------------------------------------------------------------------------------
@@ -436,14 +566,6 @@ namespace IImage3d_GuiClient
             zImage.Width = x_Length;            //stretch image to fit real space ratio
             zImage.Height = y_Length;
             zImage.Stretch = Stretch.Fill;
-
-            //Flip image for correct display orientation
-            zImage.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
-            ScaleTransform flipTrans = new ScaleTransform();
-            flipTrans.ScaleY = -1;
-            zImage.RenderTransform = flipTrans;
-
-            RenderOptions.SetBitmapScalingMode(zImage, BitmapScalingMode.NearestNeighbor); //for sharp pixel boundaries
             zplane.Children.Add(zImage);    //add image to zplane grid
 
         }
@@ -471,7 +593,13 @@ namespace IImage3d_GuiClient
             yImage.Width = x_Length;            //stretch image to fit real space ratio
             yImage.Height = z_Length;
             yImage.Stretch = Stretch.Fill;
-            RenderOptions.SetBitmapScalingMode(yImage, BitmapScalingMode.NearestNeighbor); //for sharp pixel boundaries
+            yImage.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+
+            //flip image for correct orientation
+            ScaleTransform flipTrans = new ScaleTransform();
+            flipTrans.ScaleY = -1;
+            yImage.RenderTransform = flipTrans;
+
             yplane.Children.Add(yImage);    //add image to zplane grid
 
         }
@@ -480,28 +608,28 @@ namespace IImage3d_GuiClient
         private void displayImageX()
         {
             //x plane dimensions
-            int width = dimValues[1]; // y dimension
-            int height = dimValues[2]; // z dimension
+            int height = dimValues[1]; // y dimension
+            int width = dimValues[2]; // z dimension
             int depth = dimValues[0]; // x dimension
             int stride = width;
 
-            //Create data array for single y plane
+            //Create data array for single x plane
             byte[] xImageData = new byte[width * height];
-            for (int i = 0; i < height; i++)        //Fill array with data at plane 'y'.
+
+            for (int i = 0; i < height; i++)        //Fill array with data at plane 'x'.
             {
-                for(int j = 0; j < width; j++)
+                for (int j = 0; j < width; j++)
                 {
-                    xImageData[width * i + j] = frameDataArray[j * stride0 + i * stride1 + x];
+                    xImageData[j + i * width] = frameDataArray[stride1 * j + x + i * stride0];
                 }
             }
 
             // Create bitmap and add to display
             xplane.Children.Remove(xImage);       //remove previous image               
             xImage = createImage(width, height, stride, xImageData);
-            xImage.Width = y_Length;            //stretch image to fit real space ratio
-            xImage.Height = z_Length;
+            xImage.Width = z_Length;            //stretch image to fit real space ratio
+            xImage.Height = y_Length;
             xImage.Stretch = Stretch.Fill;
-            RenderOptions.SetBitmapScalingMode(xImage, BitmapScalingMode.NearestNeighbor); //for sharp pixel boundaries
             xplane.Children.Add(xImage);     //add image to zplane grid           
         }
 
@@ -517,12 +645,12 @@ namespace IImage3d_GuiClient
             double dpiX = 96;
             double dpiY = 96;
 
-            BitmapSource bitmap;
+            BitmapSource bitmapSource;
 
             if (colorMap.Length != 256)
             {
                 var pixelFormat = PixelFormats.Gray8; // 8 bit grayscale. 1 byte per pixel
-                bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imData, stride);
+                bitmapSource = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imData, stride);
             }
             else
             {
@@ -552,14 +680,12 @@ namespace IImage3d_GuiClient
                     counter += 4;
                 }
 
-                bitmap = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
+                bitmapSource = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, imDataColor, stride * 4);
             }
-             
-            // Create Image and set its width and height  
+
+            // Create Image 
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-  
-            image.Source = bitmap;
-                                  
+            image.Source = bitmapSource;            
             return image;
         }
 
@@ -574,10 +700,6 @@ namespace IImage3d_GuiClient
         {
             // Create OpenFileDialog 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
-            // Set filter for file extension and default file extension 
-            dlg.DefaultExt = ".dcm";
-            dlg.Filter = "DICOM Files (*.dcm)|*.dcm|All Files (*.*)|*.*";
 
             // Display OpenFileDialog by calling ShowDialog method 
             bool? result = dlg.ShowDialog();
@@ -629,21 +751,49 @@ namespace IImage3d_GuiClient
         }
 
         //frameSlider
-        //Sets the current frame value based on slider position and re-displays all three
+        //Sets the current frame and ecg valuse based on slider position and re-displays all three images
         private void frameSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             //Get Slider reference and get value
             var slider = sender as Slider;
             int value = (int)slider.Value;
-            //Set variables and re-display images with new data.
-            frameDataArray = allDataArray[value]; //get the current frame data
-            frameTime = frameTimesArray[value];   //get the current frame time
-            currentFrame = value + 1;
-            displayDynamicImageInfo();
-            displayImageX();
-            displayImageY();
-            displayImageZ();
+            int frameChangeValue = value;
+
+            //If ECG is present, update ecg tracker ellipse position to the next point on the ECG curve
+            //Also, adjust frameChangeValue so that images only reload once for every frame
+            if (isECG && ecg.samples.Length > 0)
+            {
+                ecgTrackerEllipse.Center = (new Point(value * ecgXScale, (-ecg.samples[value]) * ecgYScale));
+                frameChangeValue = ((int)frameCount * value) / ecg.samples.Length;
+            }
+
+            //If changing frame, set variables and re-display images with new data.
+            //For display purposes currentFrame starts at 1, whereas frameChangeValue will start at 0
+            if (frameChangeValue != currentFrame - 1)
+            {
+                frameDataArray = allDataArray[frameChangeValue]; //get the current frame data
+                frameTime = frameTimesArray[frameChangeValue];   //get the current frame time
+                currentFrame = frameChangeValue + 1;
+                displayDynamicImageInfo();
+                displayImageX();
+                displayImageY();
+                displayImageZ();
+            }
         }
+
+        //Play and Stop buttons to begin and end animations
+        private void playButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // Start the storyboard.
+            animationStoryboard.Begin(this, true);
+        }
+
+        private void stopButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // Start the storyboard.
+            animationStoryboard.Stop(this);
+        }
+
 
         //Makes sure that input for frame rate is a positive integer.
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
@@ -664,29 +814,27 @@ namespace IImage3d_GuiClient
                 FrameTextBox.Text = textBox.Text;
                 if (frameRate == 0)
                     frameRate = oldFrameRate;
-                duration = (1 / frameRate * frameCount); //frameRate already determined as != 0
-                frameAnimation.Duration = new TimeSpan(0, 0, Convert.ToInt32((1 / frameRate * frameCount)));                
+                if (frameAnimation != null)
+                    frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * (1 / frameRate * frameCount)));
             }
             else
             {
                 System.Windows.MessageBox.Show("Please input 1 to 70 only.");
             }
-           
-        }        
+        }
 
-       
 
-/******************************************************************************
-                            * Gradient Test *
-*******************************************************************************/
+        /******************************************************************************
+                                    * Gradient Test *
+        *******************************************************************************/
 
-        //Temporary way to test image viewer with data. Locally created.       
-        //Create gradient with values from 0 to 85 for each dimensions so total range is 0 to 255
+            //Temporary way to test image viewer with data. Locally created.       
+            //Create gradient with values from 0 to 85 for each dimensions so total range is 0 to 255
         public byte[] createGradient(double a, double b, double c)
         {
             double pixel = 255 / (a + b + c - 3);
             int count = 0;
-            byte[] gradient = new byte[(int)a * (int)b * (int)c];             
+            byte[] gradient = new byte[(int)a * (int)b * (int)c];
             for (int z = 0; z < c; ++z)
             {
                 for (int y = 0; y < b; ++y)
