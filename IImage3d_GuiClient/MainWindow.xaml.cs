@@ -32,7 +32,7 @@ namespace IImage3d_GuiClient
         private float z_Length;
         private ushort[] dimValues;         //Pixel dimensions of image. Array contains 3 values for x,y,z
         private int currentFrame = 1;
-        private double frameTime;
+        private double currentFrameTime;
         private double frameRate = 60;
         private uint frameCount;
         private double[] frameTimesArray;   //Array of all the individual frame times
@@ -256,7 +256,7 @@ namespace IImage3d_GuiClient
                 } //end ECG
 
 
-                //get frame information
+                 //get frame information
                 frameCount = source.GetFrameCount();    //get frame count
                 currentFrame = 1;
                 frameSlider.Maximum = 0;
@@ -266,23 +266,39 @@ namespace IImage3d_GuiClient
                     System.Windows.MessageBox.Show("Frame count < 1. Cannot display image");
                     return;
                 }
+
                 frameTimesArray = new double[frameCount];
                 frameTimesArray = source.GetFrameTimes(); //get frame times 
-                frameTime = frameTimesArray[0];           //get initial frame time
-                if (frameCount > 1 && frameTimesArray.Length > 1)
+                currentFrameTime = frameTimesArray[0];           //get initial frame time
+
+                //get average time beteween frames (deltaT)
+                if(frameCount != frameTimesArray.Length)
                 {
-                    if (frameTimesArray[1] - frameTimesArray[0] > 0)
+                    System.Windows.MessageBox.Show("Frame count vs Frame times mismatch.\nOnly first frame will be displayed");
+                    frameCount = 1;
+                }
+
+                if(frameCount > 1)
+                {
+                    double frameDuration = frameTimesArray[frameTimesArray.Length - 1] - frameTimesArray[0];
+                    double deltaT = frameDuration / (frameCount - 1);
+
+                    if (deltaT > 0)
                     {
                         Canvas.SetZIndex(noFrameCanvas, (int)0);
-                        frameRate = 1 / (frameTimesArray[1] - frameTimesArray[0]); //get frameRate using difference between first two frames
-                        frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * (1 / frameRate) * frameCount));
+                        frameRate = 1 / deltaT; //get frameRate 
+                        frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * frameDuration));
                         if (isECG && ecg.samples.Length > 0)
                         {
-                            frameSlider.Maximum = ecg.samples.Length - 1;
-                            frameAnimation.To = ecg.samples.Length - 1;
+                            //Set ecg ellipse to only travel as far as the ecg duration specifies.
+                            double ecgDuration = (ecg.samples.Length - 1) * ecg.delta_time;
+                            int ecgCycleLength = (int)(ecg.samples.Length * frameDuration / ecgDuration);
+                            frameSlider.Maximum = ecgCycleLength - 1;
+                            frameAnimation.To = ecgCycleLength - 1;
                         }
                         else
                         {
+                            //if no ecg, frameslider max will be based on frame count, not ecg
                             frameSlider.Maximum = frameCount - 1;
                             frameAnimation.To = frameCount - 1;
                         }
@@ -293,7 +309,7 @@ namespace IImage3d_GuiClient
                     }
                     else
                     {
-                        System.Windows.MessageBox.Show("Could not get frame interval.\nFrame interval <= 0.\nOnly first frame will be displayed)");
+                        System.Windows.MessageBox.Show("Could not get frame interval.\nFrame interval <= 0.\nOnly first frame will be displayed");
                     }
                 }
                 else //If there is only one frame, hide the frame slider behind a black canvas
@@ -535,7 +551,7 @@ namespace IImage3d_GuiClient
             imageDimensionValue.Add(new imageInfoItem() { description = "b = " + (x_bound * x / (dimValues[0] - 1)) });
             imageDimensionValue.Add(new imageInfoItem() { description = "c = " + (y_bound * y / (dimValues[1] - 1)) });
             imageDimensionValue.Add(new imageInfoItem() { description = "" + currentFrame });
-            imageDimensionValue.Add(new imageInfoItem() { description = "" + frameTime });
+            imageDimensionValue.Add(new imageInfoItem() { description = "" + currentFrameTime });
 
             dimensionValueItems.ItemsSource = imageDimensionValue;
 
@@ -772,7 +788,7 @@ namespace IImage3d_GuiClient
             if (frameChangeValue != currentFrame - 1)
             {
                 frameDataArray = allDataArray[frameChangeValue]; //get the current frame data
-                frameTime = frameTimesArray[frameChangeValue];   //get the current frame time
+                currentFrameTime = frameTimesArray[frameChangeValue];   //get the current frame time
                 currentFrame = frameChangeValue + 1;
                 displayDynamicImageInfo();
                 displayImageX();
