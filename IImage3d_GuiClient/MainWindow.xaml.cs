@@ -280,19 +280,20 @@ namespace IImage3d_GuiClient
 
                 if(frameCount > 1)
                 {
-                    double frameDuration = frameTimesArray[frameTimesArray.Length - 1] - frameTimesArray[0];
-                    double deltaT = frameDuration / (frameCount - 1);
+                    double timeDifference = frameTimesArray[frameTimesArray.Length - 1] - frameTimesArray[0];
+                    double deltaT = timeDifference / (frameCount - 1);
+                    double loopDuration = timeDifference + deltaT;
 
                     if (deltaT > 0)
                     {
                         Canvas.SetZIndex(noFrameCanvas, (int)0);
                         frameRate = 1 / deltaT; //get frameRate 
-                        frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * frameDuration));
+                        frameAnimation.Duration = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(1000 * loopDuration));
                         if (isECG && ecg.samples.Length > 0)
                         {
                             //Set ecg ellipse to only travel as far as the ecg duration specifies.
-                            double ecgDuration = (ecg.samples.Length - 1) * ecg.delta_time;
-                            int ecgCycleLength = (int)(ecg.samples.Length * frameDuration / ecgDuration);
+                            double ecgDuration = ecg.samples.Length * ecg.delta_time;
+                            int ecgCycleLength = (int)(loopDuration / ecg.delta_time);
                             frameSlider.Maximum = ecgCycleLength - 1;
                             frameAnimation.To = ecgCycleLength - 1;
                         }
