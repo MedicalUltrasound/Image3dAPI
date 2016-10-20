@@ -20,6 +20,8 @@ Interfaces for inter-vendor exchange of 3D ultrasound data, together with test c
 * IImage3dFileLoader::LoadFile should return success only if the file can be read as 3D data.
 * If IImage3dFileLoader::LoadFile returns success, the file must be readable with the loader. 
 * IImage3dFileLoader::LoadFile should be well behaved when and after provided with non-conforming DICOM files or non-DICOM files. 
+* API methods shall not throw exceptions. If it is possible for exceptions to be thrown in the internal implementation, they should be caught within the component, and translated into a failure return value for the IImage3D API method call.
+* IImage3D objects should expect themselves to be launched as out-of-process COM servers, because the client software will want to prevent itself from failing if there is a failure in the IImage3D object.
 
 ### Environment
 
