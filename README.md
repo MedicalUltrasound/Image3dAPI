@@ -29,3 +29,4 @@ Interfaces for inter-vendor exchange of 3D ultrasound data, together with test c
 * A DirectX 11 compliant GPU is required for interactive review of 3D images. The loader should still be well behaved when running without a DirectX 11 compliant GPU, but without any performance guarantees. 
 * The minimum requirement for CPU is 2GHz Intel Core i-series CPU or better, with 2 GB RAM or more. 
 * The loader should support all resolutions (as specified by Image3dSource::GetFrame parameter max_resolution). It is up to the workstation integration team to assess memory consumption/performance and determine suitable limits for max_resolution upon integration. The loader should be well behaved even though it cannot support the max_resolution requested by the client.
+* IImage3dFileLoader::LoadFile should accept both paths on the form 'C:\path' as well as UNC paths on the form '\\server\path'
