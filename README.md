@@ -12,7 +12,7 @@ Interfaces for inter-vendor exchange of 3D ultrasound data, together with test c
 ### Performance
 
 * Data loading of a typical image should take less than 3 seconds, including fetching all frames (from local HDD).
-* IImage3dFileLoader::LoadFile must be fast (1-10 ms). I.e. This is needed to permit scanning many DICOM files to see if they can be loaded. LoadFile should not do scan conversion by itself.
+* IImage3dFileLoader::LoadFile must be fast (1-10 ms). I.e. This is needed to permit scanning many DICOM files to see if they can be loaded. LoadFile should not do scan conversion (i.e., from ultrasound scan-lines to a 3D Cartesian volume) by itself. This conversion should be done only when the volume data is actually requested.
 * It is strongly recommended to avoid caching of frames inside the loader. It should be up to the host to perform necessary caching. This allows the host to limit memory usage depending on available resources. Hence, loading image frame data from file and scan conversion/image processing should be delayed until Iimage3dSource::GetFrame is called.
 
 ### Robustness
