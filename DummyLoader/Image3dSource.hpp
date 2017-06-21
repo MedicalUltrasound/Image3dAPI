@@ -198,7 +198,7 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE GetSopInstanceUID (/*[out] */ BSTR *uid_str) {
-        return E_NOTIMPL;
+        return S_OK;
     }
 
 private:
