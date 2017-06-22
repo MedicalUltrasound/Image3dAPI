@@ -197,8 +197,14 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE GetSopInstanceUID (/*[out] */ BSTR *uid_str) {
-        return E_NOTIMPL;
+    HRESULT STDMETHODCALLTYPE GetSopInstanceUID (/*out*/BSTR *uid_str) {
+        if (!uid_str)
+            return E_INVALIDARG;
+        if (*uid_str)
+            return E_INVALIDARG; // input must be pointer to nullptr
+
+        *uid_str = CComBSTR("DUMMY_UID").Detach();
+        return S_OK;
     }
 
 private:
