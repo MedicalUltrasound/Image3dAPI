@@ -16,44 +16,6 @@ static unsigned short ImageFormatSize (ImageFormat format) {
         throw std::logic_error("ImageFormatSize: Unknown type.");
 }
 
-/** C++ RAII wrapper of ProbeInfo. */
-struct ProbeInfoObj : public ProbeInfo {
-    ProbeInfoObj () {
-        type = PROBE_UNKNOWN;
-        name = nullptr;
-    }
-
-    ProbeInfoObj (ProbeType _type, const std::wstring & _name) {
-        type = _type;
-        name = CComBSTR(static_cast<int>(_name.length()), _name.c_str()).Detach();
-    }
-
-    ProbeInfoObj (const ProbeInfoObj & other) {
-        type = other.type;
-        name = CComBSTR(other.name).Detach();
-    }
-
-    ~ProbeInfoObj () {
-        if (name) {
-            CComBSTR tmp;
-            tmp.Attach(name);
-            name = nullptr;
-        }
-    }
-
-    ProbeInfo Detatch () {
-        ProbeInfo info = {type, name};
-        type = PROBE_UNKNOWN;
-        name = nullptr;
-        return info;
-    }
-
-private:
-    ProbeInfoObj & operator = (const ProbeInfoObj &); ///< non-assignable
-};
-static_assert(sizeof(ProbeInfoObj) == sizeof(ProbeInfo), "ProbeInfoObj size mismatch");
-
-
 /** C++ RAII wrapper of Image3d. */
 struct Image3dObj : public Image3d {
     Image3dObj () {
