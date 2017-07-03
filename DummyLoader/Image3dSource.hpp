@@ -51,18 +51,21 @@ public:
 
         {
             // simulate sine-wave ECG
-            const size_t N = 128;
-            std::vector<float> samples;
-            samples.reserve(N);
-            for (size_t i = 0; i < N; ++i)
-                samples.push_back(sin(4*i*M_PI/N));
+            const int N = 128;
+            CComSafeArray<float> samples(N);
+            for (int i = 0; i < N; ++i)
+                samples[i] = sin(4*i*M_PI/N);
 
-            std::vector<double> trig_times;
-            trig_times.push_back(startTime); // trig every 1/2 sec
-            trig_times.push_back(startTime + duration/2);
-            trig_times.push_back(startTime + duration);
+            CComSafeArray<double> trig_times;
+            trig_times.Add(startTime); // trig every 1/2 sec
+            trig_times.Add(startTime + duration/2);
+            trig_times.Add(startTime + duration);
 
-            EcgSeriesObj ecg(startTime, duration/N, samples, trig_times); 
+            EcgSeries ecg;
+            ecg.start_time = startTime;
+            ecg.delta_time = duration / N;
+            ecg.samples    = samples;
+            ecg.trig_times = trig_times;
             m_ecg = ecg;
         }
         {
@@ -186,7 +189,7 @@ public:
             return E_INVALIDARG;
 
         // return a copy
-        *ecg = EcgSeriesObj(m_ecg).Detach();
+        *ecg = m_ecg;
         return S_OK;
     }
 
@@ -211,7 +214,7 @@ public:
 
 private:
     ProbeInfo                m_probe;
-    EcgSeriesObj             m_ecg;
+    EcgSeries                m_ecg;
     std::array<R8G8B8A8,256> m_color_map;
     Cart3dGeom               m_geom;
     std::vector<Image3dObj>  m_frames;
