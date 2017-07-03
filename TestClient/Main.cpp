@@ -45,6 +45,9 @@ int main () {
     ProbeInfo probe;
     CHECK(source->GetProbeInfo(&probe));
 
+    EcgSeries ecg;
+    CHECK(source->GetECG(&ecg));
+
     ParseSource(*source);
 
     return 0;
