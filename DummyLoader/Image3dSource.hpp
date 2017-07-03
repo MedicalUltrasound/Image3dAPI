@@ -9,7 +9,7 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 #include <array>
 #include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
-#include "../Image3dAPI/IImage3d.hpp"
+#include "../Image3dAPI/IImage3d.h"
 
 /** RGBA color struct that matches DXGI_FORMAT_R8G8B8A8_UNORM.
 Created due to the lack of such a class/struct in the Windows or Direct3D SDKs.

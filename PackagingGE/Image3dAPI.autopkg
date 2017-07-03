@@ -26,7 +26,6 @@ nuget {
             #destination = ${d_include}Image3dAPI;
             ../Image3dApi/ComSupport.hpp,
             ../Image3dApi/IImage3d.idl, ../Image3dApi/IImage3d.h, ../Image3dApi/IImage3d_i.c, ../Image3dApi/IImage3d_p.c,
-            ../Image3dApi/IImage3d.hpp
         };
 
         // documentation files

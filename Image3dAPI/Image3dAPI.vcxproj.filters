@@ -6,6 +6,5 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComSupport.hpp" />
-    <ClInclude Include="IImage3d.hpp" />
   </ItemGroup>
 </Project>
