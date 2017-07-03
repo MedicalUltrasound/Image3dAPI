@@ -1,4 +1,5 @@
-#include "../Image3dAPI/IImage3d.hpp"
+#include "../Image3dAPI/ComSupport.hpp"
+#include "../Image3dAPI/IImage3d.h"
 
 
 void ParseSource (IImage3dSource & source) {
@@ -20,7 +21,7 @@ void ParseSource (IImage3dSource & source) {
         unsigned short max_res[] = {128, 128, 128};
 
         // retrieve frame data
-        Image3dObj data;
+        Image3d data;
         CHECK(source.GetFrame(frame, geom, max_res, &data));
     }
 }
@@ -42,8 +43,11 @@ int main () {
     CComPtr<IImage3dSource> source;
     CHECK(loader->GetImageSource(&source));
 
-    ProbeInfoObj probe;
+    ProbeInfo probe;
     CHECK(source->GetProbeInfo(&probe));
+
+    EcgSeries ecg;
+    CHECK(source->GetECG(&ecg));
 
     ParseSource(*source);
 

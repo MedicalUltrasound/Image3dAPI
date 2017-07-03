@@ -9,7 +9,7 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 #include <array>
 #include <vector>
 #include "../Image3dAPI/ComSupport.hpp"
-#include "../Image3dAPI/IImage3d.hpp"
+#include "../Image3dAPI/IImage3d.h"
 
 /** RGBA color struct that matches DXGI_FORMAT_R8G8B8A8_UNORM.
 Created due to the lack of such a class/struct in the Windows or Direct3D SDKs.
@@ -39,7 +39,9 @@ uuid(6FA82ED5-6332-4344-8417-DEA55E72098C), ///< class ID (must be unique)
 helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
-    Image3dSource () : m_probe(PROBE_THORAX, L"4V") {
+    Image3dSource () {
+        m_probe.type = PROBE_THORAX;
+        m_probe.name = L"4V";
 
         // One second loop starting at t = 10
         const size_t numFrames = 60;
@@ -49,18 +51,21 @@ public:
 
         {
             // simulate sine-wave ECG
-            const size_t N = 128;
-            std::vector<float> samples;
-            samples.reserve(N);
-            for (size_t i = 0; i < N; ++i)
-                samples.push_back(sin(4*i*M_PI/N));
+            const int N = 128;
+            CComSafeArray<float> samples(N);
+            for (int i = 0; i < N; ++i)
+                samples[i] = sin(4*i*M_PI/N);
 
-            std::vector<double> trig_times;
-            trig_times.push_back(startTime); // trig every 1/2 sec
-            trig_times.push_back(startTime + duration/2);
-            trig_times.push_back(startTime + duration);
+            CComSafeArray<double> trig_times;
+            trig_times.Add(startTime); // trig every 1/2 sec
+            trig_times.Add(startTime + duration/2);
+            trig_times.Add(startTime + duration);
 
-            EcgSeriesObj ecg(startTime, duration/N, samples, trig_times); 
+            EcgSeries ecg;
+            ecg.start_time = startTime;
+            ecg.delta_time = duration / N;
+            ecg.samples    = samples;
+            ecg.trig_times = trig_times;
             m_ecg = ecg;
         }
         {
@@ -105,9 +110,18 @@ public:
                     }
                 }
 
+                Image3d tmp;
+                {
+                    tmp.time = f * fps + startTime;
+                    tmp.format = FORMAT_U8;
+                    for (size_t i = 0; i < 3; ++i)
+                        tmp.dims[i] = dims[i];
+                    tmp.data.Create(img_buf.size());
+                    memcpy(tmp.data.m_psa->pvData, img_buf.data(), img_buf.size());
+                    tmp.stride0 = dims[0] * sizeof(byte);
+                    tmp.stride1 = dims[1] * tmp.stride0;
+                }
 
-                double time = f * fps + startTime;
-                Image3dObj tmp(time, FORMAT_U8, dims, img_buf.data(), dims[0] * sizeof(byte), dims[0] * dims[1] * sizeof(byte));
                 m_frames.push_back(std::move(tmp));
             }
         }
@@ -154,7 +168,7 @@ public:
 #else
         bool deep_copy = true; // copy when communicating out-of-process
 #endif
-        *data = Image3dObj(m_frames[index], deep_copy).Detach();
+        *data = m_frames[index];
         return S_OK;
     }
 
@@ -184,7 +198,7 @@ public:
             return E_INVALIDARG;
 
         // return a copy
-        *ecg = EcgSeriesObj(m_ecg).Detach();
+        *ecg = m_ecg;
         return S_OK;
     }
 
@@ -193,7 +207,7 @@ public:
             return E_INVALIDARG;
 
         // return a copy
-        *probe = ProbeInfoObj(m_probe).Detatch();
+        *probe = m_probe;
         return S_OK;
     }
 
@@ -208,9 +222,9 @@ public:
     }
 
 private:
-    ProbeInfoObj             m_probe;
-    EcgSeriesObj             m_ecg;
+    ProbeInfo                m_probe;
+    EcgSeries                m_ecg;
     std::array<R8G8B8A8,256> m_color_map;
     Cart3dGeom               m_geom;
-    std::vector<Image3dObj>  m_frames;
+    std::vector<Image3d>     m_frames;
 };
