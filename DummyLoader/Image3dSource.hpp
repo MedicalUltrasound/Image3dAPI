@@ -110,9 +110,18 @@ public:
                     }
                 }
 
+                Image3d tmp;
+                {
+                    tmp.time = f * fps + startTime;
+                    tmp.format = FORMAT_U8;
+                    for (size_t i = 0; i < 3; ++i)
+                        tmp.dims[i] = dims[i];
+                    tmp.data.Create(img_buf.size());
+                    memcpy(tmp.data.m_psa->pvData, img_buf.data(), img_buf.size());
+                    tmp.stride0 = dims[0] * sizeof(byte);
+                    tmp.stride1 = dims[1] * tmp.stride0;
+                }
 
-                double time = f * fps + startTime;
-                Image3dObj tmp(time, FORMAT_U8, dims, img_buf.data(), dims[0] * sizeof(byte), dims[0] * dims[1] * sizeof(byte));
                 m_frames.push_back(std::move(tmp));
             }
         }
@@ -159,7 +168,7 @@ public:
 #else
         bool deep_copy = true; // copy when communicating out-of-process
 #endif
-        *data = Image3dObj(m_frames[index], deep_copy).Detach();
+        *data = m_frames[index];
         return S_OK;
     }
 
@@ -217,5 +226,5 @@ private:
     EcgSeries                m_ecg;
     std::array<R8G8B8A8,256> m_color_map;
     Cart3dGeom               m_geom;
-    std::vector<Image3dObj>  m_frames;
+    std::vector<Image3d>     m_frames;
 };
