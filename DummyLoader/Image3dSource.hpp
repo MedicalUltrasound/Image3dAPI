@@ -39,7 +39,9 @@ uuid(6FA82ED5-6332-4344-8417-DEA55E72098C), ///< class ID (must be unique)
 helpstring("3D image source")]
 class Image3dSource : public IImage3dSource {
 public:
-    Image3dSource () : m_probe(PROBE_THORAX, L"4V") {
+    Image3dSource () {
+        m_probe.type = PROBE_THORAX;
+        m_probe.name = L"4V";
 
         // One second loop starting at t = 10
         const size_t numFrames = 60;
@@ -193,7 +195,7 @@ public:
             return E_INVALIDARG;
 
         // return a copy
-        *probe = ProbeInfoObj(m_probe).Detatch();
+        *probe = m_probe;
         return S_OK;
     }
 
@@ -208,7 +210,7 @@ public:
     }
 
 private:
-    ProbeInfoObj             m_probe;
+    ProbeInfo                m_probe;
     EcgSeriesObj             m_ecg;
     std::array<R8G8B8A8,256> m_color_map;
     Cart3dGeom               m_geom;

@@ -32,6 +32,8 @@ enum ProbeType {
     PROBE_ESOPHAGUS = 2  ///< transesophageal probe
 } ProbeType;
 
+cpp_quote("")
+cpp_quote("#ifndef __cplusplus")
 
 typedef [
   uuid(1A31C197-3E53-4820-98E0-CE47941E19EF),
@@ -43,6 +45,24 @@ struct ProbeInfo {
     [helpstring("short name describing probe")]
     BSTR      name; 
 } ProbeInfo;
+
+cpp_quote("")
+cpp_quote("#else // __cplusplus")
+cpp_quote("} // extern \"C\"")
+cpp_quote("")
+cpp_quote("struct DECLSPEC_UUID(\"1A31C197-3E53-4820-98E0-CE47941E19EF\") ProbeInfo {")
+cpp_quote("    ProbeType type = PROBE_UNKNOWN;")
+cpp_quote("    CComBSTR  name; ///< BSTR wrapper")
+cpp_quote("};")
+cpp_quote("")
+cpp_quote("extern \"C\"{")
+cpp_quote("#endif")
+cpp_quote("")
+cpp_quote("#if defined _WIN64 || defined __x86_64__")
+cpp_quote("static_assert(sizeof(ProbeInfo) == 4+4+8, \"ProbeInfo size mismatch\");")
+cpp_quote("#else")
+cpp_quote("static_assert(sizeof(ProbeInfo) == 4+4, \"ProbeInfo size mismatch\");")
+cpp_quote("#endif")
 
 
 typedef [
