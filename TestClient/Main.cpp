@@ -1,4 +1,5 @@
-#include "../Image3dAPI/IImage3d.hpp"
+#include "../Image3dAPI/ComSupport.hpp"
+#include "../Image3dAPI/IImage3d.h"
 
 
 void ParseSource (IImage3dSource & source) {
