@@ -101,6 +101,8 @@ struct Cart3dGeom {
     float dir3_z;
 } Cart3dGeom;
 
+cpp_quote("")
+cpp_quote("#ifndef __cplusplus")
 
 typedef [
   uuid(47B6CCBF-6D52-4615-B086-9D809D24E34B),
@@ -119,6 +121,25 @@ struct EcgSeries {
     SAFEARRAY(double) trig_times;
 } EcgSeries;
 
+cpp_quote("")
+cpp_quote("#else // __cplusplus")
+cpp_quote("} // extern \"C\"")
+cpp_quote("")
+cpp_quote("struct DECLSPEC_UUID(\"47B6CCBF-6D52-4615-B086-9D809D24E34B\") EcgSeries {")
+cpp_quote("    double           start_time = 0;")
+cpp_quote("    double           delta_time = 0;")
+cpp_quote("    CComSafeArray<float> samples; ///< SAFEARRAY wrapper")
+cpp_quote("    CComSafeArray<double> trig_times; ///< SAFEARRAY wrapper")
+cpp_quote("};")
+cpp_quote("")
+cpp_quote("extern \"C\"{")
+cpp_quote("#endif")
+cpp_quote("")
+cpp_quote("#if defined _WIN64 || defined __x86_64__")
+cpp_quote("static_assert(sizeof(EcgSeries) == 4*8, \"EcgSeries size mismatch\");")
+cpp_quote("#else")
+cpp_quote("static_assert(sizeof(EcgSeries) == 2*8+2*4, \"EcgSeries size mismatch\");")
+cpp_quote("#endif")
 
 [ object,
   oleautomation, // use "automation" marshaler (oleaut32.dll)
