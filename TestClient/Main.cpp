@@ -41,6 +41,10 @@ int main () {
 
     CComPtr<IImage3dSource> source;
     CHECK(loader->GetImageSource(&source));
+
+    ProbeInfoObj probe;
+    CHECK(source->GetProbeInfo(&probe));
+
     ParseSource(*source);
 
     return 0;
