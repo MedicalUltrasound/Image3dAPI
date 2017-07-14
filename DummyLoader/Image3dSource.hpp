@@ -66,7 +66,7 @@ public:
             ecg.delta_time = duration / N;
             ecg.samples    = samples.Detach();
             ecg.trig_times = trig_times.Detach();
-            m_ecg = ecg;
+            m_ecg = EcgSeries(ecg);
         }
         {
             // flat gray scale
