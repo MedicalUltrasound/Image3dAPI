@@ -102,6 +102,10 @@
 </Command>
       <Message>echo Registering component</Message>
     </PostBuildEvent>
+    <Manifest>
+      <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
+      <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -125,6 +129,10 @@
 </Command>
       <Message>echo Registering component</Message>
     </PostBuildEvent>
+    <Manifest>
+      <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
+      <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -152,6 +160,10 @@
 </Command>
       <Message>echo Registering component</Message>
     </PostBuildEvent>
+    <Manifest>
+      <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
+      <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -179,6 +191,10 @@
 </Command>
       <Message>echo Registering component</Message>
     </PostBuildEvent>
+    <Manifest>
+      <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
+      <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
