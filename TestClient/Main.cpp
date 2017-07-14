@@ -30,8 +30,9 @@ void ParseSource (IImage3dSource & source) {
 int main () {
     ComInitialize com(COINIT_MULTITHREADED);
 
+    GUID dummy_loader_guid = { 0x8E754A72,0x0067,0x462B, {0x92, 0x67, 0xE8, 0x4A, 0xF8, 0x48, 0x28, 0xF1} }; // DummyLoader.Image3dFileLoader
     CComPtr<IImage3dFileLoader> loader;
-    CHECK(loader.CoCreateInstance(L"DummyLoader.Image3dFileLoader"));
+    CHECK(loader.CoCreateInstance(dummy_loader_guid));
 
     {
         // load file
