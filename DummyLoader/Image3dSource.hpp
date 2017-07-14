@@ -116,8 +116,9 @@ public:
                     tmp.format = FORMAT_U8;
                     for (size_t i = 0; i < 3; ++i)
                         tmp.dims[i] = dims[i];
-                    tmp.data.Create(img_buf.size());
-                    memcpy(tmp.data.m_psa->pvData, img_buf.data(), img_buf.size());
+                    CComSafeArray<BYTE> data(img_buf.size());
+                    memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
+                    tmp.data = data.Detach();
                     tmp.stride0 = dims[0] * sizeof(byte);
                     tmp.stride1 = dims[1] * tmp.stride0;
                 }
@@ -154,7 +155,7 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*[out]*/ Image3d *data) {
+    HRESULT STDMETHODCALLTYPE GetFrame (unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*out*/Image3d *data) {
         if (!data)
             return E_INVALIDARG;
         if (index >= m_frames.size())
@@ -168,7 +169,7 @@ public:
 #else
         bool deep_copy = true; // copy when communicating out-of-process
 #endif
-        *data = m_frames[index];
+        *data = Image3d(m_frames[index]);
         return S_OK;
     }
 
