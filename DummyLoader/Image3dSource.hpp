@@ -64,8 +64,8 @@ public:
             EcgSeries ecg;
             ecg.start_time = startTime;
             ecg.delta_time = duration / N;
-            ecg.samples    = samples;
-            ecg.trig_times = trig_times;
+            ecg.samples    = samples.Detach();
+            ecg.trig_times = trig_times.Detach();
             m_ecg = ecg;
         }
         {
@@ -198,7 +198,7 @@ public:
             return E_INVALIDARG;
 
         // return a copy
-        *ecg = m_ecg;
+        *ecg = EcgSeries(m_ecg);
         return S_OK;
     }
 
