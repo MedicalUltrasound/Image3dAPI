@@ -126,13 +126,11 @@ namespace IImage3d_GuiClient
         {
             try
             {                             
-                IImage3dSource source = null;
-                IImage3dFileLoader loader = null;
-
                 progID = ProgIdTextBox.Text;
                 imageFile = ImageFileTextBox.Text;
 
                 //CoCreateInstance of loaded DLL
+                IImage3dFileLoader loader = null;
                 try
                 {
                     Type comType = Type.GetTypeFromProgID(progID);
@@ -155,7 +153,7 @@ namespace IImage3d_GuiClient
                 if (ImageFileTextBox.Text != "")
                     imageLoadError = loader.LoadFile(ImageFileTextBox.Text);
                 //Create Image3dSource object and cast to COM interface 
-                source = loader.GetImageSource();
+                IImage3dSource source = loader.GetImageSource();
                 if (imageLoadError != null || source == null)
                 {
                     System.Windows.MessageBox.Show("Invalid image: Could not load image file");
