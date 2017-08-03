@@ -129,16 +129,26 @@ namespace IImage3d_GuiClient
                 progID = ProgIdTextBox.Text;
                 imageFile = ImageFileTextBox.Text;
 
+                // try to parse progid string first
+                Type comType = Type.GetTypeFromProgID(progID);
+                if (comType == null)
+                {
+                    try {
+                        // fallback to try to parse CLSID hex value
+                        Guid guid = Guid.Parse(ProgIdTextBox.Text);
+                        comType = Type.GetTypeFromCLSID(guid);
+                    } 
+                    catch (FormatException ex)
+                    {
+                        System.Windows.MessageBox.Show("Could not resolve IImage3dFileLoader instance. Check progid and DLL.\n\nError Details\n" + ex.ToString());
+                        return;
+                    }
+                }
+
                 //CoCreateInstance of loaded DLL
                 IImage3dFileLoader loader = null;
                 try
                 {
-                    Type comType = Type.GetTypeFromProgID(progID);
-                    if (comType == null)
-                    {
-                        System.Windows.MessageBox.Show("Could not create instance of IImage3dFileLoader. Check progid and DLL.\n");
-                        return;
-                    }
                     loader = (IImage3dFileLoader)Activator.CreateInstance(comType);
                 }
                 catch (Exception ex)
