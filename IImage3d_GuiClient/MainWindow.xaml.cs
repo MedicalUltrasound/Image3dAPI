@@ -133,10 +133,9 @@ namespace IImage3d_GuiClient
                 imageFile = ImageFileTextBox.Text;
 
                 //CoCreateInstance of loaded DLL
-                progID = ProgIdTextBox.Text;
                 try
                 {
-                    Type comType = Type.GetTypeFromProgID(ProgIdTextBox.Text);
+                    Type comType = Type.GetTypeFromProgID(progID);
                     if (comType == null)
                     {
                         System.Windows.MessageBox.Show("Could not create instance of IImage3dFileLoader. Check progid and DLL.\n");
