@@ -126,22 +126,29 @@ namespace IImage3d_GuiClient
         {
             try
             {                             
-                IImage3dSource source = null;
-                IImage3dFileLoader loader = null;
-
                 progID = ProgIdTextBox.Text;
                 imageFile = ImageFileTextBox.Text;
 
-                //CoCreateInstance of loaded DLL
-                progID = ProgIdTextBox.Text;
-                try
+                // try to parse progid string first
+                Type comType = Type.GetTypeFromProgID(progID);
+                if (comType == null)
                 {
-                    Type comType = Type.GetTypeFromProgID(ProgIdTextBox.Text);
-                    if (comType == null)
+                    try {
+                        // fallback to try to parse CLSID hex value
+                        Guid guid = Guid.Parse(ProgIdTextBox.Text);
+                        comType = Type.GetTypeFromCLSID(guid);
+                    } 
+                    catch (FormatException ex)
                     {
-                        System.Windows.MessageBox.Show("Could not create instance of IImage3dFileLoader. Check progid and DLL.\n");
+                        System.Windows.MessageBox.Show("Could not resolve IImage3dFileLoader instance. Check progid and DLL.\n\nError Details\n" + ex.ToString());
                         return;
                     }
+                }
+
+                //CoCreateInstance of loaded DLL
+                IImage3dFileLoader loader = null;
+                try
+                {
                     loader = (IImage3dFileLoader)Activator.CreateInstance(comType);
                 }
                 catch (Exception ex)
@@ -156,7 +163,7 @@ namespace IImage3d_GuiClient
                 if (ImageFileTextBox.Text != "")
                     imageLoadError = loader.LoadFile(ImageFileTextBox.Text);
                 //Create Image3dSource object and cast to COM interface 
-                source = loader.GetImageSource();
+                IImage3dSource source = loader.GetImageSource();
                 if (imageLoadError != null || source == null)
                 {
                     System.Windows.MessageBox.Show("Invalid image: Could not load image file");
