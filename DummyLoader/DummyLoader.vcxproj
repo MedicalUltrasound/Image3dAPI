@@ -92,6 +92,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,6 +113,7 @@
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
     <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
   </ItemDefinitionGroup>
@@ -121,6 +123,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -141,6 +144,7 @@
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
     <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
   </ItemDefinitionGroup>
@@ -152,6 +156,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -174,6 +179,7 @@
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
     <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
   </ItemDefinitionGroup>
@@ -185,6 +191,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -207,6 +214,7 @@
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
     <Midl>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
   </ItemDefinitionGroup>
