@@ -111,6 +111,7 @@
     </PostBuildEvent>
     <Manifest>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+      <RegistrarScriptFile>Image3dFileLoader.rgs</RegistrarScriptFile>
     </Manifest>
     <Midl>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
@@ -145,6 +146,7 @@
     </PostBuildEvent>
     <Manifest>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+      <RegistrarScriptFile>Image3dFileLoader.rgs</RegistrarScriptFile>
     </Manifest>
     <Midl>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
@@ -183,6 +185,7 @@
     </PostBuildEvent>
     <Manifest>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+      <RegistrarScriptFile>Image3dFileLoader.rgs</RegistrarScriptFile>
     </Manifest>
     <Midl>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
@@ -221,6 +224,7 @@
     </PostBuildEvent>
     <Manifest>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
+      <RegistrarScriptFile>Image3dFileLoader.rgs</RegistrarScriptFile>
     </Manifest>
     <Midl>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
