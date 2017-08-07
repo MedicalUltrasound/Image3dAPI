@@ -7,16 +7,13 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 #include "../Image3dAPI/IImage3d.h"
 #include "Image3dSource.hpp"
 
+#include "DummyLoader.h"
+#include "Resource.h"
 
-[coclass,
-default(IImage3dFileLoader),                ///< default interface
-threading(both),                            ///< "both" enables direct thread access without marshaling
-vi_progid("DummyLoader.Image3dFileLoader"), ///< version-independent name
-progid("DummyLoader.Image3dFileLoader.1"),  ///< class name
-version(1.0),
-uuid(8E754A72-0067-462B-9267-E84AF84828F1), ///< class ID (must be unique)
-helpstring("3D image file loader")]
-class Image3dFileLoader : public IImage3dFileLoader {
+class ATL_NO_VTABLE Image3dFileLoader :
+    public CComObjectRootEx<CComMultiThreadModel>,
+    public CComCoClass<Image3dFileLoader, &__uuidof(Image3dFileLoader)>,
+    public IImage3dFileLoader {
 public:
     Image3dFileLoader() {
     }
@@ -36,4 +33,12 @@ public:
         *img_src = obj.Detach();
         return S_OK;
     }
+
+    DECLARE_REGISTRY_RESOURCEID(IDR_Image3dFileLoader)
+    
+    BEGIN_COM_MAP(Image3dFileLoader)
+        COM_INTERFACE_ENTRY(IImage3dFileLoader)
+    END_COM_MAP()
 };
+
+OBJECT_ENTRY_AUTO(__uuidof(Image3dFileLoader), Image3dFileLoader)

@@ -11,6 +11,10 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
 
+#include "DummyLoader.h"
+#include "Resource.h"
+
+
 /** RGBA color struct that matches DXGI_FORMAT_R8G8B8A8_UNORM.
 Created due to the lack of such a class/struct in the Windows or Direct3D SDKs.
 Please remove this class if a more standardized alternative is available. */
@@ -29,15 +33,10 @@ struct R8G8B8A8 {
 };
 
 
-[coclass,
-default(IImage3dSource),                ///< default interface
-threading(both),                        ///< "both" enables direct thread access without marshaling
-vi_progid("DummyLoader.Image3dSource"), ///< version-independent name
-progid("DummyLoader.Image3dSource.1"),  ///< class name
-version(1.0),
-uuid(6FA82ED5-6332-4344-8417-DEA55E72098C), ///< class ID (must be unique)
-helpstring("3D image source")]
-class Image3dSource : public IImage3dSource {
+class ATL_NO_VTABLE Image3dSource :
+    public CComObjectRootEx<CComMultiThreadModel>,
+    public CComCoClass<Image3dSource, &__uuidof(Image3dSource)>,
+    public IImage3dSource {
 public:
     Image3dSource () {
         m_probe.type = PROBE_THORAX;
@@ -222,6 +221,12 @@ public:
         return S_OK;
     }
 
+    DECLARE_REGISTRY_RESOURCEID(IDR_Image3dSource)
+
+    BEGIN_COM_MAP(Image3dSource)
+        COM_INTERFACE_ENTRY(IImage3dSource)
+    END_COM_MAP()
+
 private:
     ProbeInfo                m_probe;
     EcgSeries                m_ecg;
@@ -229,3 +234,5 @@ private:
     Cart3dGeom               m_geom;
     std::vector<Image3d>     m_frames;
 };
+
+OBJECT_ENTRY_AUTO(__uuidof(Image3dSource), Image3dSource)
