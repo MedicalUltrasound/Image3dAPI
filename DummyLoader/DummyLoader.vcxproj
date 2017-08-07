@@ -116,6 +116,9 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -147,6 +150,9 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -182,6 +188,9 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -217,6 +226,9 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Image3dAPI</AdditionalIncludeDirectories>
       <HeaderFileName>%(Filename).h</HeaderFileName>
     </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
