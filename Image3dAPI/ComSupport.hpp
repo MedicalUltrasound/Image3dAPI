@@ -6,12 +6,11 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.           */
 #include <vector>
 #include <stdexcept>
 #include <cassert>
-#include <comdef.h>
 
-#define _ATL_ATTRIBUTES // must be defined before all ATL includes
+#include <comdef.h> // for _com_error
 #include <atlbase.h>
 #include <atlsafe.h> // for CComSafeArray
-#include <atlcom.h>
+#include <atlcom.h>  // for CComObject
 
 
 /** Converts unicode string to ASCII */
