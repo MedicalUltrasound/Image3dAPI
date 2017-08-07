@@ -1,0 +1,26 @@
+HKCR
+{
+	DummyLoader.Image3dSource.1 = s 'Image3dSource Object'
+	{
+		CLSID = s '{6FA82ED5-6332-4344-8417-DEA55E72098C}'
+	}
+	DummyLoader.Image3dSource = s 'Image3dSource Object'
+	{		
+		CLSID = s '{6FA82ED5-6332-4344-8417-DEA55E72098C}'
+		CurVer = s 'DummyLoader.Image3dSource.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6FA82ED5-6332-4344-8417-DEA55E72098C} = s 'Image3dSource Object'
+		{
+			ProgID = s 'DummyLoader.Image3dSource.1'
+			VersionIndependentProgID = s 'DummyLoader.Image3dSource'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			TypeLib = s '{67E59584-3F6A-4852-8051-103A4583CA5E}'
+			Version = s '1.0'
+		}
+	}
+}
