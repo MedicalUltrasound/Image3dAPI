@@ -16,4 +16,7 @@
   <ItemGroup>
     <Midl Include="DummyLoader.idl" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DummyLoader.rc" />
+  </ItemGroup>
 </Project>
