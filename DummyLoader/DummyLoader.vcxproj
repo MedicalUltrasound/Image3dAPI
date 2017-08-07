@@ -112,6 +112,9 @@
       <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -139,6 +142,9 @@
       <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -170,6 +176,9 @@
       <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -201,6 +210,9 @@
       <TypeLibraryFile>$(TargetName).tlb</TypeLibraryFile>
       <ComponentFileName>$(TargetName)$(TargetExt)</ComponentFileName>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
