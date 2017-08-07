@@ -54,7 +54,7 @@ public:
             const int N = 128;
             CComSafeArray<float> samples(N);
             for (int i = 0; i < N; ++i)
-                samples[i] = sin(4*i*M_PI/N);
+                samples[i] = static_cast<float>(sin(4*i*M_PI/N));
 
             CComSafeArray<double> trig_times;
             trig_times.Add(startTime); // trig every 1/2 sec
@@ -71,7 +71,7 @@ public:
         {
             // flat gray scale
             for (size_t i = 0; i < m_color_map.size(); ++i)
-                m_color_map[i] = R8G8B8A8(i, i, i, 0xFF);
+                m_color_map[i] = R8G8B8A8(static_cast<unsigned char>(i), static_cast<unsigned char>(i), static_cast<unsigned char>(i), 0xFF);
         }
         {
             // geometry          X     Y    Z
@@ -116,7 +116,7 @@ public:
                     tmp.format = FORMAT_U8;
                     for (size_t i = 0; i < 3; ++i)
                         tmp.dims[i] = dims[i];
-                    CComSafeArray<BYTE> data(img_buf.size());
+                    CComSafeArray<BYTE> data(static_cast<unsigned int>(img_buf.size()));
                     memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
                     tmp.data = data.Detach();
                     tmp.stride0 = dims[0] * sizeof(byte);
