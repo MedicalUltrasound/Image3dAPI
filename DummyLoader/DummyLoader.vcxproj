@@ -216,6 +216,7 @@
   <ItemGroup>
     <ClInclude Include="Image3dFileLoader.hpp" />
     <ClInclude Include="Image3dSource.hpp" />
+    <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DummyLoader.rgs" />
