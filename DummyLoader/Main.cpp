@@ -11,7 +11,6 @@ class DummyLoaderModule :
 {
 public:
     DECLARE_LIBID(LIBID_DummyLoader)
-    DECLARE_REGISTRY_APPID_RESOURCEID(IDR_DUMMYLOADER, "{0BE0C352-0B9F-432E-9CE9-8EC32CC9EF68}")
 };
 
 DummyLoaderModule _AtlModule;

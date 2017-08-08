@@ -9,7 +9,6 @@
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DummyLoader.rgs" />
     <None Include="Image3dFileLoader.rgs" />
     <None Include="Image3dSource.rgs" />
   </ItemGroup>
