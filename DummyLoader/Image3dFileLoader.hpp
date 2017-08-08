@@ -5,6 +5,7 @@ Copyright (c) 2016, GE Healthcare, Ultrasound.      */
 
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
+#include "Image3dSource.hpp"
 
 
 [coclass,
