@@ -15,14 +15,24 @@ using System.Windows.Shapes;
 
 namespace TestViewer
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+
+        private void FileOpenBtn_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void FrameSelector_ValueChanged(object sender, DragCompletedEventArgs e)
+        {
         }
     }
 }
