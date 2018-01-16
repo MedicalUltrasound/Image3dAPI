@@ -21,6 +21,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestClient", "TestClient\Te
 		{277D8DBA-C8B3-423B-A707-B6435130BF4A} = {277D8DBA-C8B3-423B-A707-B6435130BF4A}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestViewer", "TestViewer\TestViewer.csproj", "{08D5EA11-0B4C-40FD-87EC-23D42C195D59}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3} = {4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -53,6 +58,14 @@ Global
 		{8ABF3DC3-6C48-439B-B3A1-DED84351B808}.Release|Win32.Build.0 = Release|Win32
 		{8ABF3DC3-6C48-439B-B3A1-DED84351B808}.Release|x64.ActiveCfg = Release|x64
 		{8ABF3DC3-6C48-439B-B3A1-DED84351B808}.Release|x64.Build.0 = Release|x64
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Debug|Win32.ActiveCfg = Debug|x86
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Debug|Win32.Build.0 = Debug|x86
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Debug|x64.ActiveCfg = Debug|x64
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Debug|x64.Build.0 = Debug|x64
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|Win32.ActiveCfg = Release|x86
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|Win32.Build.0 = Release|x86
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|x64.ActiveCfg = Release|x64
+		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
