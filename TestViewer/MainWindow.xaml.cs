@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
+using Microsoft.Win32;
 using Image3dAPI;
 
 
@@ -39,6 +40,12 @@ namespace TestViewer
             this.FileOpenBtn.IsEnabled = true;
         }
 
+        private void FileSelectBtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            if (dialog.ShowDialog() == true)
+                FileName.Text = dialog.FileName;
+        }
 
         private void FileOpenBtn_Click(object sender, RoutedEventArgs e)
         {
