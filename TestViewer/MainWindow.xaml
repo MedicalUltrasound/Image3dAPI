@@ -20,7 +20,7 @@
             <Label>File name</Label>
             <TextBox x:Name="FileName"/>
             <Button x:Name="FileOpenBtn" IsEnabled="False" Click="FileOpenBtn_Click">Open</Button>
-            <Label>Frame index</Label>
+            <Label>Frame number</Label>
             <Slider x:Name="FrameSelector" TickPlacement="BottomRight" IsSnapToTickEnabled="True" TickFrequency="1" IsEnabled="False" Thumb.DragCompleted="FrameSelector_ValueChanged"/>
 
             <Label>File info:</Label>
@@ -42,9 +42,14 @@
             </Grid.RowDefinitions>
 
             <!-- Image grid -->
-            <Image x:Name="Image1" Grid.Column="0" Grid.Row="0"/>
-            <Image x:Name="Image2" Grid.Column="1" Grid.Row="0"/>
-            <Image x:Name="Image3" Grid.Column="0" Grid.Row="1"/>
+            <Image x:Name="ImageXY" Grid.Column="0" Grid.Row="0"/>
+            <Label TextBlock.Foreground="DimGray" Grid.Column="0" Grid.Row="0">X-Y plane</Label>
+            
+            <Image x:Name="ImageXZ" Grid.Column="1" Grid.Row="0"/>
+            <Label TextBlock.Foreground="DimGray" Grid.Column="1" Grid.Row="0">X-Z plane</Label>
+            
+            <Image x:Name="ImageYZ" Grid.Column="0" Grid.Row="1"/>
+            <Label TextBlock.Foreground="DimGray"  Grid.Column="0" Grid.Row="1">Y-Z plane</Label>
         </Grid>
     </Grid>
 </Window>

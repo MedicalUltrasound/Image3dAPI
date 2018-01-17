@@ -95,7 +95,7 @@ namespace TestViewer
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
 
-                Image1.Source = bitmap;
+                ImageYZ.Source = bitmap;
             }
             {
                 // extract center-Y slize
@@ -117,7 +117,7 @@ namespace TestViewer
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
 
-                Image2.Source = bitmap;
+                ImageXZ.Source = bitmap;
             }
             {
                 // extract center-Z slize
@@ -139,7 +139,7 @@ namespace TestViewer
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
 
-                Image3.Source = bitmap;
+                ImageXY.Source = bitmap;
             }
         }
 
