@@ -18,7 +18,10 @@
             <TextBox x:Name="LoaderName">DummyLoader.Image3dFileLoader</TextBox>
             <Button x:Name="LoadBtn" Click="LoadBtn_Click">Load</Button>
             <Label>File name</Label>
-            <TextBox x:Name="FileName"/>
+            <DockPanel>
+                <TextBox Width="160" x:Name="FileName"/>
+                <Button DockPanel.Dock="Right" x:Name="FileSelectBtn" Click="FileSelectBtn_Click">Select</Button>
+            </DockPanel>
             <Button x:Name="FileOpenBtn" IsEnabled="False" Click="FileOpenBtn_Click">Open</Button>
             <Label>Frame number</Label>
             <Slider x:Name="FrameSelector" TickPlacement="BottomRight" IsSnapToTickEnabled="True" TickFrequency="1" IsEnabled="False" Thumb.DragCompleted="FrameSelector_ValueChanged"/>
