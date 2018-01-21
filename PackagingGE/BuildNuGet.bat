@@ -4,7 +4,6 @@ set SECONDARY_NUGET_REPO=%2
 
 set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
-set AUTOPKG_FILE=..\PackagingGE\Image3dAPI.autopkg
 
 :: Dependencies:
 :: * Python.exe in PATH
@@ -50,7 +49,7 @@ echo Generating changelog (with tag decoration, graph and change stats):
 git log %PREV_TAG%..%VERSION% --decorate --graph --stat > changelog.txt
 
 pushd Image3dApi
-CALL ..\PackagingGE\PackagePublishNuget.bat %AUTOPKG_FILE% %VERSION% %PRIMARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\Image3dAPI.nuspec %VERSION% %PRIMARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 

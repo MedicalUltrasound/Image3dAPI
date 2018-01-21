@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>Image3dAPI</id>
+        <tags>image3dapi, native</tags>
+        <authors>GE Ultrasound (GE Healthcare)</authors>
+        <projectUrl><<SOURCE-URL>></projectUrl>
+
+        <licenseUrl>http://PROPRIETARY_LICENSE</licenseUrl>
+        <iconUrl>http://www.ge.com/sites/all/themes/ge_2012/favicon.ico</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>COM APIs for cross-vendor exchange of 3D ultrasound image data</description>
+        
+        <!-- information that changes with each release -->
+        <owners>Fredrik Orderud</owners>
+        <version><<GIT-VERSION>></version>
+
+        <releaseNotes>changelog in docs/changelog.txt</releaseNotes>
+        <copyright>Copyright 2015-2018</copyright>
+    </metadata>
+
+    <files>
+        <file src="Image3dAPI.targets" target="build/native/" />
+ 
+        <!-- support headers -->
+        <file src="../Image3dAPI/ComSupport.hpp" target="build/native/include/Image3dAPI/" />
+        
+        <!-- interface definitions -->
+        <file src="../Image3dAPI/IImage3d.idl"   target="build/native/include/Image3dAPI/" />
+        <file src="../Image3dAPI/IImage3d.h"     target="build/native/include/Image3dAPI/" />
+        <file src="../Image3dAPI/IImage3d_i.c"   target="build/native/include/Image3dAPI/" />
+        <file src="../Image3dAPI/IImage3d_p.c"   target="build/native/include/Image3dAPI/" />
+
+        <!-- documentation files -->
+        <file src="../changelog.txt"             target="build/native/docs/" />
+    </files>
+</package>
