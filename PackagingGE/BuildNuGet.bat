@@ -54,7 +54,7 @@ IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
 pushd DummyLoader
-CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.autopkg %VERSION% %SECONDARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.redist.nuspec %VERSION% %SECONDARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
