@@ -1,14 +1,14 @@
 @echo off
-set AUTOPKG_FILE=%1
+set NUSPEC_FILE=%1
 set VERSION_NUMBER=%2
 set NUGET_REPO=%3
 
 :: Change NuGet packaging version and project URL
-python.exe ..\PackagingGE\SetAutopkgVersion.py %AUTOPKG_FILE% %VERSION_NUMBER% https://github.com/MedicalUltrasound/Image3dAPI/tree/%VERSION_NUMBER% 
+python.exe ..\PackagingGE\SetAutopkgVersion.py %NUSPEC_FILE% %VERSION_NUMBER% https://github.com/MedicalUltrasound/Image3dAPI/tree/%VERSION_NUMBER% 
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 :: Package artifacts
-powershell -NonInteractive -NoProfile -ExecutionPolicy ByPass Write-NuGetPackage %AUTOPKG_FILE%
+nuget pack %NUSPEC_FILE%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 :: Publish artifact

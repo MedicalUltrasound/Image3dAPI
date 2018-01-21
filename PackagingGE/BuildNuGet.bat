@@ -9,7 +9,7 @@ set AUTOPKG_FILE=..\PackagingGE\Image3dAPI.autopkg
 :: Dependencies:
 :: * Python.exe in PATH
 :: * Visual Studio command prompt (msbuild & C++ compiler in PATH)
-:: * CoApp - tools for building C/C++ NuGet packages for Windows (http://coapp.org/)
+:: * NuGet.exe in PATH (https://www.nuget.org/downloads)
 
 pushd ..
 
