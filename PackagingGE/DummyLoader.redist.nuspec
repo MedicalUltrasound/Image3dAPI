@@ -26,16 +26,16 @@
       <file src="DummyLoader.redist.targets"       target="build\native\"/>
       <file src="..\changelog.txt"                 target="build\native\docs\"/>
 
-      <file src="..\DummyLoader\x64\Debug\DummyLoaderD.dll"    target="build\native\bin\x64\Debug\"/>
-      <file src="..\DummyLoader\x64\Debug\DummyLoaderD.pdb"    target="build\native\bin\x64\Debug\"/>
+      <file src="..\x64\Debug\DummyLoaderD.dll"    target="build\native\bin\x64\Debug\"/>
+      <file src="..\x64\Debug\DummyLoaderD.pdb"    target="build\native\bin\x64\Debug\"/>
 
-      <file src="..\DummyLoader\x64\Release\DummyLoader.dll"   target="build\native\bin\x64\Release\"/>
-      <file src="..\DummyLoader\x64\Release\DummyLoader.pdb"   target="build\native\bin\x64\Release\"/>
+      <file src="..\x64\Release\DummyLoader.dll"   target="build\native\bin\x64\Release\"/>
+      <file src="..\x64\Release\DummyLoader.pdb"   target="build\native\bin\x64\Release\"/>
                                                        
-      <file src="..\DummyLoader\Win32\Debug\DummyLoaderD.dll"  target="build\native\bin\Win32\Debug\"/>
-      <file src="..\DummyLoader\Win32\Debug\DummyLoaderD.pdb"  target="build\native\bin\Win32\Debug\"/>
+      <file src="..\Win32\Debug\DummyLoaderD.dll"  target="build\native\bin\Win32\Debug\"/>
+      <file src="..\Win32\Debug\DummyLoaderD.pdb"  target="build\native\bin\Win32\Debug\"/>
                                                        
-      <file src="..\DummyLoader\Win32\Release\DummyLoader.dll" target="build\native\bin\Win32\Release\"/>
-      <file src="..\DummyLoader\Win32\Release\DummyLoader.pdb" target="build\native\bin\Win32\Release\"/>
+      <file src="..\Win32\Release\DummyLoader.dll" target="build\native\bin\Win32\Release\"/>
+      <file src="..\Win32\Release\DummyLoader.pdb" target="build\native\bin\Win32\Release\"/>
   </files>
 </package>
