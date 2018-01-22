@@ -15,24 +15,13 @@ class ATL_NO_VTABLE Image3dFileLoader :
     public CComCoClass<Image3dFileLoader, &__uuidof(Image3dFileLoader)>,
     public IImage3dFileLoader {
 public:
-    Image3dFileLoader() {
-    }
+    Image3dFileLoader();
 
-    /*NOT virtual*/ ~Image3dFileLoader() {
-    }
+    /*NOT virtual*/ ~Image3dFileLoader();
 
-    HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*[out]*/ BSTR *error_message) {
-        return S_OK; // no operation
-    }
+    HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*out*/BSTR *error_message) override;
 
-    HRESULT STDMETHODCALLTYPE GetImageSource(/*[out]*/ IImage3dSource **img_src) {
-        if (!img_src)
-            return E_INVALIDARG;
-        
-        CComPtr<Image3dSource> obj = CreateLocalInstance<Image3dSource>();
-        *img_src = obj.Detach();
-        return S_OK;
-    }
+    HRESULT STDMETHODCALLTYPE GetImageSource(/*out*/IImage3dSource **img_src) override;
 
     DECLARE_REGISTRY_RESOURCEID(IDR_Image3dFileLoader)
     
