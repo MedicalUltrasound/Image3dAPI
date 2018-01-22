@@ -4,12 +4,11 @@ set SECONDARY_NUGET_REPO=%2
 
 set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
-set AUTOPKG_FILE=..\PackagingGE\Image3dAPI.autopkg
 
 :: Dependencies:
 :: * Python.exe in PATH
 :: * Visual Studio command prompt (msbuild & C++ compiler in PATH)
-:: * CoApp - tools for building C/C++ NuGet packages for Windows (http://coapp.org/)
+:: * NuGet.exe in PATH (https://www.nuget.org/downloads)
 
 pushd ..
 
@@ -50,12 +49,12 @@ echo Generating changelog (with tag decoration, graph and change stats):
 git log %PREV_TAG%..%VERSION% --decorate --graph --stat > changelog.txt
 
 pushd Image3dApi
-CALL ..\PackagingGE\PackagePublishNuget.bat %AUTOPKG_FILE% %VERSION% %PRIMARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\Image3dAPI.nuspec %VERSION% %PRIMARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
 pushd DummyLoader
-CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.autopkg %VERSION% %SECONDARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.redist.nuspec %VERSION% %SECONDARY_NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
