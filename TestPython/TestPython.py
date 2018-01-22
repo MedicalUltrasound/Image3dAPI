@@ -25,9 +25,9 @@ def SafeArrayToNumpy(safearr_obj):
 if __name__=="__main__":
     # load type library
     if "32" in platform.architecture()[0]:
-        Image3dAPI = comtypes.client.GetModule("../Image3dAPI/Win32/Debug/Image3dAPI.tlb")
+        Image3dAPI = comtypes.client.GetModule("../Win32/Image3dAPI.tlb")
     else:
-        Image3dAPI = comtypes.client.GetModule("../Image3dAPI/x64/Debug/Image3dAPI.tlb")
+        Image3dAPI = comtypes.client.GetModule("../x64/Image3dAPI.tlb")
 
     # create loader object
     loader = comtypes.client.CreateObject("DummyLoader.Image3dFileLoader")
