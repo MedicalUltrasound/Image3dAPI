@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestViewer", "TestViewer\Te
 		{4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3} = {4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3}
 	EndProjectSection
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TestPython", "TestPython\TestPython.pyproj", "{A594D690-99DB-499B-B3B0-0BF81364EBA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -66,6 +68,10 @@ Global
 		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|Win32.Build.0 = Release|x86
 		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|x64.ActiveCfg = Release|x64
 		{08D5EA11-0B4C-40FD-87EC-23D42C195D59}.Release|x64.Build.0 = Release|x64
+		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
