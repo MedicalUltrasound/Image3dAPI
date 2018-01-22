@@ -88,7 +88,8 @@
       <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>TlbImp.exe /machine:x86 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
+      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
+TlbImp.exe /machine:x86 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
 xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
 xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
@@ -108,7 +109,8 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
       <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>TlbImp.exe /machine:x64 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
+      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
+TlbImp.exe /machine:x64 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
 xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
 xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
@@ -132,7 +134,8 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
       <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>TlbImp.exe /machine:x86 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
+      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
+TlbImp.exe /machine:x86 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
 xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
 xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
@@ -156,7 +159,8 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
       <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>TlbImp.exe /machine:x64 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
+      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
+TlbImp.exe /machine:x64 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
 xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
 xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     </PostBuildEvent>
