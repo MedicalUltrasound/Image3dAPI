@@ -23,15 +23,13 @@ set /p VERSION=< NEW_TAG.txt
 
 
 echo Building projects:
-msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" Image3dApi\Image3dAPI.vcxproj
+msbuild /nologo /verbosity:minimal /target:Image3dAPI;DummyLoader /property:Configuration="Debug";Platform="Win32" Image3dAPI.sln
 IF %ERRORLEVEL% NEQ 0 exit /B 1
-msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="x64" DummyLoader\DummyLoader.vcxproj
+msbuild /nologo /verbosity:minimal /target:Image3dAPI;DummyLoader /property:Configuration="Release";Platform="Win32" Image3dAPI.sln
 IF %ERRORLEVEL% NEQ 0 exit /B 1
-msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Release";Platform="x64" DummyLoader\DummyLoader.vcxproj
+msbuild /nologo /verbosity:minimal /target:Image3dAPI;DummyLoader /property:Configuration="Debug";Platform="x64" Image3dAPI.sln
 IF %ERRORLEVEL% NEQ 0 exit /B 1
-msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Debug";Platform="Win32" DummyLoader\DummyLoader.vcxproj
-IF %ERRORLEVEL% NEQ 0 exit /B 1
-msbuild /nologo /verbosity:minimal /target:Build /property:Configuration="Release";Platform="Win32" DummyLoader\DummyLoader.vcxproj
+msbuild /nologo /verbosity:minimal /target:Image3dAPI;DummyLoader /property:Configuration="Release";Platform="x64" Image3dAPI.sln
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 echo Determine previous tag:
