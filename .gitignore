@@ -1,10 +1,8 @@
 /.vs
-/Image3dAPI.sdf
-/*.opensdf
 /x64
 /Win32
-vc110.tlb
-vc110.idl
+/*.VC.db
+/*.VC.VC.opendb
 *.nupkg
 NEW_TAG.txt
 PREV_TAG.txt

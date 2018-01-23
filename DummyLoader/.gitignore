@@ -1,3 +1,5 @@
 /x64
 /Win32
 /*.rgs
+/DummyLoader.h
+/DummyLoader_i.c
