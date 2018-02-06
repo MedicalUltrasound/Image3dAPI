@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- .NET/C# project config -->
+  <Target Name="InjectReference" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup Condition="'$(Platform)' == 'Win32' or '$(Platform)' == 'x86'">
+      <Reference Include="Image3dAPI">
+        <HintPath>$(MSBuildThisFileDirectory)..\native\lib\Win32\Image3dAPI.dll</HintPath>
+        <EmbedInteropTypes>true</EmbedInteropTypes>
+      </Reference>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)' == 'x64'">
+      <Reference Include="Image3dAPI">
+        <HintPath>$(MSBuildThisFileDirectory)..\native\lib\x64\Image3dAPI.dll</HintPath>
+        <EmbedInteropTypes>true</EmbedInteropTypes>
+      </Reference>
+    </ItemGroup>
+  </Target>
+</Project>

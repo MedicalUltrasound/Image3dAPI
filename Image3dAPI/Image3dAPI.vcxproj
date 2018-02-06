@@ -85,13 +85,16 @@
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
-TlbImp.exe /machine:x86 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
-xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
+      <Command>TlbImp.exe /machine:x86 "$(OutDir)$(TargetName).tlb" /out:$(OutDir)$(TargetName).dll
+:: Copy interface definitions to shared project dir
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)" || exit /b 1
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)" || exit /b 1
+:: Copy type libraries to shared platform folder
+xcopy /Y /D "$(OutDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)" || exit /b 1
+xcopy /Y /D "$(OutDir)$(TargetName).dll"  "$(SolutionDir)$(Platform)" || exit /b 1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,13 +109,16 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
-TlbImp.exe /machine:x64 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
-xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
+      <Command>TlbImp.exe /machine:x64 "$(OutDir)$(TargetName).tlb" /out:$(OutDir)$(TargetName).dll
+:: Copy interface definitions to shared project dir
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)" || exit /b 1
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)" || exit /b 1
+:: Copy type libraries to shared platform folder
+xcopy /Y /D "$(OutDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)" || exit /b 1
+xcopy /Y /D "$(OutDir)$(TargetName).dll"  "$(SolutionDir)$(Platform)" || exit /b 1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,13 +137,16 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
-TlbImp.exe /machine:x86 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
-xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
+      <Command>TlbImp.exe /machine:x86 "$(OutDir)$(TargetName).tlb" /out:$(OutDir)$(TargetName).dll
+:: Copy interface definitions to shared project dir
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)" || exit /b 1
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)" || exit /b 1
+:: Copy type libraries to shared platform folder
+xcopy /Y /D "$(OutDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)" || exit /b 1
+xcopy /Y /D "$(OutDir)$(TargetName).dll"  "$(SolutionDir)$(Platform)" || exit /b 1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,13 +165,16 @@ xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
     <Midl>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
-      <TypeLibraryName>$(ProjectName).tlb</TypeLibraryName>
+      <TypeLibraryName>$(OutDir)$(ProjectName).tlb</TypeLibraryName>
     </Midl>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(IntDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)"
-TlbImp.exe /machine:x64 "$(IntDir)$(TargetName).tlb" /out:$(SolutionDir)$(Platform)\$(TargetName).dll
-xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)"
-xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)"</Command>
+      <Command>TlbImp.exe /machine:x64 "$(OutDir)$(TargetName).tlb" /out:$(OutDir)$(TargetName).dll
+:: Copy interface definitions to shared project dir
+xcopy /Y /D "$(IntDir)*.h"  "$(ProjectDir)" || exit /b 1
+xcopy /Y /D "$(IntDir)*.c"  "$(ProjectDir)" || exit /b 1
+:: Copy type libraries to shared platform folder
+xcopy /Y /D "$(OutDir)$(TargetName).tlb"  "$(SolutionDir)$(Platform)" || exit /b 1
+xcopy /Y /D "$(OutDir)$(TargetName).dll"  "$(SolutionDir)$(Platform)" || exit /b 1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
