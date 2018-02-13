@@ -129,16 +129,16 @@ namespace TestViewer
             }
             {
                 // extract center-X slize (bottom-left)
-                WriteableBitmap bitmap = new WriteableBitmap(image.dims[1], image.dims[2], 96.0, 96.0, PixelFormats.Rgb24, null);
+                WriteableBitmap bitmap = new WriteableBitmap(image.dims[2], image.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
                 bitmap.Lock();
                 unsafe {
                     int x = image.dims[0] / 2;
-                    for (int y = 0; y < bitmap.Height; ++y)
+                    for (int z = 0; z < bitmap.Height; ++z)
                     {
-                        for (int z = 0; z < bitmap.Width; ++z)
+                        for (int y = 0; y < bitmap.Width; ++y)
                         {
                             byte val = image.data[x + y * image.stride0 + z * image.stride1];
-                            byte* pixel = (byte*)bitmap.BackBuffer + z * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
+                            byte* pixel = (byte*)bitmap.BackBuffer + y * (bitmap.Format.BitsPerPixel / 8) + z * bitmap.BackBufferStride;
                             SetRGBVal(pixel, color_map[val]);
                         }
                     }
