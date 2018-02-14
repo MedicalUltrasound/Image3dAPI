@@ -84,17 +84,18 @@ namespace TestViewer
             uint[] color_map = m_source.GetColorMap();
 
             {
-                // extract center-X slize
-                WriteableBitmap bitmap = new WriteableBitmap(image.dims[1], image.dims[2], 96.0, 96.0, PixelFormats.Rgb24, null);
+                // extract center-Z slize (top-left)
+                WriteableBitmap bitmap = new WriteableBitmap(image.dims[0], image.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
                 bitmap.Lock();
-                unsafe {
-                    int x = image.dims[0] / 2;
+                unsafe
+                {
+                    int z = image.dims[2] / 2;
                     for (int y = 0; y < bitmap.Height; ++y)
                     {
-                        for (int z = 0; z < bitmap.Width; ++z)
+                        for (int x = 0; x < bitmap.Width; ++x)
                         {
                             byte val = image.data[x + y * image.stride0 + z * image.stride1];
-                            byte* pixel = (byte*)bitmap.BackBuffer + z * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
+                            byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
                             SetRGBVal(pixel, color_map[val]);
                         }
                     }
@@ -102,10 +103,10 @@ namespace TestViewer
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
 
-                ImageYZ.Source = bitmap;
+                ImageXY.Source = bitmap;
             }
             {
-                // extract center-Y slize
+                // extract center-Y slize (top-right)
                 WriteableBitmap bitmap = new WriteableBitmap(image.dims[0], image.dims[2], 96.0, 96.0, PixelFormats.Rgb24, null);
                 bitmap.Lock();
                 unsafe
@@ -127,18 +128,17 @@ namespace TestViewer
                 ImageXZ.Source = bitmap;
             }
             {
-                // extract center-Z slize
-                WriteableBitmap bitmap = new WriteableBitmap(image.dims[0], image.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
+                // extract center-X slize (bottom-left)
+                WriteableBitmap bitmap = new WriteableBitmap(image.dims[2], image.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
                 bitmap.Lock();
-                unsafe
-                {
-                    int z = image.dims[2] / 2;
-                    for (int y = 0; y < bitmap.Height; ++y)
+                unsafe {
+                    int x = image.dims[0] / 2;
+                    for (int z = 0; z < bitmap.Height; ++z)
                     {
-                        for (int x = 0; x < bitmap.Width; ++x)
+                        for (int y = 0; y < bitmap.Width; ++y)
                         {
                             byte val = image.data[x + y * image.stride0 + z * image.stride1];
-                            byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
+                            byte* pixel = (byte*)bitmap.BackBuffer + y * (bitmap.Format.BitsPerPixel / 8) + z * bitmap.BackBufferStride;
                             SetRGBVal(pixel, color_map[val]);
                         }
                     }
@@ -146,7 +146,7 @@ namespace TestViewer
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
 
-                ImageXY.Source = bitmap;
+                ImageYZ.Source = bitmap;
             }
         }
 
