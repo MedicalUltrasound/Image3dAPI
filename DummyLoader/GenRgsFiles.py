@@ -1,3 +1,5 @@
+import re
+
 text = """HKCR
 {
 	PROG-NAME.CLASS-NAME.1 = s 'CLASS-NAME Object'
@@ -50,11 +52,41 @@ def GenRgsFiles(progname, typelib, classes, threadmodel, concat_filename=None):
         print('Written '+concat_filename)
 
 
-if __name__ == "__main__":
-    # the GUID values here must be unique and in sync with GUIDs in DummyLoader.idl
-    # Use guidgen.exe to generate them (included with Visual Studio)
-    classes = [['Image3dFileLoader', '8E754A72-0067-462B-9267-E84AF84828F1'],
-               ['Image3dSource',     '6FA82ED5-6332-4344-8417-DEA55E72098C'],
-              ]
+def ParseUuidString (str):
+    uuid = str[str.find('uuid(')+5:]
+    return uuid[:uuid.find(')')]
+
+
+def ParseIdl (filename):
+    '''Parse IDL file to determine library name, typelib GUID and classes with associated GUIDs'''
+    with open(filename, 'r') as f:
+        source = f.read()
+
+    attribs = '\[[^[]+\]\s*'     # detect [...] attribute blocks
+    name    = '\s+[a-zA-Z0-9_]+' # detect coclass/interface name
+        
+    # find "library" name and associated typelib uuid
+    for lib_hit in re.findall(attribs+'library'+name, source):
+        tokens = lib_hit.split()
+        for token in tokens:
+            if 'uuid(' in token:
+                typelib = ParseUuidString(token)
+                break
+        libname = tokens[-1]
+
+    # find "coclass" names with associated uuids
+    classes = [] 
+    for cls_hit in re.findall(attribs+'coclass'+name, source):
+        tokens = cls_hit.split()
+        for token in tokens:
+            if 'uuid(' in token:
+                uuid = ParseUuidString(token)
+                break
+        classes.append([tokens[-1], uuid])
     
-    GenRgsFiles('DummyLoader', '67E59584-3F6A-4852-8051-103A4583CA5E', classes, 'Both')
+    return libname, typelib, classes
+
+
+if __name__ == "__main__":
+    libname, typelib, classes = ParseIdl('DummyLoader.idl')
+    GenRgsFiles(libname, typelib, classes, 'Both')
