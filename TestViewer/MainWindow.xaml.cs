@@ -75,7 +75,7 @@ namespace TestViewer
             Debug.Assert(m_source != null);
 
             // retrieve image volume
-            ushort[] max_res = new ushort[] { 200, 300, 250 };
+            ushort[] max_res = new ushort[] { 128, 128, 128 };
 
             // get XY plane
             Cart3dGeom bboxXY = m_source.GetBoundingBox();
@@ -123,68 +123,30 @@ namespace TestViewer
 
             uint[] color_map = m_source.GetColorMap();
 
+            ImageXY.Source = GenerateBitmap(imageXY, color_map);
+            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
+            ImageYZ.Source = GenerateBitmap(imageYZ, color_map);
+        }
+
+        private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
+        {
+            WriteableBitmap bitmap = new WriteableBitmap(image.dims[0], image.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
+            bitmap.Lock();
+            unsafe
             {
-                // extract center-Z slize (top-left)
-                WriteableBitmap bitmap = new WriteableBitmap(imageXY.dims[0], imageXY.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
-                bitmap.Lock();
-                unsafe
+                for (int y = 0; y < bitmap.Height; ++y)
                 {
-                    for (int y = 0; y < bitmap.Height; ++y)
+                    for (int x = 0; x < bitmap.Width; ++x)
                     {
-                        for (int x = 0; x < bitmap.Width; ++x)
-                        {
-                            byte val = imageXY.data[x + y * imageXY.stride0];
-                            byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
-                            SetRGBVal(pixel, color_map[val]);
-                        }
+                        byte val = image.data[x + y * image.stride0];
+                        byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
+                        SetRGBVal(pixel, color_map[val]);
                     }
                 }
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
-
-                ImageXY.Source = bitmap;
             }
-            {
-                // extract center-Y slize (top-right)
-                WriteableBitmap bitmap = new WriteableBitmap(imageXZ.dims[0], imageXZ.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
-                bitmap.Lock();
-                unsafe
-                {
-                    for (int z = 0; z < bitmap.Height; ++z)
-                    {
-                        for (int x = 0; x < bitmap.Width; ++x)
-                        {
-                            byte val = imageXZ.data[x + z * imageXZ.stride0];
-                            byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + z * bitmap.BackBufferStride;
-                            SetRGBVal(pixel, color_map[val]);
-                        }
-                    }
-                }
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
-
-                ImageXZ.Source = bitmap;
-            }
-            {
-                // extract center-X slize (bottom-left)
-                WriteableBitmap bitmap = new WriteableBitmap(imageYZ.dims[0], imageYZ.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
-                bitmap.Lock();
-                unsafe {
-                    for (int z = 0; z < bitmap.Height; ++z)
-                    {
-                        for (int y = 0; y < bitmap.Width; ++y)
-                        {
-                            byte val = imageYZ.data[y + z * imageYZ.stride0];
-                            byte* pixel = (byte*)bitmap.BackBuffer + y * (bitmap.Format.BitsPerPixel / 8) + z * bitmap.BackBufferStride;
-                            SetRGBVal(pixel, color_map[val]);
-                        }
-                    }
-                }
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
-
-                ImageYZ.Source = bitmap;
-            }
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            bitmap.Unlock();
+            return bitmap;
         }
 
         unsafe static void SetRGBVal(byte* pixel, uint rgba)

@@ -15,7 +15,7 @@
         <StackPanel Grid.Column="0">
             <!-- Menu pane -->
             <Label>Loader name</Label>
-            <TextBox x:Name="LoaderName">DummyLoader.Image3dFileLoader</TextBox>
+            <TextBox x:Name="LoaderName">GEHC_CARD_US.Image3dFileLoader</TextBox>
             <Button x:Name="LoadBtn" Click="LoadBtn_Click">Load</Button>
             <Label>File name</Label>
             <DockPanel>
