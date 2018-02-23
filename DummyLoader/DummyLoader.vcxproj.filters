@@ -9,6 +9,7 @@
     <ClInclude Include="Image3dSource.hpp" />
     <ClInclude Include="Image3dFileLoader.hpp" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="LinAlg.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GenRgsFiles.py" />
