@@ -1,4 +1,5 @@
 #include "Image3dSource.hpp"
+#include "LinAlg.hpp"
 
 
 Image3dSource::Image3dSource() {
@@ -118,21 +119,101 @@ HRESULT Image3dSource::GetFrameTimes(/*out*/SAFEARRAY * *frame_times) {
     return S_OK;
 }
 
+
+/** Convert from normalized voxel pos in [0,1) to (x,y,z) coordinate. */
+static vec3f PosToCoord (vec3f origin, vec3f dir1, vec3f dir2, vec3f dir3, const vec3f pos) {
+    mat33f M;
+    col_assign(M, 0, dir1);
+    col_assign(M, 1, dir2);
+    col_assign(M, 2, dir3);
+
+    return prod(M, pos) + origin;
+}
+
+
+/** Convert from (x,y,z) coordinate to normalized voxel pos in [0,1). */
+static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
+    const vec3f origin(geom.origin_x, geom.origin_y, geom.origin_z);
+    const vec3f dir1(geom.dir1_x, geom.dir1_y, geom.dir1_z);
+    const vec3f dir2(geom.dir2_x, geom.dir2_y, geom.dir2_z);
+    const vec3f dir3(geom.dir3_x, geom.dir3_y, geom.dir3_z);
+
+    mat33f M;
+    col_assign(M, 0, dir1);
+    col_assign(M, 1, dir2);
+    col_assign(M, 2, dir3);
+
+    return prod(inv(M), xyz - origin);
+}
+
+
+static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
+    auto x = static_cast<unsigned int>(frame.dims[0] * pos.x);
+    auto y = static_cast<unsigned int>(frame.dims[1] * pos.y);
+    auto z = static_cast<unsigned int>(frame.dims[2] * pos.z);
+
+    // out-of-bounds checking
+    if ((x >= frame.dims[0]) || (y >= frame.dims[1]) || (z >= frame.dims[2]))
+        return 0; // black outside image volume
+
+    return static_cast<unsigned char*>(frame.data->pvData)[x + y*frame.stride0 + z*frame.stride1];
+}
+
+
+Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, unsigned short max_res[3]) {
+    if (max_res[2] == 0)
+        max_res[2] = 1; // require at least one plane to to retrieved
+
+    vec3f out_origin(out_geom.origin_x, out_geom.origin_y, out_geom.origin_z);
+    vec3f out_dir1(out_geom.dir1_x, out_geom.dir1_y, out_geom.dir1_z);
+    vec3f out_dir2(out_geom.dir2_x, out_geom.dir2_y, out_geom.dir2_z);
+    vec3f out_dir3(out_geom.dir3_x, out_geom.dir3_y, out_geom.dir3_z);
+
+    // allow 3rd axis to be empty if only retrieving a single slice
+    if ((out_dir3 == vec3f(0, 0, 0)) && (max_res[2] < 2))
+        out_dir3 = cross_prod(out_dir1, out_dir2);
+
+    // sample image buffer
+    std::vector<unsigned char> img_buf(max_res[0] * max_res[1] * max_res[2], 127);
+    for (unsigned short z = 0; z < max_res[2]; ++z) {
+        for (unsigned short y = 0; y < max_res[1]; ++y) {
+            for (unsigned short x = 0; x < max_res[0]; ++x) {
+                // convert from input texture coordinate to output texture coordinate
+                vec3f pos_in(x*1.0f/max_res[0], y*1.0f/max_res[1], z*1.0f/max_res[2]);
+                vec3f xyz = PosToCoord(out_origin, out_dir1, out_dir2, out_dir3, pos_in);
+                vec3f pos_out = CoordToPos(m_geom, xyz);
+
+                unsigned char val = SampleVoxel(frame, pos_out);
+                img_buf[x + y*max_res[0] + z*max_res[0] * max_res[1]] = val;
+            }
+        }
+    }
+
+    // convert to Image3d format
+    Image3d result;
+    {
+        result.time = frame.time;
+        result.format = FORMAT_U8;
+        for (size_t i = 0; i < 3; ++i)
+            result.dims[i] = max_res[i];
+        CComSafeArray<BYTE> data(static_cast<unsigned int>(img_buf.size()));
+        memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
+        result.data = data.Detach();
+        result.stride0 = result.dims[0] * sizeof(byte);
+        result.stride1 = result.dims[1] * result.stride0;
+    }
+
+    return result;
+}
+
 HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*out*/Image3d *data) {
     if (!data)
         return E_INVALIDARG;
     if (index >= m_frames.size())
         return E_BOUNDS;
 
-    // \todo: Implement cropping of output image, based on input geom
-
-    // return image data
-#ifdef _WINDLL
-    bool deep_copy = false; // don't copy when running in-process
-#else
-    bool deep_copy = true; // copy when communicating out-of-process
-#endif
-    *data = Image3d(m_frames[index]);
+    Image3d result = SampleFrame(m_frames[index], geom, max_res);
+    *data = std::move(result);
     return S_OK;
 }
 

@@ -58,6 +58,8 @@ public:
 
     HRESULT STDMETHODCALLTYPE GetSopInstanceUID(/*out*/BSTR *uid_str) override;
 
+    Image3d SampleFrame (const Image3d & frame, Cart3dGeom out_geom, unsigned short max_res[3]);
+
     DECLARE_REGISTRY_RESOURCEID(IDR_Image3dSource)
 
     BEGIN_COM_MAP(Image3dSource)
