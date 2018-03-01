@@ -5,17 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestViewer"
         mc:Ignorable="d"
-        Title="Test Viewer" Height="350" Width="525">
+        Title="Test Viewer" Height="350" Width="550">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="225" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
             <!-- Menu pane -->
             <Label>Loader name</Label>
-            <TextBox x:Name="LoaderName">DummyLoader.Image3dFileLoader</TextBox>
+            <ComboBox x:Name="LoaderName" IsEditable="True">
+                <ComboBoxItem>DummyLoader.Image3dFileLoader</ComboBoxItem>
+                <ComboBoxItem>GEHC_CARD_US.Image3dFileLoader</ComboBoxItem>
+                <ComboBoxItem>KretzLoader.KretzImage3dFileLoader</ComboBoxItem>
+            </ComboBox>
             <Button x:Name="LoadBtn" Click="LoadBtn_Click">Load</Button>
             <Label>File name</Label>
             <DockPanel>
