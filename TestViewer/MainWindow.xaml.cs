@@ -77,8 +77,16 @@ namespace TestViewer
             // retrieve image volume
             ushort[] max_res = new ushort[] { 128, 128, 128 };
 
-            // get XY plane
-            Cart3dGeom bboxXY = m_source.GetBoundingBox();
+            Cart3dGeom bbox = m_source.GetBoundingBox();
+            if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
+                // swap 2nd & 3rd axis, so that the 2nd becomes predominately "Y"
+                SwapVals(ref bbox.dir2_x, ref bbox.dir3_x);
+                SwapVals(ref bbox.dir2_y, ref bbox.dir3_y);
+                SwapVals(ref bbox.dir2_z, ref bbox.dir3_z);
+            }
+
+            // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
+            Cart3dGeom bboxXY = bbox;
             ushort[] max_resXY = new ushort[] { max_res[0], max_res[1], 1 };
             bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
             bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
@@ -88,8 +96,8 @@ namespace TestViewer
             bboxXY.dir3_z = 0;
             Image3d imageXY = m_source.GetFrame(frame, bboxXY, max_resXY);
 
-            // get XZ plane
-            Cart3dGeom bboxXZ = m_source.GetBoundingBox();
+            // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
+            Cart3dGeom bboxXZ = bbox;
             ushort[] max_resXZ = new ushort[] { max_res[0], max_res[2], 1 };
             bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
             bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
@@ -102,8 +110,8 @@ namespace TestViewer
             bboxXZ.dir3_z = 0;
             Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, max_resXZ);
 
-            // get YZ plane
-            Cart3dGeom bboxYZ = m_source.GetBoundingBox();
+            // get YZ plane (assumes 2nd axis is "Y" and 3rd is "Z")
+            Cart3dGeom bboxYZ = bbox;
             ushort[] max_resYZ = new ushort[] { max_res[1], max_res[2], 1 };
             bboxYZ.origin_x = bboxYZ.origin_x + bboxYZ.dir1_x / 2;
             bboxYZ.origin_y = bboxYZ.origin_y + bboxYZ.dir1_y / 2;
@@ -158,6 +166,13 @@ namespace TestViewer
             pixel[1] = channels[1]; // green
             pixel[2] = channels[2]; // blue
             // discard alpha channel
+        }
+
+        static void SwapVals(ref float v1, ref float v2)
+        {
+            float tmp = v1;
+            v1 = v2;
+            v2 = tmp;
         }
     }
 }
