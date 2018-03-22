@@ -57,6 +57,7 @@ namespace TestViewer
             FrameSelector.Minimum = 0;
             FrameSelector.Maximum = m_source.GetFrameCount()-1;
             FrameSelector.IsEnabled = true;
+            FrameSelector.Value = 0;
 
             FrameCount.Text = "Frame count: " + m_source.GetFrameCount();
             ProbeInfo.Text = "Probe name: "+ m_source.GetProbeInfo().name;
