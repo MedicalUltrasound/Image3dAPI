@@ -25,11 +25,15 @@ enum ImageFormat {
 typedef [
   v1_enum, // 32bit enum size
   uuid(8157DC93-DBC4-4BEC-922C-B197237CCF34),
-  helpstring("Probe type enum (extended upon demand).")]
+  helpstring("Probe type enum."
+             "Values taken from http://dicom.nema.org/medical/Dicom/2017b/output/chtml/part16/sect_CID_12035.html")]
 enum ProbeType {
-    PROBE_UNKNOWN   = 0,
-    PROBE_THORAX    = 1, ///< transthoracic probe (for imaging between ribs)
-    PROBE_ESOPHAGUS = 2  ///< transesophageal probe
+    PROBE_UNKNOWN         = 0,
+    PROBE_External        = 125261,
+    PROBE_Transesophageal = 125262,
+    PROBE_Endovaginal     = 125263,
+    PROBE_Endorectal      = 125264,
+    PROBE_Intravascular   = 125265,
 } ProbeType;
 
 cpp_quote("")
