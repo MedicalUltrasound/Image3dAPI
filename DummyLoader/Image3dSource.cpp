@@ -3,7 +3,7 @@
 
 
 Image3dSource::Image3dSource() {
-    m_probe.type = PROBE_THORAX;
+    m_probe.type = PROBE_External;
     m_probe.name = L"4V";
 
     // One second loop starting at t = 10
