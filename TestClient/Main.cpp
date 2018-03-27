@@ -1,5 +1,6 @@
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
+#include "../Image3dAPI/VersionCheck.hpp"
 
 
 void ParseSource (IImage3dSource & source) {
@@ -30,8 +31,15 @@ void ParseSource (IImage3dSource & source) {
 int main () {
     ComInitialize com(COINIT_MULTITHREADED);
 
+    CComBSTR progid(L"DummyLoader.Image3dFileLoader");
+    CLSID clsid = {};
+    CHECK(CLSIDFromProgID(progid, &clsid));
+
+    // verify that loader library is compatible
+    //CHECK(CheckImage3dAPIVersion(clsid)); // disabled, since it's not compatible with reg-free COM
+
     CComPtr<IImage3dFileLoader> loader;
-    CHECK(loader.CoCreateInstance(L"DummyLoader.Image3dFileLoader"));
+    CHECK(loader.CoCreateInstance(clsid));
 
     {
         // load file
