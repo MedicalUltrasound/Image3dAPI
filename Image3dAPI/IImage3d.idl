@@ -12,6 +12,17 @@ Design goals:
 /* Interfaces and data structures for exchanging image data. */
 import "oaidl.idl";
 
+
+typedef [
+  v1_enum, // 32bit enum size
+  uuid(39B49534-475A-474B-B91D-17BCA2062A40),
+  helpstring("Image3dAPI version.")]
+enum Image3dAPIVersion {
+    IMAGE3DAPI_VERSION_MAJOR = 1,
+    IMAGE3DAPI_VERSION_MINOR = 1,
+} Image3dAPIVersion;
+
+
 typedef [
   v1_enum, // 32bit enum size
   uuid(A45D637B-0D4A-4797-9949-2039D963C41C),
