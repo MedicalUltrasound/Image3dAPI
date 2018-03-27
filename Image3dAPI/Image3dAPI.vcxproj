@@ -183,6 +183,7 @@ xcopy /Y /D "$(OutDir)$(TargetName).dll"  "$(SolutionDir)$(Platform)" || exit /b
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComSupport.hpp" />
+    <ClInclude Include="VersionCheck.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
