@@ -22,18 +22,20 @@ text = """HKCR
 				val ThreadingModel = s 'THREAD-MODEL'
 			}
 			TypeLib = s '{TYPE-LIB}'
-			Version = s '1.0'
+			Version = s 'VERSION_MAJOR.VERSION_MINOR'
 		}
 	}
 }
 """
 
-def GenRgsFiles(progname, typelib, classes, threadmodel, concat_filename=None):
+def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filename=None):
     all_rgs_content = ''
     for cls in classes:
         content = text
         content = content.replace('PROG-NAME', progname)
         content = content.replace('TYPE-LIB', typelib)
+        content = content.replace('VERSION_MAJOR', str(version[0]))
+        content = content.replace('VERSION_MINOR', str(version[1]))
         content = content.replace('THREAD-MODEL', threadmodel)
         content = content.replace('CLASS-NAME', cls[0])
         content = content.replace('CLASS-GUID', cls[1])
@@ -86,7 +88,17 @@ def ParseIdl (filename):
     
     return libname, typelib, classes
 
+def ParseImage3dAPIVersion (filename):
+    with open(filename, 'r') as f:
+        for line in f:
+            if "IMAGE3DAPI_VERSION_MAJOR =" in line:
+                major = int(line.split()[-1][:-1])
+            elif "IMAGE3DAPI_VERSION_MINOR =" in line:
+                minor = int(line.split()[-1][:-1])
+    return [major,minor]
+
 
 if __name__ == "__main__":
     libname, typelib, classes = ParseIdl('DummyLoader.idl')
-    GenRgsFiles(libname, typelib, classes, 'Both')
+    version = ParseImage3dAPIVersion("../Image3dAPI/IImage3d.idl")
+    GenRgsFiles(libname, typelib, version, classes, 'Both')
