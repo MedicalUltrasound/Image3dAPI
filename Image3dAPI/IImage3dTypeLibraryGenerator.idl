@@ -8,13 +8,14 @@ import "IImage3d.idl";
 
 
 [
-	uuid(3ff1aab8-f3d8-33d4-825d-00104b3646c0),
-	helpstring("Interface to generate IImage3dAPI.tlb .")
+    uuid(3ff1aab8-f3d8-33d4-825d-00104b3646c0),
+    helpstring("Interface to generate IImage3dAPI.tlb .")
 ]
 library Image3dlib
 {
-	importlib("stdole32.tlb");
-	importlib("stdole2.tlb");
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
 
-	interface IImage3dFileLoader;
+    enum      Image3dAPIVersion;
+    interface IImage3dFileLoader;
 };
