@@ -1,6 +1,5 @@
 @echo off
-set PRIMARY_NUGET_REPO=%1
-set SECONDARY_NUGET_REPO=%2
+set NUGET_REPO=%1
 
 set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
@@ -12,7 +11,7 @@ set PATH=%PATH%;"C:\Program Files\Git\bin"
 
 pushd ..
 
-if DEFINED PRIMARY_NUGET_REPO (
+if DEFINED NUGET_REPO (
   python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
 ) else (
   :: Local nuget build. Not to be deployed.
@@ -39,7 +38,7 @@ set /p PREV_TAG=< PREV_TAG.txt
 
 echo Creating new GIT tag:
 git tag %VERSION%
-if DEFINED PRIMARY_NUGET_REPO (
+if DEFINED NUGET_REPO (
   git push origin %VERSION%
 )
 
@@ -47,12 +46,12 @@ echo Generating changelog (with tag decoration, graph and change stats):
 git log %PREV_TAG%..%VERSION% --decorate --graph --stat > changelog.txt
 
 pushd Image3dApi
-CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\Image3dAPI.nuspec %VERSION% %PRIMARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\Image3dAPI.nuspec %VERSION% %NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
 pushd DummyLoader
-CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.redist.nuspec %VERSION% %SECONDARY_NUGET_REPO%
+CALL ..\PackagingGE\PackagePublishNuget.bat ..\PackagingGE\DummyLoader.redist.nuspec %VERSION% %NUGET_REPO%
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 popd
 
