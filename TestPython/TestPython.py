@@ -65,8 +65,8 @@ if __name__=="__main__":
     bbox = source.GetBoundingBox()
     origin = [bbox.origin_x, bbox.origin_y, bbox.origin_z]
     dir1   = [bbox.dir1_x,   bbox.dir1_y,   bbox.dir1_z]
-    dir1   = [bbox.dir2_x,   bbox.dir2_y,   bbox.dir2_z]
-    dir1   = [bbox.dir3_x,   bbox.dir3_y,   bbox.dir3_z]
+    dir2   = [bbox.dir2_x,   bbox.dir2_y,   bbox.dir2_z]
+    dir3   = [bbox.dir3_x,   bbox.dir3_y,   bbox.dir3_z]
 
     color_map = source.GetColorMap()
 
