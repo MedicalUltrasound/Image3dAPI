@@ -15,7 +15,6 @@ import "oaidl.idl";
 
 typedef [
   v1_enum, // 32bit enum size
-  uuid(39B49534-475A-474B-B91D-17BCA2062A40),
   helpstring("Image3dAPI version.")]
 enum Image3dAPIVersion {
     IMAGE3DAPI_VERSION_MAJOR = 1,
@@ -25,7 +24,6 @@ enum Image3dAPIVersion {
 
 typedef [
   v1_enum, // 32bit enum size
-  uuid(A45D637B-0D4A-4797-9949-2039D963C41C),
   helpstring("Enum of supported image formats (extended upon demand).")]
 enum ImageFormat {
     FORMAT_INVALID  = 0, ///< make sure that "cleared" state is invalid
@@ -35,7 +33,6 @@ enum ImageFormat {
 
 typedef [
   v1_enum, // 32bit enum size
-  uuid(8157DC93-DBC4-4BEC-922C-B197237CCF34),
   helpstring("Probe type enum."
              "Values taken from http://dicom.nema.org/medical/Dicom/2017b/output/chtml/part16/sect_CID_12035.html")]
 enum ProbeType {
@@ -51,7 +48,6 @@ cpp_quote("")
 cpp_quote("#ifndef __cplusplus")
 
 typedef [
-  uuid(1A31C197-3E53-4820-98E0-CE47941E19EF),
   helpstring("Probe information.")]
 struct ProbeInfo {
     [helpstring("Can be useful for initializing renderings and quantification tools.")]
@@ -84,7 +80,6 @@ cpp_quote("")
 cpp_quote("#ifndef __cplusplus")
 
 typedef [
-  uuid(74355329-DFEF-4BC0-9103-CF9579536FE3),
   helpstring("3D image data struct. Stored in row-major order. The data buffer might be padded between rows due to alignment needs.")]
 struct Image3d {
     [helpstring("time [seconds]")]                                            double          time;
@@ -166,7 +161,6 @@ cpp_quote("#endif")
 
 
 typedef [
-  uuid(2ABE0726-3AB5-44F6-8FB3-04F22796EAA9),
   helpstring("Cartesian 3D image geometry description. All units are in meter [m].\n"
              "Coordinates are relative to the tip of the probe, with origin at the center of the aperture. The X- & Y-axes follow the 1st and 2nd probe aperture axes, and the Z-axis points into the imaged body.")]
 struct Cart3dGeom {
@@ -192,7 +186,6 @@ cpp_quote("")
 cpp_quote("#ifndef __cplusplus")
 
 typedef [
-  uuid(47B6CCBF-6D52-4615-B086-9D809D24E34B),
   helpstring("ECG time series.")]
 struct EcgSeries {
     [helpstring("time of 1st sample [seconds]")]
