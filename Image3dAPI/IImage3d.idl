@@ -162,7 +162,7 @@ cpp_quote("#endif")
 
 typedef [
   helpstring("Cartesian 3D image geometry description. All units are in meter [m].\n"
-             "Coordinates are relative to the tip of the probe, with origin at the center of the aperture. The X- & Y-axes follow the 1st and 2nd probe aperture axes, and the Z-axis points into the imaged body.")]
+             "Coordinates are relative to the tip of the probe, with origin at the center of the aperture. The X- & Y-axes follow the 1st and 2nd probe aperture axes, and the Z-axis points into the imaged body (right-hand rule).")]
 struct Cart3dGeom {
     // coordinates are not arrays to avoid "warning MIDL2492: structure containing array of float/double might not be marshalled correctly when using type library marshalling"
     float origin_x; ///< coordinate of 1st sample
