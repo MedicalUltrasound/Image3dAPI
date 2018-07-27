@@ -20,6 +20,23 @@ namespace TestViewer
             InitializeComponent();
         }
 
+        void ClearUI()
+        {
+            FrameSelector.Minimum = 0;
+            FrameSelector.Maximum = 0;
+            FrameSelector.IsEnabled = false;
+            FrameSelector.Value = 0;
+
+            FrameCount.Text = "";
+            ProbeInfo.Text = "";
+            InstanceUID.Text = "";
+
+
+            ImageXY.Source = null;
+            ImageXZ.Source = null;
+            ImageYZ.Source = null;
+        }
+
         private void LoadBtn_Click(object sender, RoutedEventArgs e)
         {
             // try to parse string as ProgId first
@@ -44,6 +61,9 @@ namespace TestViewer
                 return;
             }
 
+            // clear UI when switching to a new loader
+            ClearUI();
+
             m_loader = (IImage3dFileLoader)Activator.CreateInstance(comType);
 
             this.FileOpenBtn.IsEnabled = true;
@@ -52,8 +72,13 @@ namespace TestViewer
         private void FileSelectBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            if (dialog.ShowDialog() == true)
-                FileName.Text = dialog.FileName;
+            if (dialog.ShowDialog() != true)
+                return; // user hit cancel
+
+            // clear UI when opening a new file
+            ClearUI();
+
+            FileName.Text = dialog.FileName;
         }
 
         private void FileOpenBtn_Click(object sender, RoutedEventArgs e)
