@@ -39,14 +39,14 @@ Image3dSource::Image3dSource() {
     {
         // geometry          X     Y    Z
         Cart3dGeom geom = { -0.1f,-0.075f,  0,     // origin
-            0.2f, 0,       0,     // dir1
+            0.20f,0,       0,     // dir1
             0,    0.15f,   0,     // dir2
-            0,    0,       0.1f };// dir2
+            0,    0,       0.10f};// dir2
         m_geom = geom;
     }
     {
         // checker board image data
-        unsigned short dims[] = { 12, 14, 16 };
+        unsigned short dims[] = { 20, 15, 10 }; // matches length of dir1, dir2 & dir3, so that the image squares become quadratic
         std::vector<byte> img_buf(dims[0] * dims[1] * dims[2]);
         for (size_t f = 0; f < numFrames; ++f) {
             for (unsigned int z = 0; z < dims[2]; ++z) {
