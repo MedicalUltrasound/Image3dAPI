@@ -148,6 +148,10 @@ static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
 
 
 static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
+    // out-of-bounds checking
+    if ((pos.x < 0) || (pos.y < 0) || (pos.z < 0))
+        return 0; // black outside image volume
+
     auto x = static_cast<unsigned int>(frame.dims[0] * pos.x);
     auto y = static_cast<unsigned int>(frame.dims[1] * pos.y);
     auto z = static_cast<unsigned int>(frame.dims[2] * pos.z);
