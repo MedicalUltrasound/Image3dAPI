@@ -2,6 +2,10 @@
 #include "LinAlg.hpp"
 
 
+static const uint8_t OUTSIDE_VAL = 0;   // black outside image volume
+static const uint8_t PROBE_PLANE = 127; // gray value for plane closest to probe
+
+
 Image3dSource::Image3dSource() {
     m_probe.type = PROBE_External;
     m_probe.name = L"4V";
@@ -65,11 +69,12 @@ Image3dSource::Image3dSource() {
                 }
             }
 
+            // special grayscale value for plane closest to probe
             for (unsigned int y = 0; y < dims[1]; ++y) {
                 for (unsigned int x = 0; x < dims[0]; ++x) {
                     unsigned int z = 0;
                     byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                    out_sample = 255; // Plane closest to probe is gray.
+                    out_sample = PROBE_PLANE;
                 }
             }
 
@@ -150,7 +155,7 @@ static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
 static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
     // out-of-bounds checking
     if ((pos.x < 0) || (pos.y < 0) || (pos.z < 0))
-        return 0; // black outside image volume
+        return OUTSIDE_VAL;
 
     auto x = static_cast<unsigned int>(frame.dims[0] * pos.x);
     auto y = static_cast<unsigned int>(frame.dims[1] * pos.y);
@@ -158,7 +163,7 @@ static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
 
     // out-of-bounds checking
     if ((x >= frame.dims[0]) || (y >= frame.dims[1]) || (z >= frame.dims[2]))
-        return 0; // black outside image volume
+        return OUTSIDE_VAL;
 
     return static_cast<unsigned char*>(frame.data->pvData)[x + y*frame.stride0 + z*frame.stride1];
 }
