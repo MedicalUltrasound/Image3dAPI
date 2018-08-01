@@ -164,9 +164,9 @@ namespace TestViewer
 
             uint[] color_map = m_source.GetColorMap();
 
-            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), bboxXY.dir1_x, bboxXY.dir2_y);
-            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), bboxXZ.dir1_x, bboxXZ.dir2_z);
-            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), bboxYZ.dir1_y, bboxYZ.dir2_z);
+            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), VecLen(bboxXY, 1), VecLen(bboxXY, 2));
+            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), VecLen(bboxXZ, 1), VecLen(bboxXZ, 2));
+            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), VecLen(bboxYZ, 1), VecLen(bboxYZ, 2));
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
@@ -221,6 +221,18 @@ namespace TestViewer
             float tmp = v1;
             v1 = v2;
             v2 = tmp;
+        }
+
+        static float VecLen(Cart3dGeom g, int idx)
+        {
+            if (idx == 1)
+                return (float)Math.Sqrt(g.dir1_x*g.dir1_x + g.dir1_y*g.dir1_y + g.dir1_z*g.dir1_z);
+            else if (idx == 2)
+                return (float)Math.Sqrt(g.dir2_x*g.dir2_x + g.dir2_y*g.dir2_y + g.dir2_z*g.dir2_z);
+            else if (idx == 3)
+                return (float)Math.Sqrt(g.dir3_x*g.dir3_x + g.dir3_y*g.dir3_y + g.dir3_z*g.dir3_z);
+
+            throw new Exception("unsupported direction index");
         }
     }
 }
