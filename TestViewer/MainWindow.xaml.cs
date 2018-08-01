@@ -204,7 +204,7 @@ namespace TestViewer
         }
 
         //Convert to TransformedBitmap to incorporate correct aspect ratio.
-        private TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
+        private static TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
         {
             double widthFactor = 1;
             double heightFactor = 1;
