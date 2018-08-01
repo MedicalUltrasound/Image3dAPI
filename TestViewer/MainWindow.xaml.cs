@@ -110,7 +110,8 @@ namespace TestViewer
             Debug.Assert(m_source != null);
 
             // retrieve image volume
-            ushort[] max_res = new ushort[] { 128, 128, 128 };
+            const ushort HORIZONTAL_RES = 128;
+            const ushort VERTICAL_RES = 128;
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
@@ -122,18 +123,16 @@ namespace TestViewer
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
             Cart3dGeom bboxXY = bbox;
-            ushort[] max_resXY = new ushort[] { max_res[0], max_res[1], 1 };
             bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
             bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
             bboxXY.origin_z = bboxXY.origin_z + bboxXY.dir3_z / 2;
             bboxXY.dir3_x = 0;
             bboxXY.dir3_y = 0;
             bboxXY.dir3_z = 0;
-            Image3d imageXY = m_source.GetFrame(frame, bboxXY, max_resXY);
+            Image3d imageXY = m_source.GetFrame(frame, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
             Cart3dGeom bboxXZ = bbox;
-            ushort[] max_resXZ = new ushort[] { max_res[0], max_res[2], 1 };
             bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
             bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
             bboxXZ.origin_z = bboxXZ.origin_z + bboxXZ.dir2_z / 2;
@@ -143,11 +142,10 @@ namespace TestViewer
             bboxXZ.dir3_x = 0; 
             bboxXZ.dir3_y = 0;
             bboxXZ.dir3_z = 0;
-            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, max_resXZ);
+            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get YZ plane (assumes 2nd axis is "Y" and 3rd is "Z")
             Cart3dGeom bboxYZ = bbox;
-            ushort[] max_resYZ = new ushort[] { max_res[1], max_res[2], 1 };
             bboxYZ.origin_x = bboxYZ.origin_x + bboxYZ.dir1_x / 2;
             bboxYZ.origin_y = bboxYZ.origin_y + bboxYZ.dir1_y / 2;
             bboxYZ.origin_z = bboxYZ.origin_z + bboxYZ.dir1_z / 2;
@@ -160,7 +158,7 @@ namespace TestViewer
             bboxYZ.dir3_x = 0; 
             bboxYZ.dir3_y = 0;
             bboxYZ.dir3_z = 0;
-            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, max_resYZ);
+            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             FrameTime.Text = "Frame time: " + imageXY.time;
 
