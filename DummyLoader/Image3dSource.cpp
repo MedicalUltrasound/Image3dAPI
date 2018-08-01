@@ -69,7 +69,7 @@ Image3dSource::Image3dSource() {
                 for (unsigned int x = 0; x < dims[0]; ++x) {
                     unsigned int z = 0;
                     byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                    out_sample = 255; // Plane closest to probe is gray.
+                    out_sample = 127; // Plane closest to probe is gray.
                 }
             }
 
