@@ -109,9 +109,9 @@ namespace TestViewer
         {
             Debug.Assert(m_source != null);
 
-            // retrieve image volume
-            const ushort HORIZONTAL_RES = 128;
-            const ushort VERTICAL_RES = 128;
+            // retrieve image slices
+            const ushort HORIZONTAL_RES = 256;
+            const ushort VERTICAL_RES = 256;
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
@@ -120,6 +120,9 @@ namespace TestViewer
                 SwapVals(ref bbox.dir2_y, ref bbox.dir3_y);
                 SwapVals(ref bbox.dir2_z, ref bbox.dir3_z);
             }
+
+            // extend bounding-box axes, so that dir1, dir2 & dir3 have equal length
+            ExtendBoundingBox(ref bbox);
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
             Cart3dGeom bboxXY = bbox;
@@ -164,9 +167,9 @@ namespace TestViewer
 
             uint[] color_map = m_source.GetColorMap();
 
-            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), VecLen(bboxXY, 1), VecLen(bboxXY, 2));
-            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), VecLen(bboxXZ, 1), VecLen(bboxXZ, 2));
-            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), VecLen(bboxYZ, 1), VecLen(bboxYZ, 2));
+            ImageXY.Source = GenerateBitmap(imageXY, color_map);
+            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
+            ImageYZ.Source = GenerateBitmap(imageYZ, color_map);
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
@@ -201,21 +204,6 @@ namespace TestViewer
             // discard alpha channel
         }
 
-        //Convert to TransformedBitmap to incorporate correct aspect ratio.
-        private static TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
-        {
-            double widthFactor = 1;
-            double heightFactor = 1;
-
-            if (width > height)
-                widthFactor = width / height;
-            else
-                heightFactor = height / width;
-
-            return new TransformedBitmap(bitmap, new ScaleTransform(widthFactor, heightFactor));
-        }
-
-
         static void SwapVals(ref float v1, ref float v2)
         {
             float tmp = v1;
@@ -223,16 +211,86 @@ namespace TestViewer
             v2 = tmp;
         }
 
+        static float VecLen(float x, float y, float z)
+        {
+            return (float)Math.Sqrt(x * x + y * y + z * z);
+        }
+
         static float VecLen(Cart3dGeom g, int idx)
         {
             if (idx == 1)
-                return (float)Math.Sqrt(g.dir1_x*g.dir1_x + g.dir1_y*g.dir1_y + g.dir1_z*g.dir1_z);
+                return VecLen(g.dir1_x, g.dir1_y, g.dir1_z);
             else if (idx == 2)
-                return (float)Math.Sqrt(g.dir2_x*g.dir2_x + g.dir2_y*g.dir2_y + g.dir2_z*g.dir2_z);
+                return VecLen(g.dir2_x, g.dir2_y, g.dir2_z);
             else if (idx == 3)
-                return (float)Math.Sqrt(g.dir3_x*g.dir3_x + g.dir3_y*g.dir3_y + g.dir3_z*g.dir3_z);
+                return VecLen(g.dir3_x, g.dir3_y, g.dir3_z);
 
             throw new Exception("unsupported direction index");
+        }
+
+        /** Scale bounding-box, so that all axes share the same length.
+         *  Also update the origin to keep the bounding-box centered. */
+        static void ExtendBoundingBox(ref Cart3dGeom g)
+        {
+            float dir1_len = VecLen(g, 1);
+            float dir2_len = VecLen(g, 2);
+            float dir3_len = VecLen(g, 3);
+
+            float max_len = Math.Max(dir1_len, Math.Max(dir2_len, dir3_len));
+
+            if (dir1_len < max_len)
+            {
+                float delta = max_len - dir1_len;
+                float dx, dy, dz;
+                ScaleVector(g.dir1_x, g.dir1_y, g.dir1_z, delta, out dx, out dy, out dz);
+                // scale up dir1 so that it becomes the same length as the other axes
+                g.dir1_x += dx;
+                g.dir1_y += dy;
+                g.dir1_z += dz;
+                // move origin to keep the bounding-box centered
+                g.origin_x -= dx/2;
+                g.origin_y -= dy/2;
+                g.origin_z -= dz/2;
+            }
+
+            if (dir2_len < max_len)
+            {
+                float delta = max_len - dir2_len;
+                float dx, dy, dz;
+                ScaleVector(g.dir2_x, g.dir2_y, g.dir2_z, delta, out dx, out dy, out dz);
+                // scale up dir2 so that it becomes the same length as the other axes
+                g.dir2_x += dx;
+                g.dir2_y += dy;
+                g.dir2_z += dz;
+                // move origin to keep the bounding-box centered
+                g.origin_x -= dx / 2;
+                g.origin_y -= dy / 2;
+                g.origin_z -= dz / 2;
+            }
+
+            if (dir3_len < max_len)
+            {
+                float delta = max_len - dir3_len;
+                float dx, dy, dz;
+                ScaleVector(g.dir3_x, g.dir3_y, g.dir3_z, delta, out dx, out dy, out dz);
+                // scale up dir3 so that it becomes the same length as the other axes
+                float factor = max_len / dir3_len;
+                g.dir3_x += dx;
+                g.dir3_y += dy;
+                g.dir3_z += dz;
+                // move origin to keep the bounding-box centered
+                g.origin_x -= dx / 2;
+                g.origin_y -= dy / 2;
+                g.origin_z -= dz / 2;
+            }
+        }
+
+        static void ScaleVector(float in_x, float in_y, float in_z, float length, out float out_x, out float out_y, out float out_z)
+        {
+            float cur_len = VecLen(in_x, in_y, in_z);
+            out_x = in_x * length / cur_len;
+            out_y = in_y * length / cur_len;
+            out_z = in_z * length / cur_len;
         }
     }
 }
