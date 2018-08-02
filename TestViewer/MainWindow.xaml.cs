@@ -109,9 +109,9 @@ namespace TestViewer
         {
             Debug.Assert(m_source != null);
 
-            // retrieve image volume
-            const ushort HORIZONTAL_RES = 128;
-            const ushort VERTICAL_RES = 128;
+            // retrieve image slices
+            const ushort HORIZONTAL_RES = 256;
+            const ushort VERTICAL_RES = 256;
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
