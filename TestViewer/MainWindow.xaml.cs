@@ -110,7 +110,8 @@ namespace TestViewer
             Debug.Assert(m_source != null);
 
             // retrieve image volume
-            ushort[] max_res = new ushort[] { 128, 128, 128 };
+            const ushort HORIZONTAL_RES = 128;
+            const ushort VERTICAL_RES = 128;
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
@@ -122,18 +123,16 @@ namespace TestViewer
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
             Cart3dGeom bboxXY = bbox;
-            ushort[] max_resXY = new ushort[] { max_res[0], max_res[1], 1 };
             bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
             bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
             bboxXY.origin_z = bboxXY.origin_z + bboxXY.dir3_z / 2;
             bboxXY.dir3_x = 0;
             bboxXY.dir3_y = 0;
             bboxXY.dir3_z = 0;
-            Image3d imageXY = m_source.GetFrame(frame, bboxXY, max_resXY);
+            Image3d imageXY = m_source.GetFrame(frame, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
             Cart3dGeom bboxXZ = bbox;
-            ushort[] max_resXZ = new ushort[] { max_res[0], max_res[2], 1 };
             bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
             bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
             bboxXZ.origin_z = bboxXZ.origin_z + bboxXZ.dir2_z / 2;
@@ -143,11 +142,10 @@ namespace TestViewer
             bboxXZ.dir3_x = 0; 
             bboxXZ.dir3_y = 0;
             bboxXZ.dir3_z = 0;
-            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, max_resXZ);
+            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get YZ plane (assumes 2nd axis is "Y" and 3rd is "Z")
             Cart3dGeom bboxYZ = bbox;
-            ushort[] max_resYZ = new ushort[] { max_res[1], max_res[2], 1 };
             bboxYZ.origin_x = bboxYZ.origin_x + bboxYZ.dir1_x / 2;
             bboxYZ.origin_y = bboxYZ.origin_y + bboxYZ.dir1_y / 2;
             bboxYZ.origin_z = bboxYZ.origin_z + bboxYZ.dir1_z / 2;
@@ -160,15 +158,15 @@ namespace TestViewer
             bboxYZ.dir3_x = 0; 
             bboxYZ.dir3_y = 0;
             bboxYZ.dir3_z = 0;
-            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, max_resYZ);
+            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             FrameTime.Text = "Frame time: " + imageXY.time;
 
             uint[] color_map = m_source.GetColorMap();
 
-            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), bboxXY.dir1_x, bboxXY.dir2_y);
-            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), bboxXZ.dir1_x, bboxXZ.dir2_z);
-            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), bboxYZ.dir1_y, bboxYZ.dir2_z);
+            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), VecLen(bboxXY, 1), VecLen(bboxXY, 2));
+            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), VecLen(bboxXZ, 1), VecLen(bboxXZ, 2));
+            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), VecLen(bboxYZ, 1), VecLen(bboxYZ, 2));
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
@@ -204,7 +202,7 @@ namespace TestViewer
         }
 
         //Convert to TransformedBitmap to incorporate correct aspect ratio.
-        private TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
+        private static TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
         {
             double widthFactor = 1;
             double heightFactor = 1;
@@ -223,6 +221,18 @@ namespace TestViewer
             float tmp = v1;
             v1 = v2;
             v2 = tmp;
+        }
+
+        static float VecLen(Cart3dGeom g, int idx)
+        {
+            if (idx == 1)
+                return (float)Math.Sqrt(g.dir1_x*g.dir1_x + g.dir1_y*g.dir1_y + g.dir1_z*g.dir1_z);
+            else if (idx == 2)
+                return (float)Math.Sqrt(g.dir2_x*g.dir2_x + g.dir2_y*g.dir2_y + g.dir2_z*g.dir2_z);
+            else if (idx == 3)
+                return (float)Math.Sqrt(g.dir3_x*g.dir3_x + g.dir3_y*g.dir3_y + g.dir3_z*g.dir3_z);
+
+            throw new Exception("unsupported direction index");
         }
     }
 }
