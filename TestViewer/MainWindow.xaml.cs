@@ -167,9 +167,9 @@ namespace TestViewer
 
             uint[] color_map = m_source.GetColorMap();
 
-            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), VecLen(bboxXY, 1), VecLen(bboxXY, 2));
-            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), VecLen(bboxXZ, 1), VecLen(bboxXZ, 2));
-            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), VecLen(bboxYZ, 1), VecLen(bboxYZ, 2));
+            ImageXY.Source = GenerateBitmap(imageXY, color_map);
+            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
+            ImageYZ.Source = GenerateBitmap(imageYZ, color_map);
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
@@ -203,21 +203,6 @@ namespace TestViewer
             pixel[2] = channels[2]; // blue
             // discard alpha channel
         }
-
-        //Convert to TransformedBitmap to incorporate correct aspect ratio.
-        private static TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
-        {
-            double widthFactor = 1;
-            double heightFactor = 1;
-
-            if (width > height)
-                widthFactor = width / height;
-            else
-                heightFactor = height / width;
-
-            return new TransformedBitmap(bitmap, new ScaleTransform(widthFactor, heightFactor));
-        }
-
 
         static void SwapVals(ref float v1, ref float v2)
         {
