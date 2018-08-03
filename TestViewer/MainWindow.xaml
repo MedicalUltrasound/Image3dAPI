@@ -19,6 +19,7 @@
                 <ComboBoxItem>DummyLoader.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>GEHC_CARD_US.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>KretzLoader.KretzImage3dFileLoader</ComboBoxItem>
+                <ComboBoxItem>SiemensLoader.Image3dFileLoader</ComboBoxItem>
             </ComboBox>
             <Button x:Name="LoadBtn" Click="LoadBtn_Click">Load</Button>
             <Label>File name</Label>
