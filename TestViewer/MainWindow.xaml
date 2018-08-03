@@ -29,7 +29,7 @@
             </DockPanel>
             <Button x:Name="FileOpenBtn" IsEnabled="False" Click="FileOpenBtn_Click">Open</Button>
             <Label>Frame number</Label>
-            <Slider x:Name="FrameSelector" TickPlacement="BottomRight" IsSnapToTickEnabled="True" TickFrequency="1" IsEnabled="False" Thumb.DragCompleted="FrameSelector_ValueChanged"/>
+            <Slider x:Name="FrameSelector" TickPlacement="BottomRight" IsSnapToTickEnabled="True" TickFrequency="1" IsEnabled="False" ValueChanged="FrameSelector_ValueChanged" />
 
             <Label>File info:</Label>
             <TextBlock x:Name="FrameCount"/>

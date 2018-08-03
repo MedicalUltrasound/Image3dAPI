@@ -100,7 +100,7 @@ namespace TestViewer
             DrawImages(0);
         }
 
-        private void FrameSelector_ValueChanged(object sender, DragCompletedEventArgs e)
+        private void FrameSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             DrawImages((uint)FrameSelector.Value);
         }
