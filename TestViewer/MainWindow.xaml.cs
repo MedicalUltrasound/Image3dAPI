@@ -86,6 +86,11 @@ namespace TestViewer
             Debug.Assert(m_loader != null);
 
             string loader_error = m_loader.LoadFile(FileName.Text);
+            if ((loader_error != null) && (loader_error.Length > 0))
+            {
+                MessageBox.Show(loader_error);
+                return;
+            }
             m_source = m_loader.GetImageSource();
 
             FrameSelector.Minimum = 0;
@@ -100,7 +105,7 @@ namespace TestViewer
             DrawImages(0);
         }
 
-        private void FrameSelector_ValueChanged(object sender, DragCompletedEventArgs e)
+        private void FrameSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             DrawImages((uint)FrameSelector.Value);
         }
