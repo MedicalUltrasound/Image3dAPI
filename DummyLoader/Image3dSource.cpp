@@ -2,6 +2,10 @@
 #include "LinAlg.hpp"
 
 
+static const uint8_t OUTSIDE_VAL = 0;   // black outside image volume
+static const uint8_t PROBE_PLANE = 127; // gray value for plane closest to probe
+
+
 Image3dSource::Image3dSource() {
     m_probe.type = PROBE_External;
     m_probe.name = L"4V";
@@ -39,14 +43,14 @@ Image3dSource::Image3dSource() {
     {
         // geometry          X     Y    Z
         Cart3dGeom geom = { -0.1f,-0.075f,  0,     // origin
-            0.2f, 0,       0,     // dir1
+            0.20f,0,       0,     // dir1
             0,    0.15f,   0,     // dir2
-            0,    0,       0.1f };// dir2
+            0,    0,       0.10f};// dir2
         m_geom = geom;
     }
     {
         // checker board image data
-        unsigned short dims[] = { 12, 14, 16 };
+        unsigned short dims[] = { 20, 15, 10 }; // matches length of dir1, dir2 & dir3, so that the image squares become quadratic
         std::vector<byte> img_buf(dims[0] * dims[1] * dims[2]);
         for (size_t f = 0; f < numFrames; ++f) {
             for (unsigned int z = 0; z < dims[2]; ++z) {
@@ -65,11 +69,12 @@ Image3dSource::Image3dSource() {
                 }
             }
 
+            // special grayscale value for plane closest to probe
             for (unsigned int y = 0; y < dims[1]; ++y) {
                 for (unsigned int x = 0; x < dims[0]; ++x) {
                     unsigned int z = 0;
                     byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                    out_sample = 255; // Plane closest to probe is gray.
+                    out_sample = PROBE_PLANE;
                 }
             }
 
@@ -148,13 +153,17 @@ static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
 
 
 static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
+    // out-of-bounds checking
+    if ((pos.x < 0) || (pos.y < 0) || (pos.z < 0))
+        return OUTSIDE_VAL;
+
     auto x = static_cast<unsigned int>(frame.dims[0] * pos.x);
     auto y = static_cast<unsigned int>(frame.dims[1] * pos.y);
     auto z = static_cast<unsigned int>(frame.dims[2] * pos.z);
 
     // out-of-bounds checking
     if ((x >= frame.dims[0]) || (y >= frame.dims[1]) || (z >= frame.dims[2]))
-        return 0; // black outside image volume
+        return OUTSIDE_VAL;
 
     return static_cast<unsigned char*>(frame.data->pvData)[x + y*frame.stride0 + z*frame.stride1];
 }

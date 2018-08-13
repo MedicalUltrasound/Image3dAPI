@@ -20,6 +20,23 @@ namespace TestViewer
             InitializeComponent();
         }
 
+        void ClearUI()
+        {
+            FrameSelector.Minimum = 0;
+            FrameSelector.Maximum = 0;
+            FrameSelector.IsEnabled = false;
+            FrameSelector.Value = 0;
+
+            FrameCount.Text = "";
+            ProbeInfo.Text = "";
+            InstanceUID.Text = "";
+
+
+            ImageXY.Source = null;
+            ImageXZ.Source = null;
+            ImageYZ.Source = null;
+        }
+
         private void LoadBtn_Click(object sender, RoutedEventArgs e)
         {
             // try to parse string as ProgId first
@@ -44,6 +61,9 @@ namespace TestViewer
                 return;
             }
 
+            // clear UI when switching to a new loader
+            ClearUI();
+
             m_loader = (IImage3dFileLoader)Activator.CreateInstance(comType);
 
             this.FileOpenBtn.IsEnabled = true;
@@ -52,8 +72,13 @@ namespace TestViewer
         private void FileSelectBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            if (dialog.ShowDialog() == true)
-                FileName.Text = dialog.FileName;
+            if (dialog.ShowDialog() != true)
+                return; // user hit cancel
+
+            // clear UI when opening a new file
+            ClearUI();
+
+            FileName.Text = dialog.FileName;
         }
 
         private void FileOpenBtn_Click(object sender, RoutedEventArgs e)
@@ -61,6 +86,11 @@ namespace TestViewer
             Debug.Assert(m_loader != null);
 
             string loader_error = m_loader.LoadFile(FileName.Text);
+            if ((loader_error != null) && (loader_error.Length > 0))
+            {
+                MessageBox.Show(loader_error);
+                return;
+            }
             m_source = m_loader.GetImageSource();
 
             FrameSelector.Minimum = 0;
@@ -75,7 +105,7 @@ namespace TestViewer
             DrawImages(0);
         }
 
-        private void FrameSelector_ValueChanged(object sender, DragCompletedEventArgs e)
+        private void FrameSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             DrawImages((uint)FrameSelector.Value);
         }
@@ -84,8 +114,9 @@ namespace TestViewer
         {
             Debug.Assert(m_source != null);
 
-            // retrieve image volume
-            ushort[] max_res = new ushort[] { 128, 128, 128 };
+            // retrieve image slices
+            const ushort HORIZONTAL_RES = 256;
+            const ushort VERTICAL_RES = 256;
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
@@ -95,20 +126,21 @@ namespace TestViewer
                 SwapVals(ref bbox.dir2_z, ref bbox.dir3_z);
             }
 
+            // extend bounding-box axes, so that dir1, dir2 & dir3 have equal length
+            ExtendBoundingBox(ref bbox);
+
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
             Cart3dGeom bboxXY = bbox;
-            ushort[] max_resXY = new ushort[] { max_res[0], max_res[1], 1 };
             bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
             bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
             bboxXY.origin_z = bboxXY.origin_z + bboxXY.dir3_z / 2;
             bboxXY.dir3_x = 0;
             bboxXY.dir3_y = 0;
             bboxXY.dir3_z = 0;
-            Image3d imageXY = m_source.GetFrame(frame, bboxXY, max_resXY);
+            Image3d imageXY = m_source.GetFrame(frame, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
             Cart3dGeom bboxXZ = bbox;
-            ushort[] max_resXZ = new ushort[] { max_res[0], max_res[2], 1 };
             bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
             bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
             bboxXZ.origin_z = bboxXZ.origin_z + bboxXZ.dir2_z / 2;
@@ -118,11 +150,10 @@ namespace TestViewer
             bboxXZ.dir3_x = 0; 
             bboxXZ.dir3_y = 0;
             bboxXZ.dir3_z = 0;
-            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, max_resXZ);
+            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get YZ plane (assumes 2nd axis is "Y" and 3rd is "Z")
             Cart3dGeom bboxYZ = bbox;
-            ushort[] max_resYZ = new ushort[] { max_res[1], max_res[2], 1 };
             bboxYZ.origin_x = bboxYZ.origin_x + bboxYZ.dir1_x / 2;
             bboxYZ.origin_y = bboxYZ.origin_y + bboxYZ.dir1_y / 2;
             bboxYZ.origin_z = bboxYZ.origin_z + bboxYZ.dir1_z / 2;
@@ -135,15 +166,15 @@ namespace TestViewer
             bboxYZ.dir3_x = 0; 
             bboxYZ.dir3_y = 0;
             bboxYZ.dir3_z = 0;
-            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, max_resYZ);
+            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             FrameTime.Text = "Frame time: " + imageXY.time;
 
             uint[] color_map = m_source.GetColorMap();
 
-            ImageXY.Source = scaleBitmap(GenerateBitmap(imageXY, color_map), bboxXY.dir1_x, bboxXY.dir2_y);
-            ImageXZ.Source = scaleBitmap(GenerateBitmap(imageXZ, color_map), bboxXZ.dir1_x, bboxXZ.dir2_z);
-            ImageYZ.Source = scaleBitmap(GenerateBitmap(imageYZ, color_map), bboxYZ.dir1_y, bboxYZ.dir2_z);
+            ImageXY.Source = GenerateBitmap(imageXY, color_map);
+            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
+            ImageYZ.Source = GenerateBitmap(imageYZ, color_map);
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
@@ -178,26 +209,93 @@ namespace TestViewer
             // discard alpha channel
         }
 
-        //Convert to TransformedBitmap to incorporate correct aspect ratio.
-        private TransformedBitmap scaleBitmap(WriteableBitmap bitmap, double width, double height)
-        {
-            double widthFactor = 1;
-            double heightFactor = 1;
-
-            if (width > height)
-                widthFactor = width / height;
-            else
-                heightFactor = height / width;
-
-            return new TransformedBitmap(bitmap, new ScaleTransform(widthFactor, heightFactor));
-        }
-
-
         static void SwapVals(ref float v1, ref float v2)
         {
             float tmp = v1;
             v1 = v2;
             v2 = tmp;
+        }
+
+        static float VecLen(float x, float y, float z)
+        {
+            return (float)Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        static float VecLen(Cart3dGeom g, int idx)
+        {
+            if (idx == 1)
+                return VecLen(g.dir1_x, g.dir1_y, g.dir1_z);
+            else if (idx == 2)
+                return VecLen(g.dir2_x, g.dir2_y, g.dir2_z);
+            else if (idx == 3)
+                return VecLen(g.dir3_x, g.dir3_y, g.dir3_z);
+
+            throw new Exception("unsupported direction index");
+        }
+
+        /** Scale bounding-box, so that all axes share the same length.
+         *  Also update the origin to keep the bounding-box centered. */
+        static void ExtendBoundingBox(ref Cart3dGeom g)
+        {
+            float dir1_len = VecLen(g, 1);
+            float dir2_len = VecLen(g, 2);
+            float dir3_len = VecLen(g, 3);
+
+            float max_len = Math.Max(dir1_len, Math.Max(dir2_len, dir3_len));
+
+            if (dir1_len < max_len)
+            {
+                float delta = max_len - dir1_len;
+                float dx, dy, dz;
+                ScaleVector(g.dir1_x, g.dir1_y, g.dir1_z, delta, out dx, out dy, out dz);
+                // scale up dir1 so that it becomes the same length as the other axes
+                g.dir1_x += dx;
+                g.dir1_y += dy;
+                g.dir1_z += dz;
+                // move origin to keep the bounding-box centered
+                g.origin_x -= dx/2;
+                g.origin_y -= dy/2;
+                g.origin_z -= dz/2;
+            }
+
+            if (dir2_len < max_len)
+            {
+                float delta = max_len - dir2_len;
+                float dx, dy, dz;
+                ScaleVector(g.dir2_x, g.dir2_y, g.dir2_z, delta, out dx, out dy, out dz);
+                // scale up dir2 so that it becomes the same length as the other axes
+                g.dir2_x += dx;
+                g.dir2_y += dy;
+                g.dir2_z += dz;
+                // move origin to keep the bounding-box centered
+                g.origin_x -= dx / 2;
+                g.origin_y -= dy / 2;
+                g.origin_z -= dz / 2;
+            }
+
+            if (dir3_len < max_len)
+            {
+                float delta = max_len - dir3_len;
+                float dx, dy, dz;
+                ScaleVector(g.dir3_x, g.dir3_y, g.dir3_z, delta, out dx, out dy, out dz);
+                // scale up dir3 so that it becomes the same length as the other axes
+                float factor = max_len / dir3_len;
+                g.dir3_x += dx;
+                g.dir3_y += dy;
+                g.dir3_z += dz;
+                // move origin to keep the bounding-box centered
+                g.origin_x -= dx / 2;
+                g.origin_y -= dy / 2;
+                g.origin_z -= dz / 2;
+            }
+        }
+
+        static void ScaleVector(float in_x, float in_y, float in_z, float length, out float out_x, out float out_y, out float out_z)
+        {
+            float cur_len = VecLen(in_x, in_y, in_z);
+            out_x = in_x * length / cur_len;
+            out_y = in_y * length / cur_len;
+            out_z = in_z * length / cur_len;
         }
     }
 }
