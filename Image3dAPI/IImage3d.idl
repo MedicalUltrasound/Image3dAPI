@@ -304,6 +304,18 @@ interface IImage3dSource : IUnknown {
 };
 
 
+typedef [
+    v1_enum, // 32bit enum size
+    helpstring("Image3dAPI error codes.")]
+enum Image3dError {
+    Image3d_SUCCESS              = 0,
+    Image3d_ACCESS_FAILURE       = 1, ///< file missing, inaccessible or locked
+    Image3d_VALIDATION_FAILURE   = 2, ///< file corrupt or does not contain required vendor tags
+    Image3d_NOT_YET_SUPPORTED    = 3, ///< the loader is too old to read the file and need to be updated
+    Image3d_SUPPORT_DISCONTINUED = 4, ///< the loader no longer support the file version
+    } Image3dError;
+
+
 [ object,
   oleautomation, // use "automation" marshaler (oleaut32.dll)
   uuid(CD30759B-EB38-4469-9CA5-4DF75737A31B),
@@ -312,8 +324,8 @@ interface IImage3dSource : IUnknown {
 interface IImage3dFileLoader : IUnknown {
     [helpstring("Load proprietary image file.\n"
                 "The file might already by opened elsewhere, so no exclusive locks can be taken.\n"
-                "The function shall return quickly with informative error message (for debugging) in case of failure.")]
-    HRESULT LoadFile ([in,string] BSTR file_name, [out,string,retval] BSTR * error_message);
+                "The function shall return quickly with error type and diagnostic message (in english) in case of failure.")]
+    HRESULT LoadFile ([in,string] BSTR file_name, [out] Image3dError * error_type, [out,string] BSTR * error_msg);
 
     HRESULT GetImageSource ([out,retval] IImage3dSource ** img_src);
 };
