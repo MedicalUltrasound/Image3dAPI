@@ -21,6 +21,8 @@ public:
 
     HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*out*/BSTR *error_message) override;
 
+    HRESULT STDMETHODCALLTYPE IsHighPerfMode(BOOL * high_perf) override;
+
     HRESULT STDMETHODCALLTYPE GetImageSource(/*out*/IImage3dSource **img_src) override;
 
     DECLARE_REGISTRY_RESOURCEID(IDR_Image3dFileLoader)

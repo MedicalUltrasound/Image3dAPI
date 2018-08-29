@@ -315,5 +315,11 @@ interface IImage3dFileLoader : IUnknown {
                 "The function shall return quickly with an informative error message (for debugging) in case of failure.")]
     HRESULT LoadFile ([in] BSTR file_name, [out, retval] BSTR * error_message);
 
+    [helpstring("Query if loader is operating in high-performance mode or not. This typically means GPU accelerated.\n"
+                "A output value false implies a lower performance CPU fallback implementation.\n"
+                "CPU-only loaders shall always return true.\n"
+                "Note that this method might return E_NOT_SET until a file have been loaded.")]
+    HRESULT IsHighPerfMode ([out,retval] BOOL * high_perf);
+
     HRESULT GetImageSource ([out,retval] IImage3dSource ** img_src);
 };
