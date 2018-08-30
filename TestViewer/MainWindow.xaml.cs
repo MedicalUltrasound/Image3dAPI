@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -35,6 +36,7 @@ namespace TestViewer
             ImageXY.Source = null;
             ImageXZ.Source = null;
             ImageYZ.Source = null;
+            ECG.Data = null;
         }
 
         private void LoadBtn_Click(object sender, RoutedEventArgs e)
@@ -103,11 +105,75 @@ namespace TestViewer
             InstanceUID.Text = "UID: " + m_source.GetSopInstanceUID();
 
             DrawImages(0);
+            DrawEcg(m_source.GetFrameTimes()[0]);
+        }
+
+        private void DrawEcg (double cur_time)
+        {
+            EcgSeries ecg;
+            try {
+                ecg = m_source.GetECG();
+            } catch (Exception) {
+                ECG.Data = null; // ECG not available
+                return;
+            }
+
+            // shrink width & height slightly, so that the "actual" width/height remain unchanged
+            double W = (int)(ECG.ActualWidth - 1);
+            double H = (int)(ECG.ActualHeight - 1);
+
+            // horizontal scaling (index to X coord)
+            double ecg_pitch = W/ecg.samples.Length;
+
+            // vertical scaling (sample val to Y coord)
+            double ecg_offset =  H*ecg.samples.Max()/(ecg.samples.Max()-ecg.samples.Min());
+            double ecg_scale  = -H/(ecg.samples.Max()-ecg.samples.Min());
+
+            // vertical scaling (time to Y coord conv)
+            double time_offset = -W*ecg.start_time/(ecg.delta_time*ecg.samples.Length);
+            double time_scale  =  W/(ecg.delta_time*ecg.samples.Length);
+
+            PathGeometry pathGeom = new PathGeometry();
+            {
+                // draw ECG trace
+                PathSegmentCollection pathSegmentCollection = new PathSegmentCollection();
+                for (int i = 0; i < ecg.samples.Length; ++i) {
+                    LineSegment lineSegment = new LineSegment();
+                    lineSegment.Point = new Point(ecg_pitch*i, ecg_offset+ecg_scale*ecg.samples[i]);
+                    pathSegmentCollection.Add(lineSegment);
+                }
+
+                PathFigure pathFig = new PathFigure();
+                pathFig.StartPoint = new Point(0, ecg_offset+ecg_scale*ecg.samples[0]);
+                pathFig.Segments = pathSegmentCollection;
+
+                PathFigureCollection pathFigCol = new PathFigureCollection();
+                pathFigCol.Add(pathFig);
+
+                pathGeom.Figures = pathFigCol;
+            }
+
+            {
+                // draw current frame line
+                double x_pos = time_offset + time_scale * cur_time;
+
+                LineGeometry line = new LineGeometry();
+                line.StartPoint = new Point(x_pos, 0);
+                line.EndPoint = new Point(x_pos, H);
+
+                pathGeom.AddGeometry(line);
+            }
+
+            ECG.Stroke = Brushes.Blue;
+            ECG.StrokeThickness = 1.0;
+            ECG.Data = pathGeom;
         }
 
         private void FrameSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            DrawImages((uint)FrameSelector.Value);
+            var idx = (uint)FrameSelector.Value;
+            DrawImages(idx);
+            DrawEcg(m_source.GetFrameTimes()[idx]);
         }
 
         private void DrawImages (uint frame)
