@@ -72,7 +72,7 @@ if __name__=="__main__":
 
     frame_count = source.GetFrameCount()
     for i in range(frame_count):
-        max_res = np.ctypeslib.as_ctypes(np.array([128, 128, 128], dtype=np.ushort))
+        max_res = np.ctypeslib.as_ctypes(np.array([64, 64, 64], dtype=np.ushort))
         frame = source.GetFrame(0, bbox, max_res)
         
         print("Frame time: "+str(frame.time))

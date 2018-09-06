@@ -19,7 +19,7 @@ void ParseSource (IImage3dSource & source) {
     }
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
-        unsigned short max_res[] = {128, 128, 128};
+        unsigned short max_res[] = {64, 64, 64};
 
         // retrieve frame data
         Image3d data;
