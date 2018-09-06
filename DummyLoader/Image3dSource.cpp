@@ -11,7 +11,7 @@ Image3dSource::Image3dSource() {
     m_probe.name = L"4V";
 
     // One second loop starting at t = 10
-    const size_t numFrames = 60;
+    const size_t numFrames = 25;
     const double duration = 1.0; // Seconds
     const double startTime = 10.0;
 
