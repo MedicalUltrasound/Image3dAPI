@@ -72,12 +72,13 @@ if __name__=="__main__":
 
     frame_count = source.GetFrameCount()
     for i in range(frame_count):
-        max_res = np.ctypeslib.as_ctypes(np.array([128, 128, 128], dtype=np.ushort))
-        frame = source.GetFrame(0, bbox, max_res)
+        max_res = np.ctypeslib.as_ctypes(np.array([64, 64, 64], dtype=np.ushort))
+        frame = source.GetFrame(i, bbox, max_res)
         
-        print("Frame time: "+str(frame.time))
-        print("Frame format: "+str(frame.format))
-        print("Frame dims: ("+str(frame.dims[0])+", "+str(frame.dims[1])+", "+str(frame.dims[2])+")")
+        print("Frame metadata:")
+        print("  time:   "+str(frame.time))
+        print("  format: "+str(frame.format))
+        print("  dims:  ("+str(frame.dims[0])+", "+str(frame.dims[1])+", "+str(frame.dims[2])+")")
 
         data = FrameTo3dArray(frame)
-        print("Frame data shape: "+str(data.shape))
+        print("  shape: "+str(data.shape))
