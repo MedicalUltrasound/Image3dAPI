@@ -13,7 +13,6 @@ Image3dSource::Image3dSource() {
     // One second loop starting at t = 10
     const size_t numFrames = 60;
     const double duration = 1.0; // Seconds
-    const double fps = duration / numFrames;
     const double startTime = 10.0;
 
     {
@@ -80,7 +79,7 @@ Image3dSource::Image3dSource() {
 
             Image3d tmp;
             {
-                tmp.time = f * fps + startTime;
+                tmp.time = f*(duration/numFrames) + startTime;
                 tmp.format = FORMAT_U8;
                 for (size_t i = 0; i < 3; ++i)
                     tmp.dims[i] = dims[i];
