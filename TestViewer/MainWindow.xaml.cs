@@ -35,6 +35,7 @@ namespace TestViewer
             ImageXY.Source = null;
             ImageXZ.Source = null;
             ImageYZ.Source = null;
+            ImageSkew.Source = null;
         }
 
         private void LoadBtn_Click(object sender, RoutedEventArgs e)
@@ -168,6 +169,23 @@ namespace TestViewer
             bboxYZ.dir3_z = 0;
             Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
+            // get oblique X=Y plane
+            Cart3dGeom bboxSkew = bbox;
+            float SQRT2 = (float)Math.Sqrt(2.0);
+            bboxSkew.origin_x += (bbox.dir1_x + bbox.dir2_x) * (1-1/SQRT2)/2;
+            bboxSkew.origin_y += (bbox.dir1_y + bbox.dir2_y) * (1-1/SQRT2)/2;
+            bboxSkew.origin_z += (bbox.dir1_z + bbox.dir2_z) * (1-1/SQRT2)/2;
+            bboxSkew.dir1_x = (bbox.dir1_x + bbox.dir2_x)/SQRT2;
+            bboxSkew.dir1_y = (bbox.dir1_y + bbox.dir2_y)/SQRT2;
+            bboxSkew.dir1_z = (bbox.dir1_z + bbox.dir2_z)/SQRT2;
+            bboxSkew.dir2_x = bbox.dir3_x;
+            bboxSkew.dir2_y = bbox.dir3_y;
+            bboxSkew.dir2_z = bbox.dir3_z;
+            bboxSkew.dir3_x = 0;
+            bboxSkew.dir3_y = 0;
+            bboxSkew.dir3_z = 0;
+            Image3d imageSkew = m_source.GetFrame(frame, bboxSkew, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+
             FrameTime.Text = "Frame time: " + imageXY.time;
 
             uint[] color_map = m_source.GetColorMap();
@@ -175,6 +193,7 @@ namespace TestViewer
             ImageXY.Source = GenerateBitmap(imageXY, color_map);
             ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
             ImageYZ.Source = GenerateBitmap(imageYZ, color_map);
+            ImageSkew.Source = GenerateBitmap(imageSkew, color_map);
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
