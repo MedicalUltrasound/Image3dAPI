@@ -11,6 +11,7 @@ Each ultrasound vendor will need to provide an implementation of this API specif
 * [Image3dAPI](Image3dAPI/)   - API definitions
 * [PackagingGE](PackagingGE/) - NuGet packaging configuration
 * [RegFreeTest](RegFreeTest/) - Example of how to leverage manifest files to avoid COM registration
+* [SandboxTest](SandboxTest/) - Example of how to sandbox a loader in a separate process
 * [TestPython](TestPython/)   - Python-based sample code
 * [TestViewer](TestViewer/)   - Simple .NET-based image viewer
 
