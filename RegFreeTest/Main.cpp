@@ -38,6 +38,7 @@ int main () {
     // verify that loader library is compatible
     //CHECK(CheckImage3dAPIVersion(clsid)); // disabled, since it's not compatible with reg-free COM
 
+    // create loader without accessing the registry (possible since the DummyLoader manifest is linked in)
     CComPtr<IImage3dFileLoader> loader;
     CHECK(loader.CoCreateInstance(clsid));
 
