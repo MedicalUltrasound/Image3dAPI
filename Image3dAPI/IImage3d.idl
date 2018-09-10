@@ -300,7 +300,7 @@ interface IImage3dSource : IUnknown {
     HRESULT GetProbeInfo ([out,retval] ProbeInfo * probe);
 
     [helpstring("Get per-file DICOM UID string (to be matched against corresponding file)")]
-    HRESULT GetSopInstanceUID ([out,retval] BSTR * uid_str);
+    HRESULT GetSopInstanceUID ([out,string,retval] BSTR * uid_str);
 };
 
 
@@ -312,8 +312,8 @@ interface IImage3dSource : IUnknown {
 interface IImage3dFileLoader : IUnknown {
     [helpstring("Load proprietary image file.\n"
                 "The file might already by opened elsewhere, so no exclusive locks can be taken.\n"
-                "The function shall return quickly with an informative error message (for debugging) in case of failure.")]
-    HRESULT LoadFile ([in] BSTR file_name, [out, retval] BSTR * error_message);
+                "The function shall return quickly with informative error message (for debugging) in case of failure.")]
+    HRESULT LoadFile ([in,string] BSTR file_name, [out,string,retval] BSTR * error_message);
 
     HRESULT GetImageSource ([out,retval] IImage3dSource ** img_src);
 };
