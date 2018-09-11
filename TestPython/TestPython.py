@@ -45,6 +45,10 @@ if __name__=="__main__":
     loader = comtypes.client.CreateObject("DummyLoader.Image3dFileLoader")
     loader = loader.QueryInterface(Image3dAPI.IImage3dFileLoader)
 
+    # get supported (manufacturer,model) pairs
+    manufacturer, model = loader.GetSupportedManufacturerModels()
+    assert(len(manufacturer) == len(model))
+
     # load file
     loader.LoadFile("dummy.dcm")
     source = loader.GetImageSource()

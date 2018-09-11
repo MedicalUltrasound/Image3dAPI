@@ -42,6 +42,17 @@ int main () {
     CComPtr<IImage3dFileLoader> loader;
     CHECK(loader.CoCreateInstance(clsid));
 
+    // get list of supported (manufacturer,model) pairs
+    CComSafeArray<BSTR> manufacturer, model;
+    {
+        SAFEARRAY * ptr1 = nullptr;
+        SAFEARRAY * ptr2 = nullptr;
+        CHECK(loader->GetSupportedManufacturerModels(&ptr1, &ptr2));
+        manufacturer.Attach(ptr1);
+        model.Attach(ptr2);
+    }
+    assert(manufacturer.GetCount() == model.GetCount());
+
     {
         // load file
         CComBSTR filename = L"dummy.dcm";
