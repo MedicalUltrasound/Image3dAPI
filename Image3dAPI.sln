@@ -28,6 +28,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestViewer", "TestViewer\Te
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TestPython", "TestPython\TestPython.pyproj", "{A594D690-99DB-499B-B3B0-0BF81364EBA2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SandboxTest", "SandboxTest\SandboxTest.vcxproj", "{DFA5034E-BEA9-4299-A301-38A5DF7FD256}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3} = {4ADC48A2-1A9E-4F7B-A048-67FE02D31CB3}
+		{277D8DBA-C8B3-423B-A707-B6435130BF4A} = {277D8DBA-C8B3-423B-A707-B6435130BF4A}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -72,8 +78,19 @@ Global
 		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Release|Win32.ActiveCfg = Release|Any CPU
 		{A594D690-99DB-499B-B3B0-0BF81364EBA2}.Release|x64.ActiveCfg = Release|Any CPU
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Debug|Win32.Build.0 = Debug|Win32
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Debug|x64.ActiveCfg = Debug|x64
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Debug|x64.Build.0 = Debug|x64
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Release|Win32.ActiveCfg = Release|Win32
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Release|Win32.Build.0 = Release|Win32
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Release|x64.ActiveCfg = Release|x64
+		{DFA5034E-BEA9-4299-A301-38A5DF7FD256}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9C3239D5-451E-429B-95DE-4B251511748E}
 	EndGlobalSection
 EndGlobal
