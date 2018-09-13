@@ -161,8 +161,9 @@ cpp_quote("#endif")
 
 
 typedef [
-  helpstring("Cartesian 3D image geometry description. All units are in meter [m] and the axes shall be orthogonal.\n"
-             "Coordinates are relative to the tip of the probe, with origin at the center of the aperture. The X- & Y-axes follow the 1st and 2nd probe aperture axes, and the Z-axis points into the imaged body (right-hand rule).")]
+  helpstring("3D image geometry description that matches C.8.X.2.1.2 'Transducer Frame of Reference' in DICOM Enhanced Ultrasound (sup 43)\n"
+             "All units are in meter [m] with orthogonal axes forming a right-handed coordinate system.\n"
+             "Coordinates are relative to the tip of the transducer, with origin at the center of the aperture. The X- & Z-axes follow the 1st and 2nd aperture axes, and the Y-axis point into the imaged body.")]
 struct Cart3dGeom {
     // coordinates are not arrays to avoid "warning MIDL2492: structure containing array of float/double might not be marshalled correctly when using type library marshalling"
     float origin_x; ///< coordinate of 1st sample
