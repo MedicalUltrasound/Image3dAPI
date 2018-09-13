@@ -310,6 +310,11 @@ interface IImage3dSource : IUnknown {
   helpstring("Factory for loading 3D image data from a file.\n"
              "Implementors are responsible for also providing details on relevant DICOM tags that indicate that the loader might support the file.")]
 interface IImage3dFileLoader : IUnknown {
+    [helpstring("Return a list of (manufacturer,model) pairs for datasets supported by the loader. Both arrays shall have equal length.\n"
+                "Manufacturer corresponds to DICOM tag (0008,0070)\n"
+                "Manufacturer's Model Name corresponds to DICOM tag (0008,1090). The string might contain '*' as wildcard character.")]
+    HRESULT GetSupportedManufacturerModels ([out] SAFEARRAY(BSTR) * manufacturer, [out] SAFEARRAY(BSTR) * model);
+
     [helpstring("Load proprietary image file.\n"
                 "The file might already by opened elsewhere, so no exclusive locks can be taken.\n"
                 "The function shall return quickly with an informative error message (for debugging) in case of failure.")]

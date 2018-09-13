@@ -19,6 +19,8 @@ public:
 
     /*NOT virtual*/ ~Image3dFileLoader();
 
+    HRESULT STDMETHODCALLTYPE GetSupportedManufacturerModels(SAFEARRAY **, SAFEARRAY **) override;
+
     HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*out*/BSTR *error_message) override;
 
     HRESULT STDMETHODCALLTYPE GetImageSource(/*out*/IImage3dSource **img_src) override;
