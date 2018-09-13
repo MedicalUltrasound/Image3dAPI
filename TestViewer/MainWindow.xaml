@@ -57,8 +57,8 @@
             <Image x:Name="ImageXZ" Grid.Column="1" Grid.Row="0"/>
             <Label TextBlock.Foreground="DimGray" Grid.Column="1" Grid.Row="0">X-Z plane</Label>
             
-            <Image x:Name="ImageYZ" Grid.Column="0" Grid.Row="1"/>
-            <Label TextBlock.Foreground="DimGray"  Grid.Column="0" Grid.Row="1">Y-Z plane</Label>
+            <Image x:Name="ImageZY" Grid.Column="0" Grid.Row="1"/>
+            <Label TextBlock.Foreground="DimGray"  Grid.Column="0" Grid.Row="1">Z-Y plane</Label>
 
             <Path x:Name="ECG" Grid.Column="1" Grid.Row="1"/>
             <Label TextBlock.Foreground="DimGray"  Grid.Column="1" Grid.Row="1">ECG</Label>
