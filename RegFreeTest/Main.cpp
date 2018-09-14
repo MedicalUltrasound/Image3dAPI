@@ -1,6 +1,6 @@
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
-#include "../Image3dAPI/VersionCheck.hpp"
+#include "../Image3dAPI/RegistryCheck.hpp"
 
 
 void ParseSource (IImage3dSource & source) {
