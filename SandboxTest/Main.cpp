@@ -35,6 +35,8 @@ int main () {
     CLSID clsid = {};
     CHECK(CLSIDFromProgID(progid, &clsid));
 
+    auto list = SupportedManufacturerModels::ReadList(clsid);
+
     // verify that loader library is compatible
     CHECK(CheckImage3dAPIVersion(clsid));
 

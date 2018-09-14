@@ -24,6 +24,12 @@ text = """HKCR
 			}
 			TypeLib = s '{TYPE-LIB}'
 			Version = s 'VERSION_MAJOR.VERSION_MINOR'
+
+			SupportedManufacturerModels
+			{
+				val 'Dummy medical systems' = s 'Super scanner *'
+				val 'Dummy healthcare'      = s 'Some scanner 1;Some scanner 2'
+			}
 		}
 	}
 
