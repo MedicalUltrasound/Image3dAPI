@@ -6,6 +6,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComSupport.hpp" />
-    <ClInclude Include="VersionCheck.hpp" />
+    <ClInclude Include="RegistryCheck.hpp" />
   </ItemGroup>
 </Project>
