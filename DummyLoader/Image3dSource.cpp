@@ -40,11 +40,11 @@ Image3dSource::Image3dSource() {
             m_color_map[i] = R8G8B8A8(static_cast<unsigned char>(i), static_cast<unsigned char>(i), static_cast<unsigned char>(i), 0xFF);
     }
     {
-        // geometry          X     Y    Z
-        Cart3dGeom geom = { -0.1f,-0.075f,  0,     // origin
-            0.20f,0,       0,     // dir1
-            0,    0.15f,   0,     // dir2
-            0,    0,       0.10f};// dir2
+        // geometry          X     Y       Z
+        Cart3dGeom geom = { -0.1f, 0,     -0.075f,// origin
+                             0.20f,0,      0,     // dir1 (width)
+                             0,    0.10f,  0,     // dir2 (depth)
+                             0,    0,      0.15f};// dir3 (elevation)
         m_geom = geom;
     }
     {
@@ -69,9 +69,9 @@ Image3dSource::Image3dSource() {
             }
 
             // special grayscale value for plane closest to probe
-            for (unsigned int y = 0; y < dims[1]; ++y) {
+            for (unsigned int z = 0; z < dims[2]; ++z) {
                 for (unsigned int x = 0; x < dims[0]; ++x) {
-                    unsigned int z = 0;
+                    unsigned int y = 0;
                     byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
                     out_sample = PROBE_PLANE;
                 }

@@ -35,7 +35,7 @@ namespace TestViewer
 
             ImageXY.Source = null;
             ImageXZ.Source = null;
-            ImageYZ.Source = null;
+            ImageZY.Source = null;
             ECG.Data = null;
         }
 
@@ -238,21 +238,21 @@ namespace TestViewer
             bboxXZ.dir3_z = 0;
             Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
-            // get YZ plane (assumes 2nd axis is "Y" and 3rd is "Z")
-            Cart3dGeom bboxYZ = bbox;
-            bboxYZ.origin_x = bboxYZ.origin_x + bboxYZ.dir1_x / 2;
-            bboxYZ.origin_y = bboxYZ.origin_y + bboxYZ.dir1_y / 2;
-            bboxYZ.origin_z = bboxYZ.origin_z + bboxYZ.dir1_z / 2;
-            bboxYZ.dir1_x = bboxYZ.dir2_x;
-            bboxYZ.dir1_y = bboxYZ.dir2_y;
-            bboxYZ.dir1_z = bboxYZ.dir2_z;
-            bboxYZ.dir2_x = bboxYZ.dir3_x;
-            bboxYZ.dir2_y = bboxYZ.dir3_y;
-            bboxYZ.dir2_z = bboxYZ.dir3_z;
-            bboxYZ.dir3_x = 0; 
-            bboxYZ.dir3_y = 0;
-            bboxYZ.dir3_z = 0;
-            Image3d imageYZ = m_source.GetFrame(frame, bboxYZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
+            Cart3dGeom bboxZY = bbox;
+            bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
+            bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
+            bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
+            bboxZY.dir1_x = bbox.dir3_x;
+            bboxZY.dir1_y = bbox.dir3_y;
+            bboxZY.dir1_z = bbox.dir3_z;
+            bboxZY.dir2_x = bbox.dir2_x;
+            bboxZY.dir2_y = bbox.dir2_y;
+            bboxZY.dir2_z = bbox.dir2_z;
+            bboxZY.dir3_x = 0;
+            bboxZY.dir3_y = 0;
+            bboxZY.dir3_z = 0;
+            Image3d imageZY = m_source.GetFrame(frame, bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             FrameTime.Text = "Frame time: " + imageXY.time;
 
@@ -260,7 +260,7 @@ namespace TestViewer
 
             ImageXY.Source = GenerateBitmap(imageXY, color_map);
             ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
-            ImageYZ.Source = GenerateBitmap(imageYZ, color_map);
+            ImageZY.Source = GenerateBitmap(imageZY, color_map);
         }
 
         private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
