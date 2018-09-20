@@ -46,7 +46,7 @@ if __name__=="__main__":
     loader = loader.QueryInterface(Image3dAPI.IImage3dFileLoader)
 
     # load file
-    loader.LoadFile("dummy.dcm")
+    err_type, err_msg = loader.LoadFile("dummy.dcm")
     source = loader.GetImageSource()
 
     # retrieve probe info

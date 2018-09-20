@@ -19,7 +19,7 @@ public:
 
     /*NOT virtual*/ ~Image3dFileLoader();
 
-    HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*out*/BSTR *error_message) override;
+    HRESULT STDMETHODCALLTYPE LoadFile(BSTR file_name, /*out*/Image3dError *err_type, /*out*/BSTR *err_msg) override;
 
     HRESULT STDMETHODCALLTYPE GetImageSource(/*out*/IImage3dSource **img_src) override;
 

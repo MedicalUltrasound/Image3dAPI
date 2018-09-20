@@ -8,7 +8,12 @@ Image3dFileLoader::~Image3dFileLoader() {
 }
 
 
-HRESULT Image3dFileLoader::LoadFile(BSTR file_name, /*out*/BSTR *error_message) {
+HRESULT Image3dFileLoader::LoadFile(BSTR file_name, /*out*/Image3dError *err_type, /*out*/BSTR *err_msg) {
+    if (!err_type || !err_msg)
+        return E_INVALIDARG;
+
+    *err_type = Image3d_SUCCESS;
+    *err_msg  = CComBSTR().Detach();
     return S_OK; // no operation
 }
 

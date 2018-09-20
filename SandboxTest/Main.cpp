@@ -45,8 +45,9 @@ int main () {
     {
         // load file
         CComBSTR filename = L"dummy.dcm";
-        CComBSTR error;
-        CHECK(loader->LoadFile(filename, &error));
+        Image3dError err_type = {};
+        CComBSTR err_msg;
+        CHECK(loader->LoadFile(filename, &err_type, &err_msg));
     }
 
     CComPtr<IImage3dSource> source;

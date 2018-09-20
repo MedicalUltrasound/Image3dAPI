@@ -87,10 +87,30 @@ namespace TestViewer
         {
             Debug.Assert(m_loader != null);
 
-            string loader_error = m_loader.LoadFile(FileName.Text);
-            if ((loader_error != null) && (loader_error.Length > 0))
+            Image3dError err_type;
+            string err_msg;
+            m_loader.LoadFile(FileName.Text, out err_type, out err_msg);
+            if ((err_type != Image3dError.Image3d_SUCCESS))
             {
-                MessageBox.Show(loader_error);
+                string message;
+                switch (err_type) {
+                    case Image3dError.Image3d_ACCESS_FAILURE:
+                        message = "Unable to open the file. The file might be missing or locked.";
+                        break;
+                    case Image3dError.Image3d_VALIDATION_FAILURE:
+                        message = "Unsupported file. Probably due to unsupported vendor or modality.";
+                        break;
+                    case Image3dError.Image3d_NOT_YET_SUPPORTED:
+                        message = "The loader is too old to parse the file.";
+                        break;
+                    case Image3dError.Image3d_SUPPORT_DISCONTINUED:
+                        message = "The the file version is no longer supported (pre-DICOM format?).";
+                        break;
+                    default:
+                        message = "Unknown error";
+                        break;
+                }
+                MessageBox.Show(message+": "+err_msg);
                 return;
             }
             m_source = m_loader.GetImageSource();
