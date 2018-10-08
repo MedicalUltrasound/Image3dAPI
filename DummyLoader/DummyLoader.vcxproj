@@ -121,7 +121,7 @@
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PreBuildEvent>
-      <Command>python GenRgsFiles.py</Command>
+      <Command>GenRgsFiles.py</Command>
       <Message>Generate RGS-files</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -160,7 +160,7 @@
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PreBuildEvent>
-      <Command>python GenRgsFiles.py</Command>
+      <Command>GenRgsFiles.py</Command>
       <Message>Generate RGS-files</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -203,7 +203,7 @@
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PreBuildEvent>
-      <Command>python GenRgsFiles.py</Command>
+      <Command>GenRgsFiles.py</Command>
       <Message>Generate RGS-files</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -246,7 +246,7 @@
       <AdditionalIncludeDirectories>$(IntDir)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PreBuildEvent>
-      <Command>python GenRgsFiles.py</Command>
+      <Command>GenRgsFiles.py</Command>
       <Message>Generate RGS-files</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
