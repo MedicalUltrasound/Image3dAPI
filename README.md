@@ -27,6 +27,7 @@ This approach has advantages over the traditional DICOM data standard technique 
 
 ## Getting started
 Install [Visual Studio](https://visualstudio.microsoft.com/) 2015 or 2017, either professional or community edition. Enable the ".Net desktop development", "Desktop development with C++" and "Python development" workloads during installation.
+In addition, Python.exe need to be registered as default app for running .py scripts. This can be done by right-clicking on a .py file, then selecting "Open with", "Choose another app", locate Python.exe and enable "Always use this app to open .py files". 
 
 * Open Visual Studio with administrative privileges. Any version >= 2015 is supported.
 * Open `Image3dAPI.sln`.
