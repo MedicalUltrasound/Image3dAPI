@@ -133,6 +133,11 @@ namespace TestViewer
             EcgSeries ecg;
             try {
                 ecg = m_source.GetECG();
+
+                if (ecg.samples.Length == 0) {
+                    ECG.Data = null; // ECG not available
+                    return;
+                }
             } catch (Exception) {
                 ECG.Data = null; // ECG not available
                 return;
