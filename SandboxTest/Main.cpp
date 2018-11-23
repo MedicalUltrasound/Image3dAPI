@@ -1,6 +1,54 @@
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
 #include "../Image3dAPI/RegistryCheck.hpp"
+#include <sddl.h>
+
+
+/** RAII class for temporarily impersonating low-integrity level for the current thread.
+    Intended to be used together with CLSCTX_ENABLE_CLOAKING when creating COM objects.
+    Based on "Designing Applications to Run at a Low Integrity Level" https://msdn.microsoft.com/en-us/library/bb625960.aspx */
+struct LowIntegrity {
+    LowIntegrity()
+    {
+        HANDLE cur_token = nullptr;
+        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_DUPLICATE | TOKEN_ADJUST_DEFAULT | TOKEN_QUERY | TOKEN_ASSIGN_PRIMARY, &cur_token))
+            abort();
+
+        if (!DuplicateTokenEx(cur_token, 0, NULL, SecurityImpersonation, TokenPrimary, &m_token))
+            abort();
+
+        CloseHandle(cur_token);
+
+        PSID li_sid = nullptr;
+        if (!ConvertStringSidToSid(L"S-1-16-4096", &li_sid)) // low integrity SID
+            abort();
+
+        // reduce process integrity level
+        TOKEN_MANDATORY_LABEL TIL = {};
+        TIL.Label.Attributes = SE_GROUP_INTEGRITY;
+        TIL.Label.Sid = li_sid;
+        if (!SetTokenInformation(m_token, TokenIntegrityLevel, &TIL, sizeof(TOKEN_MANDATORY_LABEL) + GetLengthSid(li_sid)))
+            abort();
+
+        if (!ImpersonateLoggedOnUser(m_token)) // change current thread integrity
+            abort();
+
+        LocalFree(li_sid);
+        li_sid = nullptr;
+    }
+
+    ~LowIntegrity()
+    {
+        if (!RevertToSelf())
+            abort();
+
+        CloseHandle(m_token);
+        m_token = nullptr;
+    }
+
+private:
+    HANDLE m_token = nullptr;
+};
 
 
 void ParseSource (IImage3dSource & source) {
@@ -40,9 +88,12 @@ int main () {
     // verify that loader library is compatible
     CHECK(CheckImage3dAPIVersion(clsid));
 
-    // create loader in a separate dllhost.exe process
+    // create loader in a separate "low integrity" dllhost.exe process
     CComPtr<IImage3dFileLoader> loader;
-    CHECK(loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER));
+    {
+        LowIntegrity low_integrity;
+        CHECK(loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING));
+    }
 
     {
         // load file
