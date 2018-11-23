@@ -16,7 +16,7 @@ text = """HKCR
 		ForceRemove {CLASS-GUID} = s 'CLASS-NAME Object'
 		{
 			ProgID = s 'PROG-NAME.CLASS-NAME.1'
-			val AppID = s '{APPID-GUID}'
+			val AppID = s '%APPID%'
 			VersionIndependentProgID = s 'PROG-NAME.CLASS-NAME'
 			InprocServer32 = s '%MODULE%'
 			{
@@ -32,18 +32,10 @@ text = """HKCR
 			}
 		}
 	}
-
-	NoRemove AppID
-	{
-		ForceRemove {APPID-GUID} = s 'CLASS-NAME Object'
-		{
-			val DllSurrogate = s ''
-		}
-	}
 }
 """
 
-def GenRgsFiles(progname, typelib, appid, version, classes, threadmodel, concat_filename=None):
+def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filename=None):
     all_rgs_content = ''
     for cls in classes:
         content = text
@@ -54,7 +46,6 @@ def GenRgsFiles(progname, typelib, appid, version, classes, threadmodel, concat_
         content = content.replace('THREAD-MODEL', threadmodel)
         content = content.replace('CLASS-NAME', cls[0])
         content = content.replace('CLASS-GUID', cls[1])
-        content = content.replace('APPID-GUID', appid)
         
         #print(content)
         filename = cls[0]+'.rgs'
@@ -116,6 +107,5 @@ def ParseImage3dAPIVersion (filename):
 
 if __name__ == "__main__":
     libname, typelib, classes = ParseIdl('DummyLoader.idl')
-    appid = "92280FDD-C149-44E3-BDEE-736F9F9EEA4E"
     version = ParseImage3dAPIVersion("../Image3dAPI/IImage3d.idl")
-    GenRgsFiles(libname, typelib, appid, version, classes, 'Both')
+    GenRgsFiles(libname, typelib, version, classes, 'Both')

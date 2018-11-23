@@ -1,0 +1,10 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		ForceRemove '%APPID%' = s 'Image3dFileLoader Object'
+		{
+			val DllSurrogate = s ''
+		}
+	}
+}
