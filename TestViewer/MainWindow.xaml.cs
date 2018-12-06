@@ -113,7 +113,13 @@ namespace TestViewer
                 MessageBox.Show(message+": "+err_msg);
                 return;
             }
-            m_source = m_loader.GetImageSource();
+
+            try {
+                m_source = m_loader.GetImageSource();
+            } catch (Exception err) {
+                MessageBox.Show("ERROR: " + err.Message, "GetImageSource error");
+                return;
+            }
 
             FrameSelector.Minimum = 0;
             FrameSelector.Maximum = m_source.GetFrameCount()-1;
