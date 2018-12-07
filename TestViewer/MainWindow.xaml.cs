@@ -71,7 +71,17 @@ namespace TestViewer
             }
         }
 
-        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        private void LoadDefaultBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoadImpl(false);
+        }
+
+        private void LoadOutOfProcBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoadImpl(true);
+        }
+
+        private void LoadImpl(bool force_out_of_proc)
         {
             // try to parse string as ProgId first
             Type comType = Type.GetTypeFromProgID(LoaderName.Text);
@@ -100,7 +110,7 @@ namespace TestViewer
 
             if (m_loader != null)
                 Marshal.ReleaseComObject(m_loader);
-            m_loader = (IImage3dFileLoader)ComExt.CreateInstance(comType.GUID, false);
+            m_loader = (IImage3dFileLoader)ComExt.CreateInstance(comType.GUID, force_out_of_proc);
 
             this.FileOpenBtn.IsEnabled = true;
         }
