@@ -37,6 +37,11 @@ namespace TestViewer
             ImageXZ.Source = null;
             ImageZY.Source = null;
             ECG.Data = null;
+
+            if (m_source != null) {
+                Marshal.ReleaseComObject(m_source);
+                m_source = null;
+            }
         }
 
         private void LoadBtn_Click(object sender, RoutedEventArgs e)
@@ -66,6 +71,8 @@ namespace TestViewer
             // clear UI when switching to a new loader
             ClearUI();
 
+            if (m_loader != null)
+                Marshal.ReleaseComObject(m_loader);
             m_loader = (IImage3dFileLoader)Activator.CreateInstance(comType);
 
             this.FileOpenBtn.IsEnabled = true;
@@ -115,6 +122,8 @@ namespace TestViewer
             }
 
             try {
+                if (m_source != null)
+                    Marshal.ReleaseComObject(m_source);
                 m_source = m_loader.GetImageSource();
             } catch (Exception err) {
                 MessageBox.Show("ERROR: " + err.Message, "GetImageSource error");
