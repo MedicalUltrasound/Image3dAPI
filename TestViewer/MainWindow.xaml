@@ -23,7 +23,8 @@
                 <ComboBoxItem>PhilipsLoader.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>KretzLoader.KretzImage3dFileLoader</ComboBoxItem>
             </ComboBox>
-            <Button x:Name="LoadBtn" Click="LoadBtn_Click">Load</Button>
+            <Button x:Name="LoadDefaultBtn" Click="LoadDefaultBtn_Click">Load default</Button>
+            <Button x:Name="LoadOutOfProcBtn" Click="LoadOutOfProcBtn_Click">Load out-of-process</Button>
             <Label>File name</Label>
             <DockPanel>
                 <TextBox Width="160" x:Name="FileName"/>

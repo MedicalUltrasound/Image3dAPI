@@ -4,9 +4,36 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
-using System.Windows.Controls.Primitives;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using Image3dAPI;
+
+
+/** Alternative to System.Activator.CreateInstance that allows explicit control over the activation context.
+ *  Based on https://stackoverflow.com/questions/22901224/hosting-managed-code-and-garbage-collection */
+public static class ComExt {
+    [DllImport("ole32.dll", ExactSpelling = true, PreserveSig = false)]
+    static extern void CoCreateInstance(
+       [MarshalAs(UnmanagedType.LPStruct)] Guid rclsid,
+       [MarshalAs(UnmanagedType.IUnknown)] object pUnkOuter,
+       uint dwClsContext,
+       [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+       [MarshalAs(UnmanagedType.Interface)] out object rReturnedComObject);
+
+    public static object CreateInstance(Guid clsid, bool force_out_of_process) {
+        Guid IID_IUnknown = new Guid("00000000-0000-0000-C000-000000000046");
+        const uint CLSCTX_INPROC_SERVER = 0x1;
+        const uint CLSCTX_LOCAL_SERVER  = 0x4;
+
+        uint class_context = CLSCTX_LOCAL_SERVER; // always allow out-of-process activation
+        if (!force_out_of_process)
+            class_context |= CLSCTX_INPROC_SERVER; // allow in-process activation
+
+        object unk;
+        CoCreateInstance(clsid, null, class_context, IID_IUnknown, out unk);
+        return unk;
+    }
+}
 
 
 namespace TestViewer
@@ -37,9 +64,24 @@ namespace TestViewer
             ImageXZ.Source = null;
             ImageZY.Source = null;
             ECG.Data = null;
+
+            if (m_source != null) {
+                Marshal.ReleaseComObject(m_source);
+                m_source = null;
+            }
         }
 
-        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        private void LoadDefaultBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoadImpl(false);
+        }
+
+        private void LoadOutOfProcBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoadImpl(true);
+        }
+
+        private void LoadImpl(bool force_out_of_proc)
         {
             // try to parse string as ProgId first
             Type comType = Type.GetTypeFromProgID(LoaderName.Text);
@@ -66,7 +108,9 @@ namespace TestViewer
             // clear UI when switching to a new loader
             ClearUI();
 
-            m_loader = (IImage3dFileLoader)Activator.CreateInstance(comType);
+            if (m_loader != null)
+                Marshal.ReleaseComObject(m_loader);
+            m_loader = (IImage3dFileLoader)ComExt.CreateInstance(comType.GUID, force_out_of_proc);
 
             this.FileOpenBtn.IsEnabled = true;
         }
@@ -115,6 +159,8 @@ namespace TestViewer
             }
 
             try {
+                if (m_source != null)
+                    Marshal.ReleaseComObject(m_source);
                 m_source = m_loader.GetImageSource();
             } catch (Exception err) {
                 MessageBox.Show("ERROR: " + err.Message, "GetImageSource error");
@@ -332,7 +378,7 @@ namespace TestViewer
 
         /** Scale bounding-box, so that all axes share the same length.
          *  Also update the origin to keep the bounding-box centered. */
-        static void ExtendBoundingBox(ref Cart3dGeom g)
+static void ExtendBoundingBox(ref Cart3dGeom g)
         {
             float dir1_len = VecLen(g, 1);
             float dir2_len = VecLen(g, 2);
