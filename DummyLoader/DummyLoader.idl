@@ -13,7 +13,7 @@ library DummyLoader
     importlib("stdole2.tlb");
 
     [
-        version(1.0),
+        version(1.2),
         uuid(6FA82ED5-6332-4344-8417-DEA55E72098C),
         helpstring("3D image source")
     ]
@@ -23,7 +23,7 @@ library DummyLoader
     };
 
     [
-        version(1.0),
+        version(1.2),
         uuid(8E754A72-0067-462B-9267-E84AF84828F1),
         helpstring("3D image file loader")
     ]

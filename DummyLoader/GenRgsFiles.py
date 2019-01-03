@@ -36,12 +36,13 @@ text = """HKCR
 """
 
 class ComClass:
-    def __init__(self, name, uuid):
+    def __init__(self, name, uuid, version):
         self.name = name
         self.uuid = uuid
+        self.version = version
 
 
-def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filename=None):
+def GenRgsFiles (progname, typelib, classes, threadmodel, concat_filename=None):
     all_rgs_content = ''
     for cls in classes:
         content = text
@@ -50,7 +51,7 @@ def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filenam
         content = content.replace('THREAD-MODEL', threadmodel)
         content = content.replace('CLASS-NAME', cls.name)
         content = content.replace('CLASS-GUID', cls.uuid)
-        content = content.replace('VERSION',    version)
+        content = content.replace('VERSION',    cls.version)
         
         #print(content)
         filename = cls.name+'.rgs'
@@ -70,6 +71,10 @@ def ParseUuidString (val):
     uuid = val[val.find('uuid(')+5:]
     return uuid[:uuid.find(')')]
 
+def ParseVersionString (val):
+    ver = val[val.find('version(')+8:]
+    return ver[:ver.find(')')]
+
 
 def ParseIdl (filename):
     '''Parse IDL file to determine library name, typelib GUID and classes with associated GUIDs'''
@@ -88,15 +93,16 @@ def ParseIdl (filename):
                 break
         libname = tokens[-1]
 
-    # find "coclass" names with associated uuids
+    # find "coclass" names with associated uuid and version
     classes = [] 
     for cls_hit in re.findall(attribs+'coclass'+name, source):
         tokens = cls_hit.split()
         for token in tokens:
             if 'uuid(' in token:
                 uuid = ParseUuidString(token)
-                break
-        classes.append(ComClass(tokens[-1], uuid))
+            elif 'version(' in token:
+                version = ParseVersionString(token)
+        classes.append(ComClass(tokens[-1], uuid, version))
     
     return libname, typelib, classes
 
@@ -113,4 +119,10 @@ def ParseImage3dAPIVersion (filename):
 if __name__ == "__main__":
     libname, typelib, classes = ParseIdl('DummyLoader.idl')
     version = ParseImage3dAPIVersion("../Image3dAPI/IImage3d.idl")
-    GenRgsFiles(libname, typelib, version, classes, 'Both')
+    
+    # verify that COM class versions matches API version
+    for cls in classes:
+        if cls.version != version:
+            raise Exception("Version mismatch detected for "+cls.name)
+    
+    GenRgsFiles(libname, typelib, classes, 'Both')
