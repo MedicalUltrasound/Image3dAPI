@@ -66,8 +66,8 @@ def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filenam
         print('Written '+concat_filename)
 
 
-def ParseUuidString (str):
-    uuid = str[str.find('uuid(')+5:]
+def ParseUuidString (val):
+    uuid = val[val.find('uuid(')+5:]
     return uuid[:uuid.find(')')]
 
 
