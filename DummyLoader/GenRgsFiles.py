@@ -23,7 +23,7 @@ text = """HKCR
 				val ThreadingModel = s 'THREAD-MODEL'
 			}
 			TypeLib = s '{TYPE-LIB}'
-			Version = s 'VERSION_MAJOR.VERSION_MINOR'
+			Version = s 'VERSION'
 
 			SupportedManufacturerModels
 			{
@@ -41,11 +41,10 @@ def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filenam
         content = text
         content = content.replace('PROG-NAME', progname)
         content = content.replace('TYPE-LIB', typelib)
-        content = content.replace('VERSION_MAJOR', str(version[0]))
-        content = content.replace('VERSION_MINOR', str(version[1]))
         content = content.replace('THREAD-MODEL', threadmodel)
         content = content.replace('CLASS-NAME', cls[0])
         content = content.replace('CLASS-GUID', cls[1])
+        content = content.replace('VERSION',    version)
         
         #print(content)
         filename = cls[0]+'.rgs'
@@ -102,7 +101,7 @@ def ParseImage3dAPIVersion (filename):
                 major = int(line.split()[-1][:-1])
             elif "IMAGE3DAPI_VERSION_MINOR =" in line:
                 minor = int(line.split()[-1][:-1])
-    return [major,minor]
+    return str(major)+"."+str(minor)
 
 
 if __name__ == "__main__":
