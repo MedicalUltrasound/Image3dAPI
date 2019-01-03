@@ -35,6 +35,12 @@ text = """HKCR
 }
 """
 
+class ComClass:
+    def __init__(self, name, uuid):
+        self.name = name
+        self.uuid = uuid
+
+
 def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filename=None):
     all_rgs_content = ''
     for cls in classes:
@@ -42,12 +48,12 @@ def GenRgsFiles(progname, typelib, version, classes, threadmodel, concat_filenam
         content = content.replace('PROG-NAME', progname)
         content = content.replace('TYPE-LIB', typelib)
         content = content.replace('THREAD-MODEL', threadmodel)
-        content = content.replace('CLASS-NAME', cls[0])
-        content = content.replace('CLASS-GUID', cls[1])
+        content = content.replace('CLASS-NAME', cls.name)
+        content = content.replace('CLASS-GUID', cls.uuid)
         content = content.replace('VERSION',    version)
         
         #print(content)
-        filename = cls[0]+'.rgs'
+        filename = cls.name+'.rgs'
         with open(filename, 'w') as f:
             f.write(content)
             all_rgs_content += content
@@ -90,7 +96,7 @@ def ParseIdl (filename):
             if 'uuid(' in token:
                 uuid = ParseUuidString(token)
                 break
-        classes.append([tokens[-1], uuid])
+        classes.append(ComClass(tokens[-1], uuid))
     
     return libname, typelib, classes
 
