@@ -1,7 +1,6 @@
 import re
 
-text = """HKCR
-{
+progid_template1 = """
 	PROG-NAME.CLASS-NAME.1 = s 'CLASS-NAME Object'
 	{
 		CLSID = s '{CLASS-GUID}'
@@ -10,48 +9,57 @@ text = """HKCR
 	{		
 		CLSID = s '{CLASS-GUID}'
 		CurVer = s 'PROG-NAME.CLASS-NAME.1'
-	}
+	}"""
+
+clsid_template1 = """
 	NoRemove CLSID
 	{
 		ForceRemove {CLASS-GUID} = s 'CLASS-NAME Object'
-		{
+		{"""
+
+progid_template2 = """
 			ProgID = s 'PROG-NAME.CLASS-NAME.1'
-			val AppID = s '%APPID%'
-			VersionIndependentProgID = s 'PROG-NAME.CLASS-NAME'
+			VersionIndependentProgID = s 'PROG-NAME.CLASS-NAME'"""
+
+clsid_template2 = """
 			InprocServer32 = s '%MODULE%'
 			{
 				val ThreadingModel = s 'THREAD-MODEL'
 			}
 			TypeLib = s '{TYPE-LIB}'
 			Version = s 'VERSION'
-
-			SupportedManufacturerModels
-			{
-				val 'Dummy medical systems' = s 'Super scanner *'
-				val 'Dummy healthcare'      = s 'Some scanner 1;Some scanner 2'
-			}
+			ADDITIONAL-REGISTRY-ENTRIES
 		}
-	}
-}
-"""
+	}"""
 
 class ComClass:
-    def __init__(self, name, uuid, version):
+    def __init__(self, name, uuid, version, creatable):
         self.name = name
         self.uuid = uuid
         self.version = version
+        self.creatable = creatable
+        self.additional_entries = '' # default
 
 
 def GenRgsFiles (progname, typelib, classes, threadmodel, concat_filename=None):
     all_rgs_content = ''
     for cls in classes:
-        content = text
+        content = "HKCR\n{"
+        if cls.creatable:
+            content += progid_template1
+        content += clsid_template1
+        if cls.creatable:
+            content += progid_template2
+        content += clsid_template2
+        content  += "\n}\n"
+        
         content = content.replace('PROG-NAME', progname)
         content = content.replace('TYPE-LIB', typelib)
         content = content.replace('THREAD-MODEL', threadmodel)
         content = content.replace('CLASS-NAME', cls.name)
         content = content.replace('CLASS-GUID', cls.uuid)
         content = content.replace('VERSION',    cls.version)
+        content = content.replace('ADDITIONAL-REGISTRY-ENTRIES', cls.additional_entries)
         
         #print(content)
         filename = cls.name+'.rgs'
@@ -102,7 +110,7 @@ def ParseIdl (filename):
                 uuid = ParseUuidString(token)
             elif 'version(' in token:
                 version = ParseVersionString(token)
-        classes.append(ComClass(tokens[-1], uuid, version))
+        classes.append(ComClass(tokens[-1], uuid, version, creatable=True))
     
     return libname, typelib, classes
 
@@ -124,5 +132,15 @@ if __name__ == "__main__":
     for cls in classes:
         if cls.version != version:
             raise Exception("Version mismatch detected for "+cls.name)
+        if cls.name == "Image3dFileLoader":
+            cls.additional_entries += '''
+			val AppID = s '%APPID%'
+			SupportedManufacturerModels
+			{
+				val 'Dummy medical systems' = s 'Super scanner *'
+				val 'Dummy healthcare'      = s 'Some scanner 1;Some scanner 2'
+			}'''
+        else:
+            cls.creatable = False
     
     GenRgsFiles(libname, typelib, classes, 'Both')
