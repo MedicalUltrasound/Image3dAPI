@@ -3,9 +3,16 @@
 #include "ComSupport.hpp"
 
 
+static const REGSAM WOW_SAME_AS_CLIENT = 0;
+
 /** Compare the version of a COM class against the current Image3dAPI version.
-    NOTE: Not compatible with reg-free COM, since the COM class version is not included in the manifest. */
-static HRESULT CheckImage3dAPIVersion (CLSID clsid) {
+    NOTE: Not compatible with reg-free COM, since the COM class version is not included in the manifest.
+    \param clsid -          COM class ID (hexadecimal)
+    \param bitness - Part of the registry to query. Alternatives:
+         WOW_SAME_AS_CLIENT Query part of regitry that matches client bitnes
+         KEY_WOW64_32KEY    Query 32-bit part of registry, regardless of client bitness
+         KEY_WOW64_64KEY    Query 64-bit part of registry, regardless of client bitness */
+static HRESULT CheckImage3dAPIVersion (CLSID clsid, REGSAM bitness = WOW_SAME_AS_CLIENT) {
     // build registry path")
     CComBSTR reg_path(L"CLSID\\");
     reg_path.Append(clsid);
@@ -13,7 +20,7 @@ static HRESULT CheckImage3dAPIVersion (CLSID clsid) {
 
     // extract COM class version
     CRegKey cls_reg;
-    if (cls_reg.Open(HKEY_CLASSES_ROOT, reg_path, KEY_READ) != ERROR_SUCCESS)
+    if (cls_reg.Open(HKEY_CLASSES_ROOT, reg_path, KEY_READ | bitness) != ERROR_SUCCESS)
         return E_NOT_SET;
     ULONG    ver_str_len = 0;
     if (cls_reg.QueryStringValue(nullptr, nullptr, &ver_str_len) != ERROR_SUCCESS)
@@ -32,9 +39,14 @@ static HRESULT CheckImage3dAPIVersion (CLSID clsid) {
         return E_INVALIDARG; // version mismatch
 }
 
-/** Read list of suported (manufacturer,model)-pairs for a given plugin. */ 
 struct SupportedManufacturerModels {
-    static std::vector<SupportedManufacturerModels> ReadList(CLSID clsid) {
+    /** Read list of suported (manufacturer,model)-pairs for a given plugin.
+        \param clsid -          COM class ID (hexadecimal)
+        \param bitness - Part of the registry to query. Alternatives:
+             WOW_SAME_AS_CLIENT Query part of regitry that matches client bitnes
+             KEY_WOW64_32KEY    Query 32-bit part of registry, regardless of client bitness
+             KEY_WOW64_64KEY    Query 64-bit part of registry, regardless of client bitness */
+    static std::vector<SupportedManufacturerModels> ReadList (CLSID clsid, REGSAM bitness = WOW_SAME_AS_CLIENT) {
         // build registry path")
         CComBSTR reg_path(L"CLSID\\");
         reg_path.Append(clsid);
@@ -42,9 +54,9 @@ struct SupportedManufacturerModels {
 
         std::vector<SupportedManufacturerModels> list;
 
-        // extract COM class version
+        // extract COM class
         CRegKey cls_reg;
-        if (cls_reg.Open(HKEY_CLASSES_ROOT, reg_path, KEY_READ) != ERROR_SUCCESS)
+        if (cls_reg.Open(HKEY_CLASSES_ROOT, reg_path, KEY_READ | bitness) != ERROR_SUCCESS)
             return list;
 
 
