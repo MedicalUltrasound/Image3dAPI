@@ -8,11 +8,11 @@ cd /d "%~dp0"
 
 
 :: Remove all traces of DummyLoader from registry
-for %%P in (32 64) do (
-  for %%R in (HKEY_LOCAL_MACHINE HKEY_CURRENT_USER) do (
-    :: TypeLib
-    reg delete "%%R\SOFTWARE\Classes\TypeLib\{67E59584-3F6A-4852-8051-103A4583CA5E}"   /f /reg:%%P 2> NUL
+for %%R in (HKEY_LOCAL_MACHINE HKEY_CURRENT_USER) do (
+  :: TypeLib
+  reg delete "%%R\SOFTWARE\Classes\TypeLib\{67E59584-3F6A-4852-8051-103A4583CA5E}" /f 2> NUL
 
+  for %%P in (32 64) do (
     :: Image3dSource class
     reg delete "%%R\SOFTWARE\Classes\DummyLoader.Image3dSource"                        /f /reg:%%P 2> NUL
     reg delete "%%R\SOFTWARE\Classes\DummyLoader.Image3dSource.1"                      /f /reg:%%P 2> NUL
