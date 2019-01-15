@@ -5,17 +5,17 @@ set PATH=%PATH%;C:\Python27
 set PATH=%PATH%;"C:\Program Files\Git\bin"
 
 :: Dependencies:
-:: * Python.exe in PATH
+:: * Python installed
 :: * Visual Studio command prompt (msbuild & C++ compiler in PATH)
 :: * NuGet.exe in PATH (https://www.nuget.org/downloads)
 
 pushd ..
 
 if DEFINED NUGET_REPO (
-  python.exe PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
+  PackagingGE\DetermineNextTag.py minor > NEW_TAG.txt
 ) else (
   :: Local nuget build. Not to be deployed.
-  python.exe PackagingGE\DetermineNextTag.py patch > NEW_TAG.txt
+  PackagingGE\DetermineNextTag.py patch > NEW_TAG.txt
 )
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 set /p VERSION=< NEW_TAG.txt
