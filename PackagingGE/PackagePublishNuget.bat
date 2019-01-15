@@ -4,7 +4,7 @@ set VERSION_NUMBER=%2
 set NUGET_REPO=%3
 
 :: Change NuGet packaging version and project URL
-..\PackagingGE\SetAutopkgVersion.py %NUSPEC_FILE% %VERSION_NUMBER% https://github.com/MedicalUltrasound/Image3dAPI/tree/%VERSION_NUMBER% 
+..\PackagingGE\SetNuspecVersion.py %NUSPEC_FILE% %VERSION_NUMBER% https://github.com/MedicalUltrasound/Image3dAPI/tree/%VERSION_NUMBER% 
 IF %ERRORLEVEL% NEQ 0 exit /B 1
 
 :: Package artifacts
