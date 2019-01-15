@@ -11,6 +11,7 @@ def DetermineHighestTagVersion ():
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     tags = []
     for line in p.stdout.readlines():
+        line = line.decode()
         line = line.strip(' /\r\n') # remove '/' & newline suffix
         tags.append(line)
     
