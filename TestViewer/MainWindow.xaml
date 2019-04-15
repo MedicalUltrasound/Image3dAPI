@@ -19,6 +19,7 @@
                 <ComboBoxItem>DummyLoader.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>GEHC_CARD_US.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>CanonLoader.Image3dFileLoader</ComboBoxItem>
+                <ComboBoxItem>HitCV3DLoader.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>SiemensLoader.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>PhilipsLoader.Image3dFileLoader</ComboBoxItem>
                 <ComboBoxItem>KretzLoader.KretzImage3dFileLoader</ComboBoxItem>
