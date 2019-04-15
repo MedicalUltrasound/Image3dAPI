@@ -1,6 +1,7 @@
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
 #include "../Image3dAPI/RegistryCheck.hpp"
+#include <iostream>
 
 
 void ParseSource (IImage3dSource & source) {
@@ -28,10 +29,18 @@ void ParseSource (IImage3dSource & source) {
 }
 
 
-int main () {
+int wmain (int argc, wchar_t *argv[]) {
+    if (argc < 3) {
+        std::wcout << L"Usage:\n";
+        std::wcout << L"RegFreeTest.exe <loader-progid> <filename>" << std::endl;
+        return -1;
+    }
+
+    CComBSTR progid = argv[1];  // e.g. "DummyLoader.Image3dFileLoader"
+    CComBSTR filename = argv[2];
+
     ComInitialize com(COINIT_MULTITHREADED);
 
-    CComBSTR progid(L"DummyLoader.Image3dFileLoader");
     CLSID clsid = {};
     CHECK(CLSIDFromProgID(progid, &clsid));
 
@@ -44,7 +53,6 @@ int main () {
 
     {
         // load file
-        CComBSTR filename = L"dummy.dcm";
         Image3dError err_type = {};
         CComBSTR err_msg;
         CHECK(loader->LoadFile(filename, &err_type, &err_msg));
