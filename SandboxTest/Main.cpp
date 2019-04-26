@@ -108,7 +108,11 @@ int wmain (int argc, wchar_t *argv[]) {
         // load file
         Image3dError err_type = {};
         CComBSTR err_msg;
-        CHECK(loader->LoadFile(filename, &err_type, &err_msg));
+        HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
+        if (FAILED(hr)) {
+            std::wcerr << L"LoadFile failed: code=" << err_type << L", message="<< err_msg.m_str << std::endl;
+            return -1;
+        }
     }
 
     CComPtr<IImage3dSource> source;
