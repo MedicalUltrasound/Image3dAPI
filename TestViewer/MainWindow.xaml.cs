@@ -131,30 +131,32 @@ namespace TestViewer
         {
             Debug.Assert(m_loader != null);
 
-            Image3dError err_type;
-            string err_msg;
-            m_loader.LoadFile(FileName.Text, out err_type, out err_msg);
-            if ((err_type != Image3dError.Image3d_SUCCESS))
-            {
-                string message;
-                switch (err_type) {
-                    case Image3dError.Image3d_ACCESS_FAILURE:
-                        message = "Unable to open the file. The file might be missing or locked.";
-                        break;
-                    case Image3dError.Image3d_VALIDATION_FAILURE:
-                        message = "Unsupported file. Probably due to unsupported vendor or modality.";
-                        break;
-                    case Image3dError.Image3d_NOT_YET_SUPPORTED:
-                        message = "The loader is too old to parse the file.";
-                        break;
-                    case Image3dError.Image3d_SUPPORT_DISCONTINUED:
-                        message = "The the file version is no longer supported (pre-DICOM format?).";
-                        break;
-                    default:
-                        message = "Unknown error";
-                        break;
+            Image3dError err_type = Image3dError.Image3d_SUCCESS;
+            string err_msg = "";
+            try {
+                m_loader.LoadFile(FileName.Text, out err_type, out err_msg);
+            } catch (Exception) {
+                // NOTE: err_msg does not seem to be marshaled back on LoadFile failure in .Net.
+                // NOTE: This problem is limited to .Net, and does not occur in C++
+
+                string message = "Unknown error";
+                if ((err_type != Image3dError.Image3d_SUCCESS)) {
+                    switch (err_type) {
+                        case Image3dError.Image3d_ACCESS_FAILURE:
+                            message = "Unable to open the file. The file might be missing or locked.";
+                            break;
+                        case Image3dError.Image3d_VALIDATION_FAILURE:
+                            message = "Unsupported file. Probably due to unsupported vendor or modality.";
+                            break;
+                        case Image3dError.Image3d_NOT_YET_SUPPORTED:
+                            message = "The loader is too old to parse the file.";
+                            break;
+                        case Image3dError.Image3d_SUPPORT_DISCONTINUED:
+                            message = "The the file version is no longer supported (pre-DICOM format?).";
+                            break;
+                    }
                 }
-                MessageBox.Show(message+": "+err_msg);
+                MessageBox.Show("LoadFile error: " + message + " (" + err_msg+")");
                 return;
             }
 
