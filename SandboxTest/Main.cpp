@@ -58,6 +58,7 @@ void ParseSource (IImage3dSource & source) {
 
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));
+    std::wcout << L"Frame count: " << frame_count << L"\n";
 
     CComSafeArray<unsigned int> color_map;
     {
@@ -90,16 +91,23 @@ int wmain (int argc, wchar_t *argv[]) {
     ComInitialize com(COINIT_MULTITHREADED);
 
     CLSID clsid = {};
-    CHECK(CLSIDFromProgID(progid, &clsid));
+    if (FAILED(CLSIDFromProgID(progid, &clsid))) {
+        std::wcerr << L"ERRORR: Unknown progid " << progid.m_str << L"\n";
+        return -1;
+    }
 
     auto list = SupportedManufacturerModels::ReadList(clsid);
 
     // verify that loader library is compatible
-    CHECK(CheckImage3dAPIVersion(clsid));
+    if (FAILED(CheckImage3dAPIVersion(clsid))) {
+        std::wcerr << L"ERRORR: Loader " << progid.m_str << L" not compatible with current API version.\n";
+        return -1;
+    }
 
     // create loader in a separate "low integrity" dllhost.exe process
     CComPtr<IImage3dFileLoader> loader;
     {
+        std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
         LowIntegrity low_integrity;
         CHECK(loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING));
     }
