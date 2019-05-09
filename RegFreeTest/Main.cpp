@@ -10,6 +10,7 @@ void ParseSource (IImage3dSource & source) {
 
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));
+    std::wcout << L"Frame count: " << frame_count << L"\n";
 
     CComSafeArray<unsigned int> color_map;
     {
@@ -42,12 +43,16 @@ int wmain (int argc, wchar_t *argv[]) {
     ComInitialize com(COINIT_MULTITHREADED);
 
     CLSID clsid = {};
-    CHECK(CLSIDFromProgID(progid, &clsid));
+    if (FAILED(CLSIDFromProgID(progid, &clsid))) {
+        std::wcerr << L"ERRORR: Unknown progid " << progid.m_str << L"\n";
+        return -1;
+    }
 
     // verify that loader library is compatible
     //CHECK(CheckImage3dAPIVersion(clsid)); // disabled, since it's not compatible with reg-free COM
 
     // create loader without accessing the registry (possible since the DummyLoader manifest is linked in)
+    std::wcout << L"Creating loader " << progid.m_str << L"...\n";
     CComPtr<IImage3dFileLoader> loader;
     CHECK(loader.CoCreateInstance(clsid));
 
