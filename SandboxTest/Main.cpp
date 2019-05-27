@@ -2,6 +2,7 @@
 #include "../Image3dAPI/IImage3d.h"
 #include "../Image3dAPI/RegistryCheck.hpp"
 #include <iostream>
+#include <fstream>
 #include <sddl.h>
 
 
@@ -87,6 +88,13 @@ int wmain (int argc, wchar_t *argv[]) {
 
     CComBSTR progid = argv[1];  // e.g. "DummyLoader.Image3dFileLoader"
     CComBSTR filename = argv[2];
+    bool test_locked_input = true;
+
+    std::ifstream locked_file;
+    if (test_locked_input) {
+        std::wcout << L"Open file: " << argv[2] << " to test read-locked input file in loader." << std::endl;
+        locked_file.open(filename);
+    }
 
     ComInitialize com(COINIT_MULTITHREADED);
 
