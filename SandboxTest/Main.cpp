@@ -107,9 +107,19 @@ int wmain (int argc, wchar_t *argv[]) {
     auto list = SupportedManufacturerModels::ReadList(clsid);
 
     // verify that loader library is compatible
-    if (FAILED(CheckImage3dAPIVersion(clsid))) {
-        std::wcerr << L"ERRORR: Loader " << progid.m_str << L" not compatible with current API version.\n";
-        return -1;
+    // first check loader with matching bitness
+    REGSAM bitness = WOW_SAME_AS_CLIENT;
+    if (FAILED(CheckImage3dAPIVersion(clsid, bitness))) {
+        // then check loader with non-matching bitness
+#ifdef _WIN64
+        bitness = KEY_WOW64_32KEY;
+#else
+        bitness = KEY_WOW64_64KEY;
+#endif
+        if (FAILED(CheckImage3dAPIVersion(clsid, bitness))) {
+            std::wcerr << L"ERRORR: Loader " << progid.m_str << L" not compatible with current API version.\n";
+            return -1;
+        }
     }
 
     // create loader in a separate "low integrity" dllhost.exe process
