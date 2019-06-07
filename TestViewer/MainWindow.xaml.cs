@@ -97,12 +97,17 @@ namespace TestViewer
             }
 
             // API version compatibility check
-            RegistryKey ver_key = Registry.ClassesRoot.OpenSubKey("CLSID\\{"+comType.GUID+"}\\Version");
-            string ver_str = (string)ver_key.GetValue("");
-            string cur_ver = string.Format("{0}.{1}", (int)Image3dAPIVersion.IMAGE3DAPI_VERSION_MAJOR, (int)Image3dAPIVersion.IMAGE3DAPI_VERSION_MINOR);
-            if (ver_str != cur_ver) {
-                MessageBox.Show(string.Format("Incompatible loader version. Loader uses version {0}, while the current version is {1}.", ver_str, cur_ver));
-                return;
+            try {
+                RegistryKey ver_key = Registry.ClassesRoot.OpenSubKey("CLSID\\{" + comType.GUID + "}\\Version");
+                string ver_str = (string)ver_key.GetValue("");
+                string cur_ver = string.Format("{0}.{1}", (int)Image3dAPIVersion.IMAGE3DAPI_VERSION_MAJOR, (int)Image3dAPIVersion.IMAGE3DAPI_VERSION_MINOR);
+                if (ver_str != cur_ver) {
+                    MessageBox.Show(string.Format("Loader uses version {0}, while the current version is {1}.", ver_str, cur_ver), "Incompatible loader version");
+                    return;
+                }
+            } catch (Exception err) {
+                MessageBox.Show(err.Message, "Version check error");
+                // continue, since this error will also appear if the loader has non-matching bitness
             }
 
             // clear UI when switching to a new loader
