@@ -121,6 +121,11 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         Image3d data;
         PerfTimer timer("GetFrame", profile);
         CHECK(source.GetFrame(frame, geom, max_res, &data));
+
+        if (frame == 0)
+            std::cout << "First frame time: " << data.time << "\n";
+        if (frame == frame_count-1)
+            std::cout << "Last frame time: " << data.time << "\n";
     }
 }
 
