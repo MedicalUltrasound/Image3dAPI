@@ -294,7 +294,7 @@ interface IImage3dSource : IUnknown {
     [helpstring("Retrieve color-map table for mapping image intensities to RGBx values. Length is 256.")]
     HRESULT GetColorMap ([out,retval] SAFEARRAY(unsigned int) * map);
 
-    [helpstring("Get ECG data if available [optional]")]
+    [helpstring("Get ECG data if available [optional]. Shall return S_OK with an empty EcgSeries if EGC is not available.")]
     HRESULT GetECG ([out,retval] EcgSeries * ecg);
 
     [helpstring("")]
