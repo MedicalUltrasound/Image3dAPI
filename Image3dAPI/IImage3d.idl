@@ -29,6 +29,7 @@ enum ImageFormat {
     IMAGE_FORMAT_INVALID   = 0, ///< make sure that "cleared" state is invalid
     IMAGE_FORMAT_U8        = 1, ///< unsigned 8bit grayscale
     IMAGE_FORMAT_FREQ8POW8 = 2, ///< 16bit color-flow format (8bit signed frequency value, 8bit unsigned power/bandwidth value)
+    IMAGE_FORMAT_R8G8B8A8  = 3, ///< 32bit RGBA (alpha channel ignored)
 } ImageFormat;
 
 
