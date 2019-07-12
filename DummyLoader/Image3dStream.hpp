@@ -38,7 +38,7 @@ struct R8G8B8A8 {
 /** Determine the sample size [bytes] for a given image format. */
 static unsigned int ImageFormatSize(ImageFormat format) {
     switch (format) {
-    case FORMAT_U8: return 1;
+    case IMAGE_FORMAT_U8: return 1;
     }
 
     abort(); // should never be reached

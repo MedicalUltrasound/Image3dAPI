@@ -77,7 +77,7 @@ Image3dSource::Image3dSource() {
                 }
             }
 
-            m_frames.push_back(CreateImage3d(frameNumber*(duration/numFrames) + startTime, FORMAT_U8, dims, img_buf));
+            m_frames.push_back(CreateImage3d(frameNumber*(duration/numFrames) + startTime, IMAGE_FORMAT_U8, dims, img_buf));
         }
     }
 }
@@ -118,7 +118,7 @@ HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigne
         return E_BOUNDS;
 
     ImageFormat format = m_frames[index].format;
-    if (format == FORMAT_U8) {
+    if (format == IMAGE_FORMAT_U8) {
         Image3d result = SampleFrame<uint8_t>(m_frames[index], m_img_geom, out_geom, max_res);
         *data = std::move(result);
         return S_OK;

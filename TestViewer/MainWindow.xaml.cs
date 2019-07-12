@@ -349,7 +349,7 @@ namespace TestViewer
 
         private WriteableBitmap GenerateBitmap(Image3d t_img, uint[] t_map)
         {
-            Debug.Assert(t_img.format == ImageFormat.FORMAT_U8);
+            Debug.Assert(t_img.format == ImageFormat.IMAGE_FORMAT_U8);
 
             WriteableBitmap bitmap = new WriteableBitmap(t_img.dims[0], t_img.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
             bitmap.Lock();

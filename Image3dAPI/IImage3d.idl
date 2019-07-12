@@ -24,10 +24,11 @@ enum Image3dAPIVersion {
 
 typedef [
   v1_enum, // 32bit enum size
-  helpstring("Enum of supported image formats (extended upon demand).")]
+  helpstring("Enum of supported image formats (extended upon demand). Multi-channel formats are documented in byte order.")]
 enum ImageFormat {
-    FORMAT_INVALID  = 0, ///< make sure that "cleared" state is invalid
-    FORMAT_U8       = 1, ///< unsigned 8bit grayscale
+    IMAGE_FORMAT_INVALID   = 0, ///< make sure that "cleared" state is invalid
+    IMAGE_FORMAT_U8        = 1, ///< unsigned 8bit grayscale
+    IMAGE_FORMAT_FREQ8POW8 = 2, ///< 16bit color-flow format (8bit signed frequency value, 8bit unsigned power/bandwidth value)
 } ImageFormat;
 
 
@@ -96,7 +97,7 @@ cpp_quote("} // extern \"C\"")
 cpp_quote("")
 cpp_quote("struct Image3d {")
 cpp_quote("    double         time    = 0;")
-cpp_quote("    ImageFormat    format  = FORMAT_INVALID;")
+cpp_quote("    ImageFormat    format  = IMAGE_FORMAT_INVALID;")
 cpp_quote("    unsigned short dims[3] = {0,0,0};")
 cpp_quote("    unsigned int   stride0 = 0;")
 cpp_quote("    unsigned int   stride1 = 0;")
