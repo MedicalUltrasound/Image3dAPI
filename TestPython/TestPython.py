@@ -38,8 +38,8 @@ if __name__=="__main__":
     dir2   = [bbox.dir2_x,   bbox.dir2_y,   bbox.dir2_z]
     dir3   = [bbox.dir3_x,   bbox.dir3_y,   bbox.dir3_z]
 
-    color_map = source.GetColorMap()
-    print("Color-map length: "+str(len(color_map)))
+    color_format, color_map = source.GetColorMap(Image3dAPI.TYPE_TISSUE_COLOR)
+    print("Color-map length: "+str(len(color_map)/4))
 
     frame_count = source.GetFrameCount()
     for i in range(frame_count):

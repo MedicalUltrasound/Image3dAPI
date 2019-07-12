@@ -24,7 +24,7 @@ public:
 
     HRESULT STDMETHODCALLTYPE GetBoundingBox(/*out*/Cart3dGeom *geom) override;
 
-    HRESULT STDMETHODCALLTYPE GetColorMap(/*out*/SAFEARRAY ** map) override;
+    HRESULT STDMETHODCALLTYPE GetColorMap(ColorMapType type, /*out*/ImageFormat * format, /*out*/SAFEARRAY ** map) override;
 
     HRESULT STDMETHODCALLTYPE GetECG(/*out*/EcgSeries *ecg) override;
 

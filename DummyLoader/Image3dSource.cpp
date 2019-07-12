@@ -135,17 +135,22 @@ HRESULT Image3dSource::GetBoundingBox(/*out*/Cart3dGeom *geom) {
     return S_OK;
 }
 
-HRESULT Image3dSource::GetColorMap(/*out*/SAFEARRAY ** map) {
+HRESULT Image3dSource::GetColorMap(ColorMapType type, /*out*/ImageFormat * format, /*out*/SAFEARRAY ** map) {
     if (!map)
         return E_INVALIDARG;
     if (*map)
         return E_INVALIDARG;
 
-    // copy to new buffer
-    CComSafeArray<uint32_t> color_map(static_cast<unsigned int>(m_color_map_tissue.size()));
-    memcpy(&color_map.GetAt(0), m_color_map_tissue.data(), sizeof(m_color_map_tissue));
-    *map = color_map.Detach(); // transfer ownership
-    return S_OK;
+    if (type == TYPE_TISSUE_COLOR) {
+        *format = IMAGE_FORMAT_R8G8B8A8;
+        // copy to new buffer
+        CComSafeArray<uint8_t> color_map(4*static_cast<unsigned int>(m_color_map_tissue.size()));
+        memcpy(&color_map.GetAt(0), m_color_map_tissue.data(), sizeof(m_color_map_tissue));
+        *map = color_map.Detach(); // transfer ownership
+        return S_OK;
+    }
+
+    return E_NOTIMPL;
 }
 
 HRESULT Image3dSource::GetECG(/*out*/EcgSeries *ecg) {

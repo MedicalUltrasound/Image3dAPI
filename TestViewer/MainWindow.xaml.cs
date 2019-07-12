@@ -326,7 +326,10 @@ namespace TestViewer
         {
             Debug.Assert(m_source != null);
 
-            uint[] color_map = m_source.GetColorMap();
+            ImageFormat image_format;
+            byte[] color_map = m_source.GetColorMap(ColorMapType.TYPE_TISSUE_COLOR, out image_format);
+            if (image_format != ImageFormat.IMAGE_FORMAT_R8G8B8A8)
+                throw new Exception("Unexpected color-map format");
 
             // retrieve image slices
             const ushort HORIZONTAL_RES = 256;
@@ -347,7 +350,7 @@ namespace TestViewer
             FrameTime.Text = "Frame time: " + imageXY.time;
         }
 
-        private WriteableBitmap GenerateBitmap(Image3d t_img, uint[] t_map)
+        private WriteableBitmap GenerateBitmap(Image3d t_img, byte[] t_map)
         {
             Debug.Assert(t_img.format == ImageFormat.IMAGE_FORMAT_U8);
 
@@ -359,7 +362,7 @@ namespace TestViewer
                         byte t_val = t_img.data[x + y * t_img.stride0];
 
                         // lookup tissue color
-                        byte[] channels = BitConverter.GetBytes(t_map[t_val]);
+                        byte[] channels = BitConverter.GetBytes(BitConverter.ToUInt32(t_map, 4*t_val));
 
                         // assign red, green & blue
                         byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;

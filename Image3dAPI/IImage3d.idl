@@ -32,6 +32,15 @@ enum ImageFormat {
     IMAGE_FORMAT_R8G8B8A8  = 3, ///< 32bit RGBA (alpha channel ignored)
 } ImageFormat;
 
+typedef [
+    v1_enum, // 32bit enum size
+    helpstring("Enum of supported color-map formats (extended upon demand).")]
+enum ColorMapType {
+    TYPE_TISSUE_COLOR, ///< tisse color-map; type=R8G8B8A8, size=256     (for slicing)
+    TYPE_FLOW_COLOR,   ///< flow color-map;  type=R8G8B8A8, size=256*256 (for slicing, in freq&bw space)
+    TYPE_FLOW_ARB,     ///< flow arbitration; type=uint8_t, size=256*256 (for deciding if tissue or flow shall be shown)
+} ColorMapType;
+
 
 typedef [
   v1_enum, // 32bit enum size
@@ -293,8 +302,8 @@ interface IImage3dSource : IUnknown {
     [helpstring("Get a bounding box encapsulating all image data. Can be used as intput to GetFrame to avoid cropping.")]
     HRESULT GetBoundingBox ([out,retval] Cart3dGeom * geom);
 
-    [helpstring("Retrieve color-map table for mapping image intensities to RGBx values. Length is 256.")]
-    HRESULT GetColorMap ([out,retval] SAFEARRAY(unsigned int) * map);
+    [helpstring("Retrieve color-map table for mapping image samples to RGBx values. Length and format depend on type.")]
+    HRESULT GetColorMap ([in] ColorMapType type, [out] ImageFormat * format, [out,retval] SAFEARRAY(BYTE) * table);
 
     [helpstring("Get ECG data if available [optional]. Shall return S_OK with an empty EcgSeries if EGC is not available.")]
     HRESULT GetECG ([out,retval] EcgSeries * ecg);

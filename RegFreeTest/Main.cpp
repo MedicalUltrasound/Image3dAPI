@@ -5,10 +5,15 @@
 
 
 void ParseSource (IImage3dSource & source) {
-    CComSafeArray<uint32_t> color_map;
+    CComSafeArray<uint8_t> color_map;
     {
+        ImageFormat img_format = IMAGE_FORMAT_INVALID;
         SAFEARRAY * tmp = nullptr;
-        CHECK(source.GetColorMap(&tmp));
+        CHECK(source.GetColorMap(TYPE_TISSUE_COLOR, &img_format, &tmp));
+        if (img_format != IMAGE_FORMAT_R8G8B8A8) {
+            std::wcerr << "ERROR: Unexpected color-map format.\n";
+            std::exit(-1);
+        }
         color_map.Attach(tmp);
         tmp = nullptr;
     }

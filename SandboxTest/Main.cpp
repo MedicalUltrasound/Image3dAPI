@@ -32,19 +32,23 @@ private:
 
 
 void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
-    CComSafeArray<uint32_t> color_map;
+    CComSafeArray<uint8_t> color_map;
     {
+        ImageFormat img_format = IMAGE_FORMAT_INVALID;
         SAFEARRAY * tmp = nullptr;
-        CHECK(source.GetColorMap(&tmp));
+        CHECK(source.GetColorMap(TYPE_TISSUE_COLOR, &img_format, &tmp));
+        if (img_format != IMAGE_FORMAT_R8G8B8A8) {
+            std::wcerr << "ERROR: Unexpected color-map format.\n";
+            std::exit(-1);
+        }
         color_map.Attach(tmp);
         tmp = nullptr;
     }
 
     if (verbose) {
         std::cout << "Color-map:\n";
-        for (unsigned int i = 0; i < color_map.GetCount(); i++) {
-            unsigned int color = color_map[(int)i];
-            uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
+        for (unsigned int i = 0; i < color_map.GetCount()/4; i++) {
+            uint8_t *rgbx = &color_map[(int)(4*i)];
             std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
         }
     }
