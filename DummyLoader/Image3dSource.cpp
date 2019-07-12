@@ -2,8 +2,6 @@
 #include "LinAlg.hpp"
 
 
-static const uint8_t OUTSIDE_VAL = 0;   // black outside image volume
-static const uint8_t PROBE_PLANE = 127; // gray value for plane closest to probe
 
 
 Image3dSource::Image3dSource() {
@@ -45,93 +43,50 @@ Image3dSource::Image3dSource() {
                              0.20f,0,      0,     // dir1 (width)
                              0,    0.10f,  0,     // dir2 (depth)
                              0,    0,      0.15f};// dir3 (elevation)
-        m_img_geom = geom;
+        m_bbox = geom;
     }
-    {
-        // checker board image data
-        unsigned short dims[] = { 20, 15, 10 }; // matches length of dir1, dir2 & dir3, so that the image squares become quadratic
-        std::vector<byte> img_buf(dims[0] * dims[1] * dims[2]);
-        for (size_t frameNumber = 0; frameNumber < numFrames; ++frameNumber) {
-            for (unsigned int z = 0; z < dims[2]; ++z) {
-                for (unsigned int y = 0; y < dims[1]; ++y) {
-                    for (unsigned int x = 0; x < dims[0]; ++x) {
-                        bool even_f = (frameNumber / 2 % 2) == 0;
-                        bool even_x = (x / 2 % 2) == 0;
-                        bool even_y = (y / 2 % 2) == 0;
-                        bool even_z = (z / 2 % 2) == 0;
-                        byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                        if (even_f ^ even_x ^ even_y ^ even_z)
-                            out_sample = 255;
-                        else
-                            out_sample = 0;
-                    }
-                }
-            }
 
-            // special grayscale value for plane closest to probe
-            for (unsigned int z = 0; z < dims[2]; ++z) {
-                for (unsigned int x = 0; x < dims[0]; ++x) {
-                    unsigned int y = 0;
-                    byte & out_sample = img_buf[x + y*dims[0] + z*dims[0] * dims[1]];
-                    out_sample = PROBE_PLANE;
-                }
-            }
-
-            m_frames.push_back(CreateImage3d(frameNumber*(duration/numFrames) + startTime, IMAGE_FORMAT_U8, dims, img_buf));
-        }
-    }
+    // a single tissue stream
+    m_stream_types.push_back(IMAGE_TYPE_TISSUE);
 }
 
 Image3dSource::~Image3dSource() {
 }
 
 
-HRESULT Image3dSource::GetFrameCount(/*out*/unsigned int *size) {
+HRESULT Image3dSource::GetStreamCount(/*out*/unsigned int *size) {
     if (!size)
         return E_INVALIDARG;
 
-    *size = static_cast<unsigned int>(m_frames.size());
-    return S_OK;
-}
-
-HRESULT Image3dSource::GetFrameTimes(/*out*/SAFEARRAY * *frame_times) {
-    if (!frame_times)
-        return E_INVALIDARG;
-
-    const unsigned int N = static_cast<unsigned int>(m_frames.size());
-    CComSafeArray<double> result(N);
-    if (N > 0) {
-        double * time_arr = &result.GetAt(0);
-        for (unsigned int i = 0; i < N; ++i)
-            time_arr[i] = m_frames[i].time;
-    }
-
-    *frame_times = result.Detach();
+    *size = static_cast<unsigned int>(m_stream_types.size());
     return S_OK;
 }
 
 
-HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) {
-    if (!data)
+
+HRESULT Image3dSource::GetStream(unsigned int index, Cart3dGeom out_geom, unsigned short max_resolution[3], /*out*/IImage3dStream ** stream) {
+    if (!stream)
         return E_INVALIDARG;
-    if (index >= m_frames.size())
+    if (index >= m_stream_types.size())
         return E_BOUNDS;
 
-    ImageFormat format = m_frames[index].format;
-    if (format == IMAGE_FORMAT_U8) {
-        Image3d result = SampleFrame<uint8_t>(m_frames[index], m_img_geom, out_geom, max_res);
-        *data = std::move(result);
-        return S_OK;
+    CComPtr<IImage3dStream> stream_obj;
+    {
+        // on-demand stream creation
+        auto stream_cls = CreateLocalInstance<Image3dStream>();
+        stream_cls->Initialize(m_stream_types[index], m_bbox, out_geom, max_resolution);
+        stream_obj = stream_cls; // cast class pointer to interface
     }
 
-    return E_NOTIMPL;
+    *stream = stream_obj.Detach();
+    return S_OK;
 }
 
 HRESULT Image3dSource::GetBoundingBox(/*out*/Cart3dGeom *geom) {
     if (!geom)
         return E_INVALIDARG;
 
-    *geom = m_img_geom;
+    *geom = m_bbox;
     return S_OK;
 }
 

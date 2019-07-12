@@ -13,6 +13,11 @@ for %%R in (HKEY_LOCAL_MACHINE HKEY_CURRENT_USER) do (
   reg delete "%%R\SOFTWARE\Classes\TypeLib\{67E59584-3F6A-4852-8051-103A4583CA5E}" /f 2> NUL
 
   for %%P in (32 64) do (
+    :: Image3dStream class
+    reg delete "%%R\SOFTWARE\Classes\DummyLoader.Image3dStream"                    /f 2> NUL
+    reg delete "%%R\SOFTWARE\Classes\DummyLoader.Image3dStream.1"                  /f 2> NUL
+    reg delete "%%R\SOFTWARE\Classes\CLSID\{78317A0E-56BF-4735-AB5B-FE0751219FE8}" /f /reg:%%P 2> NUL
+
     :: Image3dSource class
     reg delete "%%R\SOFTWARE\Classes\DummyLoader.Image3dSource"                    /f 2> NUL
     reg delete "%%R\SOFTWARE\Classes\DummyLoader.Image3dSource.1"                  /f 2> NUL

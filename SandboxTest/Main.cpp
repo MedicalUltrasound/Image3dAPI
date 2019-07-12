@@ -64,14 +64,28 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
     }
 
+    unsigned int stream_count = 0;
+    CHECK(source.GetStreamCount(&stream_count));
+    if (stream_count == 0) {
+        std::wcerr << "ERROR: No image streams found.\n";
+        std::exit(-1);
+    }
+
+    unsigned short max_res[] = {64, 64, 64};
+    CComPtr<IImage3dStream> stream;
+    CHECK(source.GetStream(0, bbox, max_res, &stream));
+
+    ImageType stream_type = IMAGE_TYPE_INVALID;
+    CHECK(stream->GetType(&stream_type));
+
     unsigned int frame_count = 0;
-    CHECK(source.GetFrameCount(&frame_count));
+    CHECK(stream->GetFrameCount(&frame_count));
     std::wcout << L"Frame count: " << frame_count << L"\n";
 
     CComSafeArray<double> frame_times;
     {
         SAFEARRAY * data = nullptr;
-        CHECK(source.GetFrameTimes(&data));
+        CHECK(stream->GetFrameTimes(&data));
         frame_times.Attach(data);
         data = nullptr;
     }
@@ -86,7 +100,6 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     }
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
-        unsigned short max_res[] = { 64, 64, 64 };
         if (profile) {
             max_res[0] = 128;
             max_res[1] = 128;
@@ -96,7 +109,7 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         // retrieve frame data
         Image3d data;
         PerfTimer timer("GetFrame", profile);
-        CHECK(source.GetFrame(frame, bbox, max_res, &data));
+        CHECK(stream->GetFrame(frame, &data));
 
         if (frame == 0)
             std::cout << "First frame time: " << data.time << "\n";

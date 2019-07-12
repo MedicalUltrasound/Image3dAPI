@@ -58,9 +58,15 @@ if __name__=="__main__":
     color_format, color_map = source.GetColorMap(Image3dAPI.TYPE_TISSUE_COLOR)
     print("Color-map length: "+str(len(color_map)/4))
 
-    frame_count = source.GetFrameCount()
+    max_res = np.ctypeslib.as_ctypes(np.array([64, 64, 64], dtype=np.ushort))
+    stream = source.GetStream(0, bbox, max_res)
+
+    stream_type = stream.GetType()
+    print("Stream type "+str(stream_type))
+
+    frame_count = stream.GetFrameCount()
     for i in range(frame_count):
-        max_res = np.ctypeslib.as_ctypes(np.array([64, 64, 64], dtype=np.ushort))
-        frame = source.GetFrame(i, bbox, max_res)
+        frame = stream.GetFrame(i)
+
         data = FrameTo3dArray(frame)
         SaveITKImage(frame, bbox, "image3DAPIDummOutput" + str(i) + ".mhd")

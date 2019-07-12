@@ -43,9 +43,9 @@ namespace TestViewer
         IImage3dFileLoader m_loader;
         IImage3dSource     m_source;
 
-        Cart3dGeom         m_bboxXY;
-        Cart3dGeom         m_bboxXZ;
-        Cart3dGeom         m_bboxZY;
+        IImage3dStream     m_streamXY;
+        IImage3dStream     m_streamXZ;
+        IImage3dStream     m_streamZY;
 
         public MainWindow()
         {
@@ -68,9 +68,9 @@ namespace TestViewer
             ImageXZ.Source = null;
             ImageZY.Source = null;
 
-            m_bboxXY = new Cart3dGeom();
-            m_bboxXZ = new Cart3dGeom();
-            m_bboxZY = new Cart3dGeom();
+            m_streamXY = null;
+            m_streamXZ = null;
+            m_streamZY = null;
 
             ECG.Data = null;
 
@@ -183,18 +183,19 @@ namespace TestViewer
                 return;
             }
 
+            InitializeSlices();
+
             FrameSelector.Minimum = 0;
-            FrameSelector.Maximum = m_source.GetFrameCount()-1;
+            FrameSelector.Maximum = m_streamXY.GetFrameCount()-1;
             FrameSelector.IsEnabled = true;
             FrameSelector.Value = 0;
 
-            FrameCount.Text = "Frame count: " + m_source.GetFrameCount();
+            FrameCount.Text = "Frame count: " + m_streamXY.GetFrameCount();
             ProbeInfo.Text = "Probe name: "+ m_source.GetProbeInfo().name;
             InstanceUID.Text = "UID: " + m_source.GetSopInstanceUID();
 
-            InitializeSlices();
             DrawSlices(0);
-            DrawEcg(m_source.GetFrameTimes()[0]);
+            DrawEcg(m_streamXY.GetFrameTimes()[0]);
         }
 
         private void DrawEcg (double cur_time)
@@ -267,12 +268,16 @@ namespace TestViewer
         {
             var idx = (uint)FrameSelector.Value;
             DrawSlices(idx);
-            DrawEcg(m_source.GetFrameTimes()[idx]);
+            DrawEcg(m_streamXY.GetFrameTimes()[idx]);
         }
 
         private void InitializeSlices()
         {
             Debug.Assert(m_source != null);
+
+            uint stream_count = m_source.GetStreamCount();
+            if (stream_count < 1)
+                throw new Exception("No image streams found");
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)) {
@@ -285,41 +290,47 @@ namespace TestViewer
             // extend bounding-box axes, so that dir1, dir2 & dir3 have equal length
             ExtendBoundingBox(ref bbox);
 
+            const ushort HORIZONTAL_RES = 256;
+            const ushort VERTICAL_RES = 256;
+
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
-            m_bboxXY = bbox;
-            m_bboxXY.origin_x = m_bboxXY.origin_x + m_bboxXY.dir3_x / 2;
-            m_bboxXY.origin_y = m_bboxXY.origin_y + m_bboxXY.dir3_y / 2;
-            m_bboxXY.origin_z = m_bboxXY.origin_z + m_bboxXY.dir3_z / 2;
-            m_bboxXY.dir3_x = 0;
-            m_bboxXY.dir3_y = 0;
-            m_bboxXY.dir3_z = 0;
+            Cart3dGeom bboxXY = bbox;
+            bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
+            bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
+            bboxXY.origin_z = bboxXY.origin_z + bboxXY.dir3_z / 2;
+            bboxXY.dir3_x = 0;
+            bboxXY.dir3_y = 0;
+            bboxXY.dir3_z = 0;
+            m_streamXY = m_source.GetStream(0, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
-            m_bboxXZ = bbox;
-            m_bboxXZ.origin_x = m_bboxXZ.origin_x + m_bboxXZ.dir2_x / 2;
-            m_bboxXZ.origin_y = m_bboxXZ.origin_y + m_bboxXZ.dir2_y / 2;
-            m_bboxXZ.origin_z = m_bboxXZ.origin_z + m_bboxXZ.dir2_z / 2;
-            m_bboxXZ.dir2_x = m_bboxXZ.dir3_x;
-            m_bboxXZ.dir2_y = m_bboxXZ.dir3_y;
-            m_bboxXZ.dir2_z = m_bboxXZ.dir3_z;
-            m_bboxXZ.dir3_x = 0;
-            m_bboxXZ.dir3_y = 0;
-            m_bboxXZ.dir3_z = 0;
+            Cart3dGeom bboxXZ = bbox;
+            bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
+            bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
+            bboxXZ.origin_z = bboxXZ.origin_z + bboxXZ.dir2_z / 2;
+            bboxXZ.dir2_x = bboxXZ.dir3_x;
+            bboxXZ.dir2_y = bboxXZ.dir3_y;
+            bboxXZ.dir2_z = bboxXZ.dir3_z;
+            bboxXZ.dir3_x = 0;
+            bboxXZ.dir3_y = 0;
+            bboxXZ.dir3_z = 0;
+            m_streamXZ = m_source.GetStream(0, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
-            m_bboxZY = bbox;
-            m_bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
-            m_bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
-            m_bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
-            m_bboxZY.dir1_x = bbox.dir3_x;
-            m_bboxZY.dir1_y = bbox.dir3_y;
-            m_bboxZY.dir1_z = bbox.dir3_z;
-            m_bboxZY.dir2_x = bbox.dir2_x;
-            m_bboxZY.dir2_y = bbox.dir2_y;
-            m_bboxZY.dir2_z = bbox.dir2_z;
-            m_bboxZY.dir3_x = 0;
-            m_bboxZY.dir3_y = 0;
-            m_bboxZY.dir3_z = 0;
+            Cart3dGeom bboxZY = bbox;
+            bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
+            bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
+            bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
+            bboxZY.dir1_x = bbox.dir3_x;
+            bboxZY.dir1_y = bbox.dir3_y;
+            bboxZY.dir1_z = bbox.dir3_z;
+            bboxZY.dir2_x = bbox.dir2_x;
+            bboxZY.dir2_y = bbox.dir2_y;
+            bboxZY.dir2_z = bbox.dir2_z;
+            bboxZY.dir3_x = 0;
+            bboxZY.dir3_y = 0;
+            bboxZY.dir3_z = 0;
+            m_streamZY = m_source.GetStream(0, bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
         }
 
         private void DrawSlices (uint frame)
@@ -332,19 +343,17 @@ namespace TestViewer
                 throw new Exception("Unexpected color-map format");
 
             // retrieve image slices
-            const ushort HORIZONTAL_RES = 256;
-            const ushort VERTICAL_RES = 256;
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
-            Image3d imageXY = m_source.GetFrame(frame, m_bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            Image3d imageXY = m_streamXY.GetFrame(frame);
             ImageXY.Source = GenerateBitmap(imageXY, color_map);
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
-            Image3d imageXZ = m_source.GetFrame(frame, m_bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            Image3d imageXZ = m_streamXZ.GetFrame(frame);
             ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
 
             // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
-            Image3d imageZY = m_source.GetFrame(frame, m_bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            Image3d imageZY = m_streamZY.GetFrame(frame);
             ImageZY.Source = GenerateBitmap(imageZY, color_map);
 
             FrameTime.Text = "Frame time: " + imageXY.time;
