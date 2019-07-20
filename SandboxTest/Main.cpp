@@ -1,9 +1,32 @@
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
 #include "../Image3dAPI/RegistryCheck.hpp"
+#include <chrono>
 #include <iostream>
 #include <fstream>
 #include <sddl.h>
+
+
+class PerfTimer {
+    using clock = std::chrono::high_resolution_clock;
+public:
+    PerfTimer(const char * prefix, bool enable) : m_prefix(prefix) {
+        if (enable)
+            m_start = clock::now();
+
+    }
+    ~PerfTimer() {
+        if (m_start == clock::time_point())
+            return; // profiling disabled
+
+        auto stop = clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - m_start).count();
+        std::cout << m_prefix << " took " << duration << "ms\n";
+    }
+private:
+    const char *      m_prefix;
+    clock::time_point m_start;
+};
 
 
 /** RAII class for temporarily impersonating low-integrity level for the current thread.
@@ -53,7 +76,7 @@ private:
 };
 
 
-void ParseSource (IImage3dSource & source, bool verbose) {
+void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     Cart3dGeom geom = {};
     CHECK(source.GetBoundingBox(&geom));
 
@@ -91,6 +114,7 @@ void ParseSource (IImage3dSource & source, bool verbose) {
 
         // retrieve frame data
         Image3d data;
+        PerfTimer timer("GetFrame", profile);
         CHECK(source.GetFrame(frame, geom, max_res, &data));
     }
 }
@@ -99,7 +123,7 @@ void ParseSource (IImage3dSource & source, bool verbose) {
 int wmain (int argc, wchar_t *argv[]) {
     if (argc < 3) {
         std::wcout << L"Usage:\n";
-        std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose]" << std::endl;
+        std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose|-profile]" << std::endl;
         return -1;
     }
 
@@ -107,9 +131,12 @@ int wmain (int argc, wchar_t *argv[]) {
     CComBSTR filename = argv[2];
 
     bool verbose = false; // more extensive logging
+    bool profile = false; // profile loader performance
     if (argc >= 4) {
         if (std::wstring(argv[3]) == L"-verbose")
             verbose = true;
+        else if (std::wstring(argv[3]) == L"-profile")
+            profile = true;
     }
 
     bool test_locked_input = true;
@@ -151,6 +178,7 @@ int wmain (int argc, wchar_t *argv[]) {
     {
         std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
         LowIntegrity low_integrity;
+        PerfTimer timer("CoCreateInstance", profile);
         CHECK(loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING));
     }
 
@@ -158,6 +186,7 @@ int wmain (int argc, wchar_t *argv[]) {
         // load file
         Image3dError err_type = {};
         CComBSTR err_msg;
+        PerfTimer timer("LoadFile", profile);
         HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
         if (FAILED(hr)) {
             std::wcerr << L"LoadFile failed: code=" << err_type << L", message="<< err_msg.m_str << std::endl;
@@ -166,7 +195,10 @@ int wmain (int argc, wchar_t *argv[]) {
     }
 
     CComPtr<IImage3dSource> source;
-    CHECK(loader->GetImageSource(&source));
+    {
+        PerfTimer timer("GetImageSource", profile);
+        CHECK(loader->GetImageSource(&source));
+    }
 
     ProbeInfo probe;
     CHECK(source->GetProbeInfo(&probe));
@@ -174,7 +206,7 @@ int wmain (int argc, wchar_t *argv[]) {
     EcgSeries ecg;
     CHECK(source->GetECG(&ecg));
 
-    ParseSource(*source, verbose);
+    ParseSource(*source, verbose, profile);
 
     return 0;
 }
