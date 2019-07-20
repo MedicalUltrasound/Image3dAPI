@@ -53,15 +53,17 @@ private:
 };
 
 
-void ParseSource (IImage3dSource & source) {
+void ParseSource (IImage3dSource & source, bool verbose) {
     Cart3dGeom geom = {};
     CHECK(source.GetBoundingBox(&geom));
 
-    std::cout << "Bounding box:\n";
-    std::cout << "  Origin: " << geom.origin_x<< ", " << geom.origin_y << ", " << geom.origin_z << "\n";
-    std::cout << "  Dir1:   " << geom.dir1_x  << ", " << geom.dir1_y   << ", " << geom.dir1_z   << "\n";
-    std::cout << "  Dir2:   " << geom.dir2_x  << ", " << geom.dir2_y   << ", " << geom.dir2_z   << "\n";
-    std::cout << "  Dir3:   " << geom.dir3_x  << ", " << geom.dir3_y   << ", " << geom.dir3_z   << "\n";
+    if (verbose) {
+        std::cout << "Bounding box:\n";
+        std::cout << "  Origin: " << geom.origin_x << ", " << geom.origin_y << ", " << geom.origin_z << "\n";
+        std::cout << "  Dir1:   " << geom.dir1_x   << ", " << geom.dir1_y   << ", " << geom.dir1_z   << "\n";
+        std::cout << "  Dir2:   " << geom.dir2_x   << ", " << geom.dir2_y   << ", " << geom.dir2_z   << "\n";
+        std::cout << "  Dir3:   " << geom.dir3_x   << ", " << geom.dir3_y   << ", " << geom.dir3_z   << "\n";
+    }
 
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));
@@ -75,11 +77,13 @@ void ParseSource (IImage3dSource & source) {
         tmp = nullptr;
     }
 
-    std::cout << "Color-map:\n";
-    for (unsigned int i = 0; i < color_map.GetCount(); i++) {
-        unsigned int color = color_map[(int)i];
-        uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
-        std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
+    if (verbose) {
+        std::cout << "Color-map:\n";
+        for (unsigned int i = 0; i < color_map.GetCount(); i++) {
+            unsigned int color = color_map[(int)i];
+            uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
+            std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
+        }
     }
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
@@ -95,12 +99,19 @@ void ParseSource (IImage3dSource & source) {
 int wmain (int argc, wchar_t *argv[]) {
     if (argc < 3) {
         std::wcout << L"Usage:\n";
-        std::wcout << L"SandboxTest.exe <loader-progid> <filename>" << std::endl;
+        std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose]" << std::endl;
         return -1;
     }
 
     CComBSTR progid = argv[1];  // e.g. "DummyLoader.Image3dFileLoader"
     CComBSTR filename = argv[2];
+
+    bool verbose = false; // more extensive logging
+    if (argc >= 4) {
+        if (std::wstring(argv[3]) == L"-verbose")
+            verbose = true;
+    }
+
     bool test_locked_input = true;
 
     std::ifstream locked_file;
@@ -163,7 +174,7 @@ int wmain (int argc, wchar_t *argv[]) {
     EcgSeries ecg;
     CHECK(source->GetECG(&ecg));
 
-    ParseSource(*source);
+    ParseSource(*source, verbose);
 
     return 0;
 }
