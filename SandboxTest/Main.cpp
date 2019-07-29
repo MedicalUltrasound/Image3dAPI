@@ -211,7 +211,10 @@ int wmain (int argc, wchar_t *argv[]) {
     EcgSeries ecg;
     CHECK(source->GetECG(&ecg));
 
-    ParseSource(*source, verbose, profile);
+    {
+        PerfTimer timer("ParseSource", profile);
+        ParseSource(*source, verbose, profile);
+    }
 
     return 0;
 }
