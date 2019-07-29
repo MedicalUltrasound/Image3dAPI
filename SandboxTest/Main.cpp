@@ -110,7 +110,12 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     }
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
-        unsigned short max_res[] = {64, 64, 64};
+        unsigned short max_res[] = { 64, 64, 64 };
+        if (profile) {
+            max_res[0] = 128;
+            max_res[1] = 128;
+            max_res[2] = 128;
+        }
 
         // retrieve frame data
         Image3d data;
@@ -206,7 +211,10 @@ int wmain (int argc, wchar_t *argv[]) {
     EcgSeries ecg;
     CHECK(source->GetECG(&ecg));
 
-    ParseSource(*source, verbose, profile);
+    {
+        PerfTimer timer("ParseSource", profile);
+        ParseSource(*source, verbose, profile);
+    }
 
     return 0;
 }
