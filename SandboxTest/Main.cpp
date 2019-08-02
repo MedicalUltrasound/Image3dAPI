@@ -121,6 +121,11 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         Image3d data;
         PerfTimer timer("GetFrame", profile);
         CHECK(source.GetFrame(frame, geom, max_res, &data));
+
+        if (frame == 0)
+            std::cout << "First frame time: " << data.time << "\n";
+        if (frame == frame_count-1)
+            std::cout << "Last frame time: " << data.time << "\n";
     }
 }
 
@@ -207,9 +212,28 @@ int wmain (int argc, wchar_t *argv[]) {
 
     ProbeInfo probe;
     CHECK(source->GetProbeInfo(&probe));
+    std::wcout << "Probe name: " << probe.name.m_str << L"\n";
 
     EcgSeries ecg;
     CHECK(source->GetECG(&ecg));
+
+    if (verbose) {
+        CComSafeArray<float> samples;
+        samples.Attach(ecg.samples); // transfer ownership
+        ecg.samples = nullptr;
+
+        std::wcout << L"ECG sample count: " << samples.GetCount() << L"\n";
+        std::wcout << L"First ECG sample time: " << ecg.start_time << L"\n";
+        std::wcout << L"Last ECG sample time:  " << ecg.start_time + (samples.GetCount()-1)*ecg.delta_time << L"\n";
+
+        CComSafeArray<double> trig_times;
+        trig_times.Attach(ecg.trig_times); // transfer ownership
+        ecg.trig_times = nullptr;
+
+        std::wcout << L"ECG QRS trig times:\n";
+        for (unsigned int i = 0; i < trig_times.GetCount(); ++i)
+            std::wcout << L"  " << trig_times[(int)i] << "\n";
+    }
 
     {
         PerfTimer timer("ParseSource", profile);
