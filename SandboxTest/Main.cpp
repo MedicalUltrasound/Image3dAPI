@@ -92,6 +92,23 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     CHECK(source.GetFrameCount(&frame_count));
     std::wcout << L"Frame count: " << frame_count << L"\n";
 
+    CComSafeArray<double> frame_times;
+    {
+        SAFEARRAY * data = nullptr;
+        CHECK(source.GetFrameTimes(&data));
+        frame_times.Attach(data);
+        data = nullptr;
+    }
+
+    if (verbose)
+    {
+        std::cout << "Frame times:\n";
+        for (unsigned int i = 0; i < frame_times.GetCount(); i++) {
+            double time = frame_times[(int)i];
+            std::cout << "  " << time << "\n";
+        }
+    }
+
     CComSafeArray<unsigned int> color_map;
     {
         SAFEARRAY * tmp = nullptr;
