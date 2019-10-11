@@ -198,7 +198,7 @@ struct EcgSeries {
     [helpstring("ECG sample waveform")]
     SAFEARRAY(float) samples;
 
-    [helpstring("QRS trig time(s) within series [optional]")]
+    [helpstring("QRS/R-wave trig time(s) [seconds] within series [optional]")]
     SAFEARRAY(double) trig_times;
 } EcgSeries;
 
