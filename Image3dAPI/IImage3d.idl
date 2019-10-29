@@ -285,7 +285,7 @@ interface IImage3dSource : IUnknown {
     [helpstring("Get the time of all frames (useful for matching frame indices to ECG before retrieving image data) ")]
     HRESULT GetFrameTimes ([out, retval] SAFEARRAY(double) * frame_times);
 
-    [helpstring("Get image data (const) for a given frame within a specified geometry")]
+    [helpstring("Get image data (const) for a given frame within a specified geometry. The returned frame might have lower resolution than requested.")]
     HRESULT GetFrame ([in] unsigned int index, [in] Cart3dGeom geom, [in] unsigned short max_resolution[3], [out,retval] Image3d * data);
 
     [helpstring("Get a bounding box encapsulating all image data. Can be used as intput to GetFrame to avoid cropping.")]
