@@ -227,6 +227,12 @@ int wmain (int argc, wchar_t *argv[]) {
         CHECK(loader->GetImageSource(&source));
     }
 
+    {
+        CComBSTR sopInstanceUID;
+        CHECK(source->GetSopInstanceUID(&sopInstanceUID));
+        std::wcout << L"SOP Instance UID: " << sopInstanceUID.m_str << L"\n";
+    }
+
     ProbeInfo probe;
     CHECK(source->GetProbeInfo(&probe));
     std::wcout << "Probe name: " << probe.name.m_str << L"\n";
