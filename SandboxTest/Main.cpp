@@ -163,7 +163,35 @@ CComPtr<IImage3dFileLoader> CreateLoader(const CComBSTR &progid, const CLSID cls
     return loader;
 }
 
-int wmain (int argc, wchar_t *argv[]) {
+CComPtr<IImage3dSource> LoadFileAndGetImageSource(const CComPtr<IImage3dFileLoader>& loader, const CComBSTR& filename, const bool profile)
+{
+    {
+        // load file
+        Image3dError err_type = {};
+        CComBSTR err_msg;
+        PerfTimer timer("LoadFile", profile);
+        HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
+        if (FAILED(hr)) {
+            std::wcerr << L"LoadFile failed: code=" << err_type << L", message=" << err_msg.m_str << std::endl;
+            exit(-1);
+        }
+    }
+
+    CComPtr<IImage3dSource> source;
+    {
+        PerfTimer timer("GetImageSource", profile);
+        HRESULT hr = loader->GetImageSource(&source);
+        if (FAILED(hr)) {
+            _com_error err(hr);
+            std::wcerr << L"GetImageSource failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
+            exit(-1);
+        }
+    }
+
+    return source;
+}
+
+int wmain(int argc, wchar_t *argv[]) {
     if (argc < 3) {
         std::wcout << L"Usage:\n";
         std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose|-profile]" << std::endl;
@@ -217,28 +245,7 @@ int wmain (int argc, wchar_t *argv[]) {
     // create loader in a separate "low integrity" dllhost.exe process
     CComPtr<IImage3dFileLoader> loader = CreateLoader(progid, clsid, profile);
 
-    {
-        // load file
-        Image3dError err_type = {};
-        CComBSTR err_msg;
-        PerfTimer timer("LoadFile", profile);
-        HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
-        if (FAILED(hr)) {
-            std::wcerr << L"LoadFile failed: code=" << err_type << L", message="<< err_msg.m_str << std::endl;
-            exit(-1);
-        }
-    }
-
-    CComPtr<IImage3dSource> source;
-    {
-        PerfTimer timer("GetImageSource", profile);
-        HRESULT hr = loader->GetImageSource(&source);
-        if (FAILED(hr)) {
-            _com_error err(hr);
-            std::wcerr << L"GetImageSource failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
-            exit(-1);
-        }
-    }
+    CComPtr<IImage3dSource> source = LoadFileAndGetImageSource(loader, filename, profile);
 
     {
         CComBSTR sopInstanceUID;
