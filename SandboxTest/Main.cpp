@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <sddl.h>
 
 
@@ -157,15 +158,13 @@ int wmain (int argc, wchar_t *argv[]) {
     CComBSTR progid = argv[1];  // e.g. "DummyLoader.Image3dFileLoader"
     CComBSTR filename = argv[2];
 
-    bool verbose = false; // more extensive logging
-    bool profile = false; // profile loader performance
-    if (argc >= 4) {
-        if (std::wstring(argv[3]) == L"-verbose")
-            verbose = true;
-        else if (std::wstring(argv[3]) == L"-profile")
-            profile = true;
+    std::set<std::wstring> options;
+    for (int i = 3; i < argc; ++i) {
+        options.insert(argv[i]);
     }
 
+    bool verbose = options.find(L"-verbose") != options.end(); // more extensive logging
+    bool profile = options.find(L"-profile") != options.end(); // profile loader performance
     bool test_locked_input = true;
 
     std::ifstream locked_file;
