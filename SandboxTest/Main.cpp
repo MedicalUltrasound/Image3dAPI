@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <sddl.h>
 
 
@@ -146,8 +147,51 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     }
 }
 
+CComPtr<IImage3dFileLoader> CreateLoader(const CComBSTR &progid, const CLSID clsid, const bool profile)
+{
+    CComPtr<IImage3dFileLoader> loader;
+    std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
+    LowIntegrity low_integrity;
+    PerfTimer timer("CoCreateInstance", profile);
+    HRESULT hr = loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING);
+    if (FAILED(hr)) {
+        _com_error err(hr);
+        std::wcerr << L"CoCreateInstance failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
+        exit(-1);
+    }
 
-int wmain (int argc, wchar_t *argv[]) {
+    return loader;
+}
+
+CComPtr<IImage3dSource> LoadFileAndGetImageSource(const CComPtr<IImage3dFileLoader>& loader, const CComBSTR& filename, const bool profile)
+{
+    {
+        // load file
+        Image3dError err_type = {};
+        CComBSTR err_msg;
+        PerfTimer timer("LoadFile", profile);
+        HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
+        if (FAILED(hr)) {
+            std::wcerr << L"LoadFile failed: code=" << err_type << L", message=" << err_msg.m_str << std::endl;
+            exit(-1);
+        }
+    }
+
+    CComPtr<IImage3dSource> source;
+    {
+        PerfTimer timer("GetImageSource", profile);
+        HRESULT hr = loader->GetImageSource(&source);
+        if (FAILED(hr)) {
+            _com_error err(hr);
+            std::wcerr << L"GetImageSource failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
+            exit(-1);
+        }
+    }
+
+    return source;
+}
+
+int wmain(int argc, wchar_t *argv[]) {
     if (argc < 3) {
         std::wcout << L"Usage:\n";
         std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose|-profile]" << std::endl;
@@ -157,15 +201,13 @@ int wmain (int argc, wchar_t *argv[]) {
     CComBSTR progid = argv[1];  // e.g. "DummyLoader.Image3dFileLoader"
     CComBSTR filename = argv[2];
 
-    bool verbose = false; // more extensive logging
-    bool profile = false; // profile loader performance
-    if (argc >= 4) {
-        if (std::wstring(argv[3]) == L"-verbose")
-            verbose = true;
-        else if (std::wstring(argv[3]) == L"-profile")
-            profile = true;
+    std::set<std::wstring> options;
+    for (int i = 3; i < argc; ++i) {
+        options.insert(argv[i]);
     }
 
+    bool verbose = options.find(L"-verbose") != options.end(); // more extensive logging
+    bool profile = options.find(L"-profile") != options.end(); // profile loader performance
     bool test_locked_input = true;
 
     std::ifstream locked_file;
@@ -201,31 +243,9 @@ int wmain (int argc, wchar_t *argv[]) {
     }
 
     // create loader in a separate "low integrity" dllhost.exe process
-    CComPtr<IImage3dFileLoader> loader;
-    {
-        std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
-        LowIntegrity low_integrity;
-        PerfTimer timer("CoCreateInstance", profile);
-        CHECK(loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING));
-    }
+    CComPtr<IImage3dFileLoader> loader = CreateLoader(progid, clsid, profile);
 
-    {
-        // load file
-        Image3dError err_type = {};
-        CComBSTR err_msg;
-        PerfTimer timer("LoadFile", profile);
-        HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
-        if (FAILED(hr)) {
-            std::wcerr << L"LoadFile failed: code=" << err_type << L", message="<< err_msg.m_str << std::endl;
-            return -1;
-        }
-    }
-
-    CComPtr<IImage3dSource> source;
-    {
-        PerfTimer timer("GetImageSource", profile);
-        CHECK(loader->GetImageSource(&source));
-    }
+    CComPtr<IImage3dSource> source = LoadFileAndGetImageSource(loader, filename, profile);
 
     {
         CComBSTR sopInstanceUID;
