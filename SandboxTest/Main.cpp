@@ -206,7 +206,12 @@ int wmain (int argc, wchar_t *argv[]) {
         std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
         LowIntegrity low_integrity;
         PerfTimer timer("CoCreateInstance", profile);
-        CHECK(loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING));
+        HRESULT hr = loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING);
+        if (FAILED(hr)) {
+            _com_error err(hr);
+            std::wcerr << L"CoCreateInstance failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
+            exit(-1);
+        }
     }
 
     {
@@ -217,14 +222,19 @@ int wmain (int argc, wchar_t *argv[]) {
         HRESULT hr = loader->LoadFile(filename, &err_type, &err_msg);
         if (FAILED(hr)) {
             std::wcerr << L"LoadFile failed: code=" << err_type << L", message="<< err_msg.m_str << std::endl;
-            return -1;
+            exit(-1);
         }
     }
 
     CComPtr<IImage3dSource> source;
     {
         PerfTimer timer("GetImageSource", profile);
-        CHECK(loader->GetImageSource(&source));
+        HRESULT hr = loader->GetImageSource(&source);
+        if (FAILED(hr)) {
+            _com_error err(hr);
+            std::wcerr << L"GetImageSource failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
+            exit(-1);
+        }
     }
 
     {
