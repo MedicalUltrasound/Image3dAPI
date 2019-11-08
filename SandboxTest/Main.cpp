@@ -216,7 +216,7 @@ int wmain(int argc, wchar_t *argv[]) {
         locked_file.open(filename);
     }
 
-    ComInitialize com(COINIT_MULTITHREADED);
+    ComInitialize com(COINIT_APARTMENTTHREADED);
 
     CLSID clsid = {};
     if (FAILED(CLSIDFromProgID(progid, &clsid))) {
