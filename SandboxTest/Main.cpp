@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <thread>
 #include <sddl.h>
 
 
@@ -194,7 +195,7 @@ CComPtr<IImage3dSource> LoadFileAndGetImageSource(const CComPtr<IImage3dFileLoad
 int wmain(int argc, wchar_t *argv[]) {
     if (argc < 3) {
         std::wcout << L"Usage:\n";
-        std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose|-profile]" << std::endl;
+        std::wcout << L"SandboxTest.exe <loader-progid> <filename> [-verbose|-profile] [-threading]" << std::endl;
         return -1;
     }
 
@@ -208,6 +209,8 @@ int wmain(int argc, wchar_t *argv[]) {
 
     bool verbose = options.find(L"-verbose") != options.end(); // more extensive logging
     bool profile = options.find(L"-profile") != options.end(); // profile loader performance
+    bool test_threading = options.find(L"-threading") != options.end(); // instantiate loader, load file and get image source in a separate thread
+
     bool test_locked_input = true;
 
     std::ifstream locked_file;
@@ -243,9 +246,29 @@ int wmain(int argc, wchar_t *argv[]) {
     }
 
     // create loader in a separate "low integrity" dllhost.exe process
-    CComPtr<IImage3dFileLoader> loader = CreateLoader(progid, clsid, profile);
+    CComPtr<IImage3dFileLoader> loader;
+    CComPtr<IImage3dSource> source;
 
-    CComPtr<IImage3dSource> source = LoadFileAndGetImageSource(loader, filename, profile);
+    if (!test_threading) {
+        loader = CreateLoader(progid, clsid, profile);
+        source = LoadFileAndGetImageSource(loader, filename, profile);
+    } else {
+        std::wcout << L"Instantiate loader, load file and get image source in a separate thread" << std::endl;
+        CComPtr<IStream> stream;
+
+        std::thread loader_thread([&]() {
+            ComInitialize com_thread(COINIT_APARTMENTTHREADED);
+            loader = CreateLoader(progid, clsid, profile);
+
+            CComPtr<IImage3dSource> internal_source = LoadFileAndGetImageSource(loader, filename, profile);
+
+            CHECK(CoMarshalInterThreadInterfaceInStream(__uuidof(IImage3dSource), internal_source, &stream));
+        });
+
+        loader_thread.join();
+
+        CHECK(CoGetInterfaceAndReleaseStream(stream.Detach(), __uuidof(IImage3dSource), (void**)&source));
+    }
 
     {
         CComBSTR sopInstanceUID;
