@@ -147,6 +147,21 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     }
 }
 
+CComPtr<IImage3dFileLoader> CreateLoader(const CComBSTR &progid, const CLSID clsid, const bool profile)
+{
+    CComPtr<IImage3dFileLoader> loader;
+    std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
+    LowIntegrity low_integrity;
+    PerfTimer timer("CoCreateInstance", profile);
+    HRESULT hr = loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING);
+    if (FAILED(hr)) {
+        _com_error err(hr);
+        std::wcerr << L"CoCreateInstance failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
+        exit(-1);
+    }
+
+    return loader;
+}
 
 int wmain (int argc, wchar_t *argv[]) {
     if (argc < 3) {
@@ -200,18 +215,7 @@ int wmain (int argc, wchar_t *argv[]) {
     }
 
     // create loader in a separate "low integrity" dllhost.exe process
-    CComPtr<IImage3dFileLoader> loader;
-    {
-        std::wcout << L"Creating loader " << progid.m_str << L" in low-integrity mode...\n";
-        LowIntegrity low_integrity;
-        PerfTimer timer("CoCreateInstance", profile);
-        HRESULT hr = loader.CoCreateInstance(clsid, nullptr, CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING);
-        if (FAILED(hr)) {
-            _com_error err(hr);
-            std::wcerr << L"CoCreateInstance failed: code=" << hr << L", message=" << err.ErrorMessage() << std::endl;
-            exit(-1);
-        }
-    }
+    CComPtr<IImage3dFileLoader> loader = CreateLoader(progid, clsid, profile);
 
     {
         // load file
