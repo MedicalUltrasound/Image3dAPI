@@ -235,7 +235,7 @@ int wmain (int argc, wchar_t *argv[]) {
 
     ProbeInfo probe;
     CHECK(source->GetProbeInfo(&probe));
-    std::wcout << "Probe name: " << probe.name.m_str << L"\n";
+    std::wcout << L"Probe name: " << probe.name.m_str << L"\n";
 
     EcgSeries ecg;
     CHECK(source->GetECG(&ecg));
