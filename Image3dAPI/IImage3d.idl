@@ -276,7 +276,7 @@ cpp_quote("#endif")
 
 [ object,
   oleautomation, // use "automation" marshaler (oleaut32.dll)
-  uuid(D483D815-52DD-4750-8CA2-5C6C489588B6),
+  uuid(881DC121-1C8B-44AE-99E2-AAE4AD6A50E0),
   helpstring("Interface for retrieving 3D image data.")]
 interface IImage3dSource : IUnknown {
     [helpstring("Get the number of frames available")]
@@ -319,7 +319,7 @@ enum Image3dError {
 
 [ object,
   oleautomation, // use "automation" marshaler (oleaut32.dll)
-  uuid(CD30759B-EB38-4469-9CA5-4DF75737A31B),
+  uuid(381BA014-DA39-48B2-B0E7-7454D439469A),
   helpstring("Factory for loading 3D image data from a file.\n"
              "Implementors are responsible for also providing details on relevant DICOM tags that indicate that the loader might support the file.")]
 interface IImage3dFileLoader : IUnknown {
