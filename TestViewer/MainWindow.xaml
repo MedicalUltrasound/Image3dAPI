@@ -54,13 +54,13 @@
             </Grid.RowDefinitions>
 
             <!-- Image grid -->
-            <Image x:Name="ImageXY" Grid.Column="0" Grid.Row="0"/>
+            <Image x:Name="ImageXY" Grid.Column="0" Grid.Row="0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
             <Label TextBlock.Foreground="DimGray" Grid.Column="0" Grid.Row="0">X-Y plane</Label>
-            
-            <Image x:Name="ImageXZ" Grid.Column="1" Grid.Row="0"/>
+
+            <Image x:Name="ImageXZ" Grid.Column="1" Grid.Row="0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
             <Label TextBlock.Foreground="DimGray" Grid.Column="1" Grid.Row="0">X-Z plane</Label>
-            
-            <Image x:Name="ImageZY" Grid.Column="0" Grid.Row="1"/>
+
+            <Image x:Name="ImageZY" Grid.Column="0" Grid.Row="1" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
             <Label TextBlock.Foreground="DimGray"  Grid.Column="0" Grid.Row="1">Z-Y plane</Label>
 
             <Path x:Name="ECG" Grid.Column="1" Grid.Row="1"/>
