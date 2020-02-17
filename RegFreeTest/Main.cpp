@@ -5,8 +5,8 @@
 
 
 void ParseSource (IImage3dSource & source) {
-    Cart3dGeom geom = {};
-    CHECK(source.GetBoundingBox(&geom));
+    Cart3dGeom bbox = {};
+    CHECK(source.GetBoundingBox(&bbox));
 
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));
@@ -25,7 +25,7 @@ void ParseSource (IImage3dSource & source) {
 
         // retrieve frame data
         Image3d data;
-        CHECK(source.GetFrame(frame, geom, max_res, &data));
+        CHECK(source.GetFrame(frame, bbox, max_res, &data));
     }
 }
 

@@ -79,15 +79,15 @@ private:
 
 
 void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
-    Cart3dGeom geom = {};
-    CHECK(source.GetBoundingBox(&geom));
+    Cart3dGeom bbox = {};
+    CHECK(source.GetBoundingBox(&bbox));
 
     if (verbose) {
         std::cout << "Bounding box:\n";
-        std::cout << "  Origin: " << geom.origin_x << ", " << geom.origin_y << ", " << geom.origin_z << "\n";
-        std::cout << "  Dir1:   " << geom.dir1_x   << ", " << geom.dir1_y   << ", " << geom.dir1_z   << "\n";
-        std::cout << "  Dir2:   " << geom.dir2_x   << ", " << geom.dir2_y   << ", " << geom.dir2_z   << "\n";
-        std::cout << "  Dir3:   " << geom.dir3_x   << ", " << geom.dir3_y   << ", " << geom.dir3_z   << "\n";
+        std::cout << "  Origin: " << bbox.origin_x << ", " << bbox.origin_y << ", " << bbox.origin_z << "\n";
+        std::cout << "  Dir1:   " << bbox.dir1_x   << ", " << bbox.dir1_y   << ", " << bbox.dir1_z   << "\n";
+        std::cout << "  Dir2:   " << bbox.dir2_x   << ", " << bbox.dir2_y   << ", " << bbox.dir2_z   << "\n";
+        std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
     }
 
     unsigned int frame_count = 0;
@@ -139,7 +139,7 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         // retrieve frame data
         Image3d data;
         PerfTimer timer("GetFrame", profile);
-        CHECK(source.GetFrame(frame, geom, max_res, &data));
+        CHECK(source.GetFrame(frame, bbox, max_res, &data));
 
         if (frame == 0)
             std::cout << "First frame time: " << data.time << "\n";
