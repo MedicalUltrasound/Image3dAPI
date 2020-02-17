@@ -70,7 +70,7 @@ private:
     ProbeInfo                m_probe;
     EcgSeries                m_ecg;
     std::array<R8G8B8A8,256> m_color_map;
-    Cart3dGeom               m_geom;
+    Cart3dGeom               m_img_geom = {};
     std::vector<Image3d>     m_frames;
 };
 
