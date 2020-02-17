@@ -43,6 +43,10 @@ namespace TestViewer
         IImage3dFileLoader m_loader;
         IImage3dSource     m_source;
 
+        Cart3dGeom         m_bboxXY;
+        Cart3dGeom         m_bboxXZ;
+        Cart3dGeom         m_bboxZY;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -63,6 +67,11 @@ namespace TestViewer
             ImageXY.Source = null;
             ImageXZ.Source = null;
             ImageZY.Source = null;
+
+            m_bboxXY = new Cart3dGeom();
+            m_bboxXZ = new Cart3dGeom();
+            m_bboxZY = new Cart3dGeom();
+
             ECG.Data = null;
 
             if (m_source != null) {
@@ -183,7 +192,8 @@ namespace TestViewer
             ProbeInfo.Text = "Probe name: "+ m_source.GetProbeInfo().name;
             InstanceUID.Text = "UID: " + m_source.GetSopInstanceUID();
 
-            DrawImages(0);
+            InitializeSlices();
+            DrawSlices(0);
             DrawEcg(m_source.GetFrameTimes()[0]);
         }
 
@@ -256,20 +266,16 @@ namespace TestViewer
         private void FrameSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var idx = (uint)FrameSelector.Value;
-            DrawImages(idx);
+            DrawSlices(idx);
             DrawEcg(m_source.GetFrameTimes()[idx]);
         }
 
-        private void DrawImages (uint frame)
+        private void InitializeSlices()
         {
             Debug.Assert(m_source != null);
 
-            // retrieve image slices
-            const ushort HORIZONTAL_RES = 256;
-            const ushort VERTICAL_RES = 256;
-
             Cart3dGeom bbox = m_source.GetBoundingBox();
-            if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)){
+            if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)) {
                 // swap 2nd & 3rd axis, so that the 2nd becomes predominately "Y"
                 SwapVals(ref bbox.dir2_x, ref bbox.dir3_x);
                 SwapVals(ref bbox.dir2_y, ref bbox.dir3_y);
@@ -280,43 +286,58 @@ namespace TestViewer
             ExtendBoundingBox(ref bbox);
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
-            Cart3dGeom bboxXY = bbox;
-            bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
-            bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
-            bboxXY.origin_z = bboxXY.origin_z + bboxXY.dir3_z / 2;
-            bboxXY.dir3_x = 0;
-            bboxXY.dir3_y = 0;
-            bboxXY.dir3_z = 0;
-            Image3d imageXY = m_source.GetFrame(frame, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            m_bboxXY = bbox;
+            m_bboxXY.origin_x = m_bboxXY.origin_x + m_bboxXY.dir3_x / 2;
+            m_bboxXY.origin_y = m_bboxXY.origin_y + m_bboxXY.dir3_y / 2;
+            m_bboxXY.origin_z = m_bboxXY.origin_z + m_bboxXY.dir3_z / 2;
+            m_bboxXY.dir3_x = 0;
+            m_bboxXY.dir3_y = 0;
+            m_bboxXY.dir3_z = 0;
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
-            Cart3dGeom bboxXZ = bbox;
-            bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
-            bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
-            bboxXZ.origin_z = bboxXZ.origin_z + bboxXZ.dir2_z / 2;
-            bboxXZ.dir2_x = bboxXZ.dir3_x;
-            bboxXZ.dir2_y = bboxXZ.dir3_y;
-            bboxXZ.dir2_z = bboxXZ.dir3_z;
-            bboxXZ.dir3_x = 0; 
-            bboxXZ.dir3_y = 0;
-            bboxXZ.dir3_z = 0;
-            Image3d imageXZ = m_source.GetFrame(frame, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            m_bboxXZ = bbox;
+            m_bboxXZ.origin_x = m_bboxXZ.origin_x + m_bboxXZ.dir2_x / 2;
+            m_bboxXZ.origin_y = m_bboxXZ.origin_y + m_bboxXZ.dir2_y / 2;
+            m_bboxXZ.origin_z = m_bboxXZ.origin_z + m_bboxXZ.dir2_z / 2;
+            m_bboxXZ.dir2_x = m_bboxXZ.dir3_x;
+            m_bboxXZ.dir2_y = m_bboxXZ.dir3_y;
+            m_bboxXZ.dir2_z = m_bboxXZ.dir3_z;
+            m_bboxXZ.dir3_x = 0;
+            m_bboxXZ.dir3_y = 0;
+            m_bboxXZ.dir3_z = 0;
 
             // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
-            Cart3dGeom bboxZY = bbox;
-            bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
-            bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
-            bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
-            bboxZY.dir1_x = bbox.dir3_x;
-            bboxZY.dir1_y = bbox.dir3_y;
-            bboxZY.dir1_z = bbox.dir3_z;
-            bboxZY.dir2_x = bbox.dir2_x;
-            bboxZY.dir2_y = bbox.dir2_y;
-            bboxZY.dir2_z = bbox.dir2_z;
-            bboxZY.dir3_x = 0;
-            bboxZY.dir3_y = 0;
-            bboxZY.dir3_z = 0;
-            Image3d imageZY = m_source.GetFrame(frame, bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            m_bboxZY = bbox;
+            m_bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
+            m_bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
+            m_bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
+            m_bboxZY.dir1_x = bbox.dir3_x;
+            m_bboxZY.dir1_y = bbox.dir3_y;
+            m_bboxZY.dir1_z = bbox.dir3_z;
+            m_bboxZY.dir2_x = bbox.dir2_x;
+            m_bboxZY.dir2_y = bbox.dir2_y;
+            m_bboxZY.dir2_z = bbox.dir2_z;
+            m_bboxZY.dir3_x = 0;
+            m_bboxZY.dir3_y = 0;
+            m_bboxZY.dir3_z = 0;
+        }
+
+        private void DrawSlices (uint frame)
+        {
+            Debug.Assert(m_source != null);
+
+            // retrieve image slices
+            const ushort HORIZONTAL_RES = 256;
+            const ushort VERTICAL_RES = 256;
+
+            // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
+            Image3d imageXY = m_source.GetFrame(frame, m_bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+
+            // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
+            Image3d imageXZ = m_source.GetFrame(frame, m_bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+
+            // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
+            Image3d imageZY = m_source.GetFrame(frame, m_bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
 
             FrameTime.Text = "Frame time: " + imageXY.time;
 
@@ -385,7 +406,7 @@ namespace TestViewer
 
         /** Scale bounding-box, so that all axes share the same length.
          *  Also update the origin to keep the bounding-box centered. */
-static void ExtendBoundingBox(ref Cart3dGeom g)
+        static void ExtendBoundingBox(ref Cart3dGeom g)
         {
             float dir1_len = VecLen(g, 1);
             float dir2_len = VecLen(g, 2);
