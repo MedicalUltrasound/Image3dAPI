@@ -46,7 +46,7 @@ public:
 
     HRESULT STDMETHODCALLTYPE GetFrameTimes(/*out*/SAFEARRAY * *frame_times) override;
 
-    HRESULT STDMETHODCALLTYPE GetFrame(unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*out*/Image3d *data) override;
+    HRESULT STDMETHODCALLTYPE GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) override;
 
     HRESULT STDMETHODCALLTYPE GetBoundingBox(/*out*/Cart3dGeom *geom) override;
 
@@ -70,7 +70,7 @@ private:
     ProbeInfo                m_probe;
     EcgSeries                m_ecg;
     std::array<R8G8B8A8,256> m_color_map;
-    Cart3dGeom               m_geom;
+    Cart3dGeom               m_img_geom = {};
     std::vector<Image3d>     m_frames;
 };
 

@@ -40,12 +40,12 @@ Image3dSource::Image3dSource() {
             m_color_map[i] = R8G8B8A8(static_cast<unsigned char>(i), static_cast<unsigned char>(i), static_cast<unsigned char>(i), 0xFF);
     }
     {
-        // geometry          X     Y       Z
+        // image geometry    X     Y       Z
         Cart3dGeom geom = { -0.1f, 0,     -0.075f,// origin
                              0.20f,0,      0,     // dir1 (width)
                              0,    0.10f,  0,     // dir2 (depth)
                              0,    0,      0.15f};// dir3 (elevation)
-        m_geom = geom;
+        m_img_geom = geom;
     }
     {
         // checker board image data
@@ -189,7 +189,7 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
                 // convert from input texture coordinate to output texture coordinate
                 vec3f pos_in(x*1.0f/max_res[0], y*1.0f/max_res[1], z*1.0f/max_res[2]);
                 vec3f xyz = PosToCoord(out_origin, out_dir1, out_dir2, out_dir3, pos_in);
-                vec3f pos_out = CoordToPos(m_geom, xyz);
+                vec3f pos_out = CoordToPos(m_img_geom, xyz);
 
                 unsigned char val = SampleVoxel(frame, pos_out);
                 img_buf[x + y*max_res[0] + z*max_res[0] * max_res[1]] = val;
@@ -214,13 +214,13 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
     return result;
 }
 
-HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*out*/Image3d *data) {
+HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) {
     if (!data)
         return E_INVALIDARG;
     if (index >= m_frames.size())
         return E_BOUNDS;
 
-    Image3d result = SampleFrame(m_frames[index], geom, max_res);
+    Image3d result = SampleFrame(m_frames[index], out_geom, max_res);
     *data = std::move(result);
     return S_OK;
 }
@@ -229,7 +229,7 @@ HRESULT Image3dSource::GetBoundingBox(/*out*/Cart3dGeom *geom) {
     if (!geom)
         return E_INVALIDARG;
 
-    *geom = m_geom;
+    *geom = m_img_geom;
     return S_OK;
 }
 
