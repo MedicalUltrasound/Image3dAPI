@@ -4,12 +4,14 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Image3dSource.cpp" />
     <ClCompile Include="Image3dFileLoader.cpp" />
+    <ClCompile Include="Image3dStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Image3dSource.hpp" />
     <ClInclude Include="Image3dFileLoader.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="LinAlg.hpp" />
+    <ClInclude Include="Image3dStream.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GenRgsFiles.py" />
