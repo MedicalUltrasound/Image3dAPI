@@ -253,11 +253,13 @@
   <ItemGroup>
     <ClCompile Include="Image3dFileLoader.cpp" />
     <ClCompile Include="Image3dSource.cpp" />
+    <ClCompile Include="Image3dStream.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Image3dFileLoader.hpp" />
     <ClInclude Include="Image3dSource.hpp" />
+    <ClInclude Include="Image3dStream.hpp" />
     <ClInclude Include="LinAlg.hpp" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
