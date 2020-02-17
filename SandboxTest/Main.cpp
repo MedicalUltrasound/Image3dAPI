@@ -90,6 +90,23 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
     }
 
+    CComSafeArray<unsigned int> color_map;
+    {
+        SAFEARRAY * tmp = nullptr;
+        CHECK(source.GetColorMap(&tmp));
+        color_map.Attach(tmp);
+        tmp = nullptr;
+    }
+
+    if (verbose) {
+        std::cout << "Color-map:\n";
+        for (unsigned int i = 0; i < color_map.GetCount(); i++) {
+            unsigned int color = color_map[(int)i];
+            uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
+            std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
+        }
+    }
+
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));
     std::wcout << L"Frame count: " << frame_count << L"\n";
@@ -108,23 +125,6 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         for (unsigned int i = 0; i < frame_times.GetCount(); i++) {
             double time = frame_times[(int)i];
             std::cout << "  " << time << "\n";
-        }
-    }
-
-    CComSafeArray<unsigned int> color_map;
-    {
-        SAFEARRAY * tmp = nullptr;
-        CHECK(source.GetColorMap(&tmp));
-        color_map.Attach(tmp);
-        tmp = nullptr;
-    }
-
-    if (verbose) {
-        std::cout << "Color-map:\n";
-        for (unsigned int i = 0; i < color_map.GetCount(); i++) {
-            unsigned int color = color_map[(int)i];
-            uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
-            std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
         }
     }
 

@@ -8,10 +8,6 @@ void ParseSource (IImage3dSource & source) {
     Cart3dGeom bbox = {};
     CHECK(source.GetBoundingBox(&bbox));
 
-    unsigned int frame_count = 0;
-    CHECK(source.GetFrameCount(&frame_count));
-    std::wcout << L"Frame count: " << frame_count << L"\n";
-
     CComSafeArray<unsigned int> color_map;
     {
         SAFEARRAY * tmp = nullptr;
@@ -19,6 +15,10 @@ void ParseSource (IImage3dSource & source) {
         color_map.Attach(tmp);
         tmp = nullptr;
     }
+
+    unsigned int frame_count = 0;
+    CHECK(source.GetFrameCount(&frame_count));
+    std::wcout << L"Frame count: " << frame_count << L"\n";
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
         unsigned short max_res[] = {64, 64, 64};
