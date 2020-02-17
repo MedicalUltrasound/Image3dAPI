@@ -46,7 +46,7 @@ public:
 
     HRESULT STDMETHODCALLTYPE GetFrameTimes(/*out*/SAFEARRAY * *frame_times) override;
 
-    HRESULT STDMETHODCALLTYPE GetFrame(unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*out*/Image3d *data) override;
+    HRESULT STDMETHODCALLTYPE GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) override;
 
     HRESULT STDMETHODCALLTYPE GetBoundingBox(/*out*/Cart3dGeom *geom) override;
 

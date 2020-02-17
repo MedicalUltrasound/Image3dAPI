@@ -214,13 +214,13 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
     return result;
 }
 
-HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom geom, unsigned short max_res[3], /*out*/Image3d *data) {
+HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) {
     if (!data)
         return E_INVALIDARG;
     if (index >= m_frames.size())
         return E_BOUNDS;
 
-    Image3d result = SampleFrame(m_frames[index], geom, max_res);
+    Image3d result = SampleFrame(m_frames[index], out_geom, max_res);
     *data = std::move(result);
     return S_OK;
 }
