@@ -79,17 +79,6 @@ private:
 
 
 void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
-    Cart3dGeom bbox = {};
-    CHECK(source.GetBoundingBox(&bbox));
-
-    if (verbose) {
-        std::cout << "Bounding box:\n";
-        std::cout << "  Origin: " << bbox.origin_x << ", " << bbox.origin_y << ", " << bbox.origin_z << "\n";
-        std::cout << "  Dir1:   " << bbox.dir1_x   << ", " << bbox.dir1_y   << ", " << bbox.dir1_z   << "\n";
-        std::cout << "  Dir2:   " << bbox.dir2_x   << ", " << bbox.dir2_y   << ", " << bbox.dir2_z   << "\n";
-        std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
-    }
-
     CComSafeArray<unsigned int> color_map;
     {
         SAFEARRAY * tmp = nullptr;
@@ -105,6 +94,17 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
             uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
             std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
         }
+    }
+
+    Cart3dGeom bbox = {};
+    CHECK(source.GetBoundingBox(&bbox));
+
+    if (verbose) {
+        std::cout << "Bounding box:\n";
+        std::cout << "  Origin: " << bbox.origin_x << ", " << bbox.origin_y << ", " << bbox.origin_z << "\n";
+        std::cout << "  Dir1:   " << bbox.dir1_x   << ", " << bbox.dir1_y   << ", " << bbox.dir1_z   << "\n";
+        std::cout << "  Dir2:   " << bbox.dir2_x   << ", " << bbox.dir2_y   << ", " << bbox.dir2_z   << "\n";
+        std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
     }
 
     unsigned int frame_count = 0;
