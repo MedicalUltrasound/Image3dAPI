@@ -5,10 +5,9 @@
 
 /** RAII class for temporarily impersonating low-integrity level for the current thread.
     Intended to be used together with CLSCTX_ENABLE_CLOAKING when creating COM objects.
-    Based on "Designing Applications to Run at a Low Integrity Level" https://msdn.microsoft.com/en-us/library/bb625960.aspx */
+    Based on "Designing Applications to Run at a Low Integrity Level" https://docs.microsoft.com/en-us/previous-versions/dotnet/articles/bb625960(v=msdn.10) */
 struct LowIntegrity {
-    LowIntegrity()
-    {
+    LowIntegrity() {
         HANDLE cur_token = nullptr;
         if (!OpenProcessToken(GetCurrentProcess(), TOKEN_DUPLICATE | TOKEN_ADJUST_DEFAULT | TOKEN_QUERY | TOKEN_ASSIGN_PRIMARY, &cur_token))
             abort();
@@ -36,8 +35,7 @@ struct LowIntegrity {
         li_sid = nullptr;
     }
 
-    ~LowIntegrity()
-    {
+    ~LowIntegrity() {
         if (!RevertToSelf())
             abort();
 
