@@ -5,9 +5,6 @@
 
 
 void ParseSource (IImage3dSource & source) {
-    Cart3dGeom bbox = {};
-    CHECK(source.GetBoundingBox(&bbox));
-
     CComSafeArray<unsigned int> color_map;
     {
         SAFEARRAY * tmp = nullptr;
@@ -15,6 +12,9 @@ void ParseSource (IImage3dSource & source) {
         color_map.Attach(tmp);
         tmp = nullptr;
     }
+
+    Cart3dGeom bbox = {};
+    CHECK(source.GetBoundingBox(&bbox));
 
     unsigned int frame_count = 0;
     CHECK(source.GetFrameCount(&frame_count));

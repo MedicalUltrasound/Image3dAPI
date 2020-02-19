@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LowIntegrity.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DFA5034E-BEA9-4299-A301-38A5DF7FD256}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

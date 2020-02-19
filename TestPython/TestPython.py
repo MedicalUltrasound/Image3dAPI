@@ -69,6 +69,7 @@ if __name__=="__main__":
     dir3   = [bbox.dir3_x,   bbox.dir3_y,   bbox.dir3_z]
 
     color_map = source.GetColorMap()
+    print("Color-map length: "+str(len(color_map)))
 
     frame_count = source.GetFrameCount()
     for i in range(frame_count):

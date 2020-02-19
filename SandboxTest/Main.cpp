@@ -1,12 +1,12 @@
 #include "../Image3dAPI/ComSupport.hpp"
 #include "../Image3dAPI/IImage3d.h"
 #include "../Image3dAPI/RegistryCheck.hpp"
+#include "LowIntegrity.hpp"
 #include <chrono>
 #include <iostream>
 #include <fstream>
 #include <set>
 #include <thread>
-#include <sddl.h>
 
 
 class PerfTimer {
@@ -31,65 +31,7 @@ private:
 };
 
 
-/** RAII class for temporarily impersonating low-integrity level for the current thread.
-    Intended to be used together with CLSCTX_ENABLE_CLOAKING when creating COM objects.
-    Based on "Designing Applications to Run at a Low Integrity Level" https://msdn.microsoft.com/en-us/library/bb625960.aspx */
-struct LowIntegrity {
-    LowIntegrity()
-    {
-        HANDLE cur_token = nullptr;
-        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_DUPLICATE | TOKEN_ADJUST_DEFAULT | TOKEN_QUERY | TOKEN_ASSIGN_PRIMARY, &cur_token))
-            abort();
-
-        if (!DuplicateTokenEx(cur_token, 0, NULL, SecurityImpersonation, TokenPrimary, &m_token))
-            abort();
-
-        CloseHandle(cur_token);
-
-        PSID li_sid = nullptr;
-        if (!ConvertStringSidToSid(L"S-1-16-4096", &li_sid)) // low integrity SID
-            abort();
-
-        // reduce process integrity level
-        TOKEN_MANDATORY_LABEL TIL = {};
-        TIL.Label.Attributes = SE_GROUP_INTEGRITY;
-        TIL.Label.Sid = li_sid;
-        if (!SetTokenInformation(m_token, TokenIntegrityLevel, &TIL, sizeof(TOKEN_MANDATORY_LABEL) + GetLengthSid(li_sid)))
-            abort();
-
-        if (!ImpersonateLoggedOnUser(m_token)) // change current thread integrity
-            abort();
-
-        LocalFree(li_sid);
-        li_sid = nullptr;
-    }
-
-    ~LowIntegrity()
-    {
-        if (!RevertToSelf())
-            abort();
-
-        CloseHandle(m_token);
-        m_token = nullptr;
-    }
-
-private:
-    HANDLE m_token = nullptr;
-};
-
-
 void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
-    Cart3dGeom bbox = {};
-    CHECK(source.GetBoundingBox(&bbox));
-
-    if (verbose) {
-        std::cout << "Bounding box:\n";
-        std::cout << "  Origin: " << bbox.origin_x << ", " << bbox.origin_y << ", " << bbox.origin_z << "\n";
-        std::cout << "  Dir1:   " << bbox.dir1_x   << ", " << bbox.dir1_y   << ", " << bbox.dir1_z   << "\n";
-        std::cout << "  Dir2:   " << bbox.dir2_x   << ", " << bbox.dir2_y   << ", " << bbox.dir2_z   << "\n";
-        std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
-    }
-
     CComSafeArray<unsigned int> color_map;
     {
         SAFEARRAY * tmp = nullptr;
@@ -105,6 +47,17 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
             uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
             std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
         }
+    }
+
+    Cart3dGeom bbox = {};
+    CHECK(source.GetBoundingBox(&bbox));
+
+    if (verbose) {
+        std::cout << "Bounding box:\n";
+        std::cout << "  Origin: " << bbox.origin_x << ", " << bbox.origin_y << ", " << bbox.origin_z << "\n";
+        std::cout << "  Dir1:   " << bbox.dir1_x   << ", " << bbox.dir1_y   << ", " << bbox.dir1_z   << "\n";
+        std::cout << "  Dir2:   " << bbox.dir2_x   << ", " << bbox.dir2_y   << ", " << bbox.dir2_z   << "\n";
+        std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
     }
 
     unsigned int frame_count = 0;
