@@ -51,11 +51,11 @@ Image3dSource::Image3dSource() {
         // checker board image data
         unsigned short dims[] = { 20, 15, 10 }; // matches length of dir1, dir2 & dir3, so that the image squares become quadratic
         std::vector<byte> img_buf(dims[0] * dims[1] * dims[2]);
-        for (size_t f = 0; f < numFrames; ++f) {
+        for (size_t frameNumber = 0; frameNumber < numFrames; ++frameNumber) {
             for (unsigned int z = 0; z < dims[2]; ++z) {
                 for (unsigned int y = 0; y < dims[1]; ++y) {
                     for (unsigned int x = 0; x < dims[0]; ++x) {
-                        bool even_f = (f / 2 % 2) == 0;
+                        bool even_f = (frameNumber / 2 % 2) == 0;
                         bool even_x = (x / 2 % 2) == 0;
                         bool even_y = (y / 2 % 2) == 0;
                         bool even_z = (z / 2 % 2) == 0;
@@ -77,20 +77,7 @@ Image3dSource::Image3dSource() {
                 }
             }
 
-            Image3d tmp;
-            {
-                tmp.time = f*(duration/numFrames) + startTime;
-                tmp.format = FORMAT_U8;
-                for (size_t i = 0; i < 3; ++i)
-                    tmp.dims[i] = dims[i];
-                CComSafeArray<BYTE> data(static_cast<unsigned int>(img_buf.size()));
-                memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
-                tmp.data = data.Detach();
-                tmp.stride0 = dims[0] * sizeof(byte);
-                tmp.stride1 = dims[1] * tmp.stride0;
-            }
-
-            m_frames.push_back(std::move(tmp));
+            m_frames.push_back(CreateImage3d(frameNumber*(duration/numFrames) + startTime, FORMAT_U8, dims, img_buf));
         }
     }
 }
