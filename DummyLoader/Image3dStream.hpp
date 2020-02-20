@@ -31,3 +31,31 @@ struct R8G8B8A8 {
 
     unsigned char r, g, b, a;  ///< color channels
 };
+
+/** Determine the sample size [bytes] for a given image format. */
+static unsigned int ImageFormatSize(ImageFormat format) {
+    switch (format) {
+    case FORMAT_U8: return 1;
+    }
+
+    abort(); // should never be reached
+}
+
+/** Create a Image3d object from a std::vector buffer. */
+static Image3d CreateImage3d (double time, ImageFormat format, const unsigned short dims[3], const std::vector<byte> &img_buf) {
+    Image3d img;
+    img.time = time;
+    img.format = format;
+    for (size_t i = 0; i < 3; ++i)
+        img.dims[i] = dims[i];
+
+    CComSafeArray<BYTE> data(static_cast<unsigned int>(img_buf.size()));
+    memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
+    img.data = data.Detach();
+
+    // assume packed storage
+    img.stride0 = dims[0] * ImageFormatSize(format);
+    img.stride1 = dims[1] * img.stride0;
+
+    return img;
+}

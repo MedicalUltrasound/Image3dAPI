@@ -77,20 +77,7 @@ Image3dSource::Image3dSource() {
                 }
             }
 
-            Image3d tmp;
-            {
-                tmp.time = f*(duration/numFrames) + startTime;
-                tmp.format = FORMAT_U8;
-                for (size_t i = 0; i < 3; ++i)
-                    tmp.dims[i] = dims[i];
-                CComSafeArray<BYTE> data(static_cast<unsigned int>(img_buf.size()));
-                memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
-                tmp.data = data.Detach();
-                tmp.stride0 = dims[0] * sizeof(byte);
-                tmp.stride1 = dims[1] * tmp.stride0;
-            }
-
-            m_frames.push_back(std::move(tmp));
+            m_frames.push_back(CreateImage3d(f*(duration/numFrames) + startTime, FORMAT_U8, dims, img_buf));
         }
     }
 }
