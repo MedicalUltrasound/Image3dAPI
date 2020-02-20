@@ -184,21 +184,7 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
         }
     }
 
-    // convert to Image3d format
-    Image3d result;
-    {
-        result.time = frame.time;
-        result.format = FORMAT_U8;
-        for (size_t i = 0; i < 3; ++i)
-            result.dims[i] = max_res[i];
-        CComSafeArray<BYTE> data(static_cast<unsigned int>(img_buf.size()));
-        memcpy(data.m_psa->pvData, img_buf.data(), img_buf.size());
-        result.data = data.Detach();
-        result.stride0 = result.dims[0] * sizeof(byte);
-        result.stride1 = result.dims[1] * result.stride0;
-    }
-
-    return result;
+    return CreateImage3d(frame.time, FORMAT_U8, max_res, img_buf);
 }
 
 HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) {
