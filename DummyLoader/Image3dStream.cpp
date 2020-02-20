@@ -55,6 +55,24 @@ void Image3dStream::Initialize (ImageType type, Cart3dGeom img_geom, Cart3dGeom 
 
             m_frames.push_back(CreateImage3d(frameNumber*(duration/numFrames) + startTime, IMAGE_FORMAT_U8, dims, img_buf));
         }
+    } else if (type == IMAGE_TYPE_BLOOD_VEL) {
+        // velocity & bandwidth scale color-flow data
+        unsigned short dims[] = { 20, 15, 10 }; // matches length of dir1, dir2 & dir3, so that the image squares become quadratic
+        std::vector<byte> img_buf(2 * dims[0] * dims[1] * dims[2]);
+        for (size_t frameNumber = 0; frameNumber < numFrames; ++frameNumber) {
+            for (unsigned int z = 0; z < dims[2]; ++z) {
+                for (unsigned int y = 0; y < dims[1]; ++y) {
+                    for (unsigned int x = 0; x < dims[0]; ++x) {
+                        int8_t & freq = reinterpret_cast<int8_t&>(img_buf[0 + 2*(x + y*dims[0] + z*dims[0] * dims[1])]);
+                        byte & bw   = img_buf[1 + 2*(x + y*dims[0] + z*dims[0] * dims[1])];
+
+                        freq = static_cast<int8_t>(255*(0.5f - y*1.0f/dims[1])); // [+127, -128] along Y axis
+                        bw   = static_cast<uint8_t>(256*(x*1.0f/dims[0]));       // [0,255] along X axis
+                    }
+                }
+            }
+            m_frames.push_back(CreateImage3d(frameNumber*(duration/numFrames) + startTime, IMAGE_FORMAT_FREQ8POW8, dims, img_buf));
+        }
     } else {
         abort(); // should never be reached
     }

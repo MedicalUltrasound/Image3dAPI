@@ -40,7 +40,10 @@ public:
 private:
     ProbeInfo                m_probe;
     EcgSeries                m_ecg;
-    std::array<R8G8B8A8,256> m_color_map_tissue;
+
+    std::array<R8G8B8A8,256>     m_color_map_tissue;
+    std::array<R8G8B8A8,256*256> m_color_map_flow;
+    std::array<uint8_t,256*256>  m_flow_arb;
 
     Cart3dGeom               m_bbox = {};
     std::vector<ImageType>   m_stream_types;
