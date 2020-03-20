@@ -3,6 +3,7 @@ import platform
 import comtypes
 import comtypes.client
 import numpy as np
+import SimpleITK as sitk
 
 
 def SafeArrayToNumpy (safearr_ptr, copy=True):
@@ -33,6 +34,32 @@ def FrameTo3dArray (frame):
     arr_3d = np.lib.stride_tricks.as_strided(arr_1d, shape=frame.dims, strides=(1, frame.stride0, frame.stride1))
     return np.copy(arr_3d) 
 
+
+def SaveITKImage(imgFrame, bbox, outputFilename):
+    array = FrameTo3dArray(imgFrame)
+    itk_img = sitk.GetImageFromArray(array.astype("float64"))
+
+    m2mm = 1000
+
+    dir1   = [bbox.dir1_x,   bbox.dir1_y,   bbox.dir1_z]
+    dir2   = [bbox.dir2_x,   bbox.dir2_y,   bbox.dir2_z]
+    dir3   = [bbox.dir3_x,   bbox.dir3_y,   bbox.dir3_z]
+
+    # all units from Image3dAPI are in meters according to https://github.com/MedicalUltrasound/Image3dAPI/wiki#image-geometry
+    spacingX = np.linalg.norm(dir1) / imgFrame.dims[0] * m2mm # convert from meters to millimeters
+    spacingY = np.linalg.norm(dir2) / imgFrame.dims[1] * m2mm
+    spacingZ = np.linalg.norm(dir3) / imgFrame.dims[2] * m2mm
+
+
+    dir1 = dir1 / np.linalg.norm(dir1)
+    dir2 = dir2 / np.linalg.norm(dir2)
+    dir3 = dir3 / np.linalg.norm(dir3)
+
+    itk_img.SetSpacing((spacingX,spacingY,spacingZ))
+    itk_img.SetOrigin((bbox.origin_x*m2mm, bbox.origin_y*m2mm, bbox.origin_z*m2mm))
+    itk_img.SetDirection((dir1[0], dir2[0], dir3[0], dir1[1], dir2[1], dir3[1], dir1[2], dir2[2], dir3[2]))
+
+    sitk.WriteImage(itk_img, outputFilename)
 
 if __name__=="__main__":
     # load type library
@@ -83,3 +110,5 @@ if __name__=="__main__":
 
         data = FrameTo3dArray(frame)
         print("  shape: "+str(data.shape))
+
+        SaveITKImage(frame, bbox, "image3DAPIDummOutput" + str(i) + ".mhd")
