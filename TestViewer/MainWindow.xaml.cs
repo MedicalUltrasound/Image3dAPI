@@ -358,9 +358,9 @@ namespace TestViewer
                 {
                     for (int x = 0; x < bitmap.Width; ++x)
                     {
-                        byte val = t_img.data[x + y * t_img.stride0];
+                        byte t_val = t_img.data[x + y * t_img.stride0];
                         byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
-                        SetRGBVal(pixel, t_map[val]);
+                        SetRGBVal(pixel, t_val, t_map);
                     }
                 }
             }
@@ -369,10 +369,10 @@ namespace TestViewer
             return bitmap;
         }
 
-        unsafe static void SetRGBVal(byte* pixel, uint rgba)
+        unsafe static void SetRGBVal(byte* pixel, byte t_val, uint[] t_map)
         {
             // split input rgba color into individual channels
-            byte[] channels = BitConverter.GetBytes(rgba);
+            byte[] channels = BitConverter.GetBytes(t_map[t_val]);
             // assign red, green & blue
             pixel[0] = channels[0]; // red
             pixel[1] = channels[1]; // green
