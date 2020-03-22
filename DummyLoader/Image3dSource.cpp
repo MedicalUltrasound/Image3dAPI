@@ -213,7 +213,7 @@ HRESULT Image3dSource::GetColorMap(/*out*/SAFEARRAY ** map) {
         return E_INVALIDARG;
 
     // copy to new buffer
-    CComSafeArray<unsigned int> color_map(static_cast<unsigned int>(m_color_map.size()));
+    CComSafeArray<uint32_t> color_map(static_cast<unsigned int>(m_color_map.size()));
     memcpy(&color_map.GetAt(0), m_color_map.data(), sizeof(m_color_map));
     *map = color_map.Detach(); // transfer ownership
     return S_OK;
