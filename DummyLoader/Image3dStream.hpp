@@ -46,6 +46,8 @@ static unsigned int ImageFormatSize(ImageFormat format) {
 
 /** Create a Image3d object from a std::vector buffer. */
 static Image3d CreateImage3d (double time, ImageFormat format, const unsigned short dims[3], const std::vector<byte> &img_buf) {
+    assert(img_buf.size() == ImageFormatSize(format)*dims[0]*dims[1]*dims[2]);
+
     Image3d img;
     img.time = time;
     img.format = format;
