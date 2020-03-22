@@ -157,6 +157,7 @@ static T SampleVoxel (const Image3d & frame, const vec3f pos) {
 }
 
 
+template <class T>
 Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, unsigned short max_res[3]) {
     if (max_res[2] == 0)
         max_res[2] = 1; // require at least one plane to to retrieved
@@ -171,7 +172,7 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
         out_dir3 = cross_prod(out_dir1, out_dir2);
 
     // sample image buffer
-    std::vector<unsigned char> img_buf(max_res[0] * max_res[1] * max_res[2], 127);
+    std::vector<unsigned char> img_buf(sizeof(T) * max_res[0] * max_res[1] * max_res[2], 127);
     for (unsigned short z = 0; z < max_res[2]; ++z) {
         for (unsigned short y = 0; y < max_res[1]; ++y) {
             for (unsigned short x = 0; x < max_res[0]; ++x) {
@@ -180,8 +181,8 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
                 vec3f xyz = PosToCoord(out_origin, out_dir1, out_dir2, out_dir3, pos_in);
                 vec3f pos_out = CoordToPos(m_img_geom, xyz);
 
-                auto val = SampleVoxel<uint8_t>(frame, pos_out);
-                img_buf[x + y*max_res[0] + z*max_res[0] * max_res[1]] = val;
+                T val = SampleVoxel<T>(frame, pos_out);
+                reinterpret_cast<T*>(img_buf.data())[x + y*max_res[0] + z*max_res[0] * max_res[1]] = val;
             }
         }
     }
@@ -195,9 +196,14 @@ HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigne
     if (index >= m_frames.size())
         return E_BOUNDS;
 
-    Image3d result = SampleFrame(m_frames[index], out_geom, max_res);
-    *data = std::move(result);
-    return S_OK;
+    ImageFormat format = m_frames[index].format;
+    if (format == FORMAT_U8) {
+        Image3d result = SampleFrame<uint8_t>(m_frames[index], out_geom, max_res);
+        *data = std::move(result);
+        return S_OK;
+    }
+
+    return E_NOTIMPL;
 }
 
 HRESULT Image3dSource::GetBoundingBox(/*out*/Cart3dGeom *geom) {
