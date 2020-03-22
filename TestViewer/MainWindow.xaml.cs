@@ -348,9 +348,9 @@ namespace TestViewer
             ImageZY.Source = GenerateBitmap(imageZY, color_map);
         }
 
-        private WriteableBitmap GenerateBitmap(Image3d image, uint[] color_map)
+        private WriteableBitmap GenerateBitmap(Image3d t_img, uint[] t_map)
         {
-            WriteableBitmap bitmap = new WriteableBitmap(image.dims[0], image.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
+            WriteableBitmap bitmap = new WriteableBitmap(t_img.dims[0], t_img.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
             bitmap.Lock();
             unsafe
             {
@@ -358,9 +358,9 @@ namespace TestViewer
                 {
                     for (int x = 0; x < bitmap.Width; ++x)
                     {
-                        byte val = image.data[x + y * image.stride0];
+                        byte t_val = t_img.data[x + y * t_img.stride0];
                         byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
-                        SetRGBVal(pixel, color_map[val]);
+                        SetRGBVal(pixel, t_val, t_map);
                     }
                 }
             }
@@ -369,10 +369,10 @@ namespace TestViewer
             return bitmap;
         }
 
-        unsafe static void SetRGBVal(byte* pixel, uint rgba)
+        unsafe static void SetRGBVal(byte* pixel, byte t_val, uint[] t_map)
         {
             // split input rgba color into individual channels
-            byte* channels = (byte*)&rgba;
+            byte[] channels = BitConverter.GetBytes(t_map[t_val]);
             // assign red, green & blue
             pixel[0] = channels[0]; // red
             pixel[1] = channels[1]; // green

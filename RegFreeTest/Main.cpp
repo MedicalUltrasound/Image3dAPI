@@ -5,7 +5,7 @@
 
 
 void ParseSource (IImage3dSource & source) {
-    CComSafeArray<unsigned int> color_map;
+    CComSafeArray<uint32_t> color_map;
     {
         SAFEARRAY * tmp = nullptr;
         CHECK(source.GetColorMap(&tmp));
