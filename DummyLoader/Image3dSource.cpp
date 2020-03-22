@@ -137,8 +137,10 @@ static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
     return prod(inv(M), xyz - origin);
 }
 
+template <class T>
+static T SampleVoxel (const Image3d & frame, const vec3f pos) {
+    assert(ImageFormatSize(frame.format) == sizeof(T));
 
-static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
     // out-of-bounds checking
     if ((pos.x < 0) || (pos.y < 0) || (pos.z < 0))
         return OUTSIDE_VAL;
@@ -151,7 +153,7 @@ static unsigned char SampleVoxel (const Image3d & frame, const vec3f pos) {
     if ((x >= frame.dims[0]) || (y >= frame.dims[1]) || (z >= frame.dims[2]))
         return OUTSIDE_VAL;
 
-    return static_cast<unsigned char*>(frame.data->pvData)[x + y*frame.stride0 + z*frame.stride1];
+    return static_cast<T*>(frame.data->pvData)[x + y*frame.stride0/sizeof(T) + z*frame.stride1/sizeof(T)];
 }
 
 
@@ -178,13 +180,13 @@ Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, 
                 vec3f xyz = PosToCoord(out_origin, out_dir1, out_dir2, out_dir3, pos_in);
                 vec3f pos_out = CoordToPos(m_img_geom, xyz);
 
-                unsigned char val = SampleVoxel(frame, pos_out);
+                auto val = SampleVoxel<uint8_t>(frame, pos_out);
                 img_buf[x + y*max_res[0] + z*max_res[0] * max_res[1]] = val;
             }
         }
     }
 
-    return CreateImage3d(frame.time, FORMAT_U8, max_res, img_buf);
+    return CreateImage3d(frame.time, frame.format, max_res, img_buf);
 }
 
 HRESULT Image3dSource::GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) {
