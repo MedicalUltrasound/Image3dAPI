@@ -372,7 +372,7 @@ namespace TestViewer
         unsafe static void SetRGBVal(byte* pixel, uint rgba)
         {
             // split input rgba color into individual channels
-            byte* channels = (byte*)&rgba;
+            byte[] channels = BitConverter.GetBytes(rgba);
             // assign red, green & blue
             pixel[0] = channels[0]; // red
             pixel[1] = channels[1]; // green
