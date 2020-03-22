@@ -16,10 +16,10 @@ Copyright (c) 2020, GE Healthcare, Ultrasound.      */
 
 
 /** RGBA color struct that matches DXGI_FORMAT_R8G8B8A8_UNORM.
-Created due to the lack of such a class/struct in the Windows or Direct3D SDKs.
-Please remove this class if a more standardized alternative is available. */
+    Created due to the lack of such a class/struct in the Windows or Direct3D SDKs.
+    Please remove this class if a more standardized alternative is available. */
 struct R8G8B8A8 {
-    R8G8B8A8 () : r(0), g(0), b(0), a(0) {
+    R8G8B8A8 () {
     }
 
     R8G8B8A8 (unsigned char _r, unsigned char _g, unsigned char _b, unsigned char _a) : r(_r), g(_g), b(_b), a(_a) {
@@ -29,7 +29,10 @@ struct R8G8B8A8 {
         return *reinterpret_cast<const unsigned int*>(this);
     }
 
-    unsigned char r, g, b, a;  ///< color channels
+    uint8_t r = 0; ///< color channels
+    uint8_t g = 0;
+    uint8_t b = 0;
+    uint8_t a = 0;
 };
 
 /** Determine the sample size [bytes] for a given image format. */
