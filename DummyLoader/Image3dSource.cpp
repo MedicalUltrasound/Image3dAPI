@@ -111,52 +111,6 @@ HRESULT Image3dSource::GetFrameTimes(/*out*/SAFEARRAY * *frame_times) {
 }
 
 
-/** Convert from normalized voxel pos in [0,1) to (x,y,z) coordinate. */
-static vec3f PosToCoord (vec3f origin, vec3f dir1, vec3f dir2, vec3f dir3, const vec3f pos) {
-    mat33f M;
-    col_assign(M, 0, dir1);
-    col_assign(M, 1, dir2);
-    col_assign(M, 2, dir3);
-
-    return prod(M, pos) + origin;
-}
-
-
-/** Convert from (x,y,z) coordinate to normalized voxel pos in [0,1). */
-static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
-    const vec3f origin(geom.origin_x, geom.origin_y, geom.origin_z);
-    const vec3f dir1(geom.dir1_x, geom.dir1_y, geom.dir1_z);
-    const vec3f dir2(geom.dir2_x, geom.dir2_y, geom.dir2_z);
-    const vec3f dir3(geom.dir3_x, geom.dir3_y, geom.dir3_z);
-
-    mat33f M;
-    col_assign(M, 0, dir1);
-    col_assign(M, 1, dir2);
-    col_assign(M, 2, dir3);
-
-    return prod(inv(M), xyz - origin);
-}
-
-template <class T>
-static T SampleVoxel (const Image3d & frame, const vec3f pos) {
-    assert(ImageFormatSize(frame.format) == sizeof(T));
-
-    // out-of-bounds checking
-    if ((pos.x < 0) || (pos.y < 0) || (pos.z < 0))
-        return OUTSIDE_VAL;
-
-    auto x = static_cast<unsigned int>(frame.dims[0] * pos.x);
-    auto y = static_cast<unsigned int>(frame.dims[1] * pos.y);
-    auto z = static_cast<unsigned int>(frame.dims[2] * pos.z);
-
-    // out-of-bounds checking
-    if ((x >= frame.dims[0]) || (y >= frame.dims[1]) || (z >= frame.dims[2]))
-        return OUTSIDE_VAL;
-
-    return static_cast<T*>(frame.data->pvData)[x + y*frame.stride0/sizeof(T) + z*frame.stride1/sizeof(T)];
-}
-
-
 template <class T>
 Image3d Image3dSource::SampleFrame (const Image3d & frame, Cart3dGeom out_geom, unsigned short max_res[3]) {
     if (max_res[2] == 0)
