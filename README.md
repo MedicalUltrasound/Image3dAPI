@@ -26,9 +26,16 @@ The DICOM 3D standard is an alternative solution to sharing of 3D ultrasound dat
 This approach has advantages over the traditional DICOM data standard technique including complete seamless backward compatibility to existing stored studies, smaller files sizes, faster network transfers, and faster loading of studies (since no conversion from vendor raw data to DICOM format is required). This new approach also allows the vendors to continually innovate as well, instead of being locked into a frozen data specification.
 
 ## Getting started
-Install [Visual Studio](https://visualstudio.microsoft.com/) 2015 or 2017, either professional or community edition. Enable the ".Net desktop development", "Desktop development with C++" and "Python development" workloads during installation.
-In addition, Python.exe need to be registered as default app for running .py scripts. This can be done by right-clicking on a .py file, then selecting "Open with", "Choose another app", locate Python.exe and enable "Always use this app to open .py files". 
 
+### Tools 
+* Install [Visual Studio](https://visualstudio.microsoft.com/) 2015 or 2017, either professional or community edition. Enable the following workloads during installation: 
+    * ".Net desktop development"
+    * "Desktop development with C++" 
+    * and "Python development" .
+    * Also make sure to tick "Windows Universal CRT SDK" and all versions of "Windows 10 SDK" 
+* In addition, Python.exe need to be registered as default app for running .py scripts. This can be done by right-clicking on a .py file, then selecting "Open with", "Choose another app", locate Python.exe and enable "Always use this app to open .py files". 
+
+### Build
 * Open Visual Studio with administrative privileges. Any version >= 2015 is supported.
 * Open `Image3dAPI.sln`.
 * Build the solution.
