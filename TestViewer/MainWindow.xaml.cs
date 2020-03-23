@@ -326,26 +326,25 @@ namespace TestViewer
         {
             Debug.Assert(m_source != null);
 
+            uint[] color_map = m_source.GetColorMap();
+
             // retrieve image slices
             const ushort HORIZONTAL_RES = 256;
             const ushort VERTICAL_RES = 256;
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
             Image3d imageXY = m_source.GetFrame(frame, m_bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            ImageXY.Source = GenerateBitmap(imageXY, color_map);
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
             Image3d imageXZ = m_source.GetFrame(frame, m_bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
 
             // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
             Image3d imageZY = m_source.GetFrame(frame, m_bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            ImageZY.Source = GenerateBitmap(imageZY, color_map);
 
             FrameTime.Text = "Frame time: " + imageXY.time;
-
-            uint[] color_map = m_source.GetColorMap();
-
-            ImageXY.Source = GenerateBitmap(imageXY, color_map);
-            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
-            ImageZY.Source = GenerateBitmap(imageZY, color_map);
         }
 
         private WriteableBitmap GenerateBitmap(Image3d t_img, uint[] t_map)
