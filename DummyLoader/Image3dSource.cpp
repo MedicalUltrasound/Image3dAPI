@@ -35,9 +35,9 @@ Image3dSource::Image3dSource() {
         m_ecg = EcgSeries(ecg);
     }
     {
-        // flat gray scale
-        for (size_t i = 0; i < m_color_map.size(); ++i)
-            m_color_map[i] = R8G8B8A8(static_cast<unsigned char>(i), static_cast<unsigned char>(i), static_cast<unsigned char>(i), 0xFF);
+        // flat gray tissue scale
+        for (size_t i = 0; i < m_color_map_tissue.size(); ++i)
+            m_color_map_tissue[i] = R8G8B8A8(static_cast<unsigned char>(i), static_cast<unsigned char>(i), static_cast<unsigned char>(i), 0xFF);
     }
     {
         // image geometry    X     Y       Z
@@ -142,8 +142,8 @@ HRESULT Image3dSource::GetColorMap(/*out*/SAFEARRAY ** map) {
         return E_INVALIDARG;
 
     // copy to new buffer
-    CComSafeArray<uint32_t> color_map(static_cast<unsigned int>(m_color_map.size()));
-    memcpy(&color_map.GetAt(0), m_color_map.data(), sizeof(m_color_map));
+    CComSafeArray<uint32_t> color_map(static_cast<unsigned int>(m_color_map_tissue.size()));
+    memcpy(&color_map.GetAt(0), m_color_map_tissue.data(), sizeof(m_color_map_tissue));
     *map = color_map.Detach(); // transfer ownership
     return S_OK;
 }
