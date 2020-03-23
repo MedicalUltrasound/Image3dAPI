@@ -5,6 +5,7 @@ Copyright (c) 2015, GE Vingmed Ultrasound            */
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <tuple>
 
 
 /** 3D vector type. */
@@ -221,12 +222,43 @@ static vec3f PosToCoord (vec3f origin, vec3f dir1, vec3f dir2, vec3f dir3, const
 }
 
 
-/** Convert from (x,y,z) coordinate to normalized voxel pos in [0,1). */
-static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
+static std::tuple<vec3f, vec3f, vec3f, vec3f> FromCart3dGeom (Cart3dGeom geom) {
     const vec3f origin(geom.origin_x, geom.origin_y, geom.origin_z);
     const vec3f dir1(geom.dir1_x, geom.dir1_y, geom.dir1_z);
     const vec3f dir2(geom.dir2_x, geom.dir2_y, geom.dir2_z);
     const vec3f dir3(geom.dir3_x, geom.dir3_y, geom.dir3_z);
+
+    return std::make_tuple(origin, dir1, dir2, dir3);
+}
+
+
+static Cart3dGeom ToCart3dGeom (vec3f origin, vec3f dir1, vec3f dir2, vec3f dir3) {
+    Cart3dGeom geom = {};
+    {
+        geom.origin_x = origin.x;
+        geom.origin_y = origin.y;
+        geom.origin_z = origin.z;
+
+        geom.dir1_x = dir1.x;
+        geom.dir1_y = dir1.y;
+        geom.dir1_z = dir1.z;
+
+        geom.dir2_x = dir2.x;
+        geom.dir2_y = dir2.y;
+        geom.dir2_z = dir2.z;
+
+        geom.dir3_x = dir3.x;
+        geom.dir3_y = dir3.y;
+        geom.dir3_z = dir3.z;
+    }
+    return geom;
+}
+
+
+/** Convert from (x,y,z) coordinate to normalized voxel pos in [0,1). */
+static vec3f CoordToPos (Cart3dGeom geom, const vec3f xyz) {
+    vec3f origin, dir1, dir2, dir3;
+    std::tie(origin, dir1, dir2, dir3) = FromCart3dGeom(geom);
 
     mat33f M;
     col_assign(M, 0, dir1);
@@ -262,10 +294,8 @@ static Image3d SampleFrame (const Image3d & frame, Cart3dGeom frame_geom, Cart3d
     if (max_res[2] == 0)
         max_res[2] = 1; // require at least one plane to to retrieved
 
-    vec3f out_origin(out_geom.origin_x, out_geom.origin_y, out_geom.origin_z);
-    vec3f out_dir1(out_geom.dir1_x, out_geom.dir1_y, out_geom.dir1_z);
-    vec3f out_dir2(out_geom.dir2_x, out_geom.dir2_y, out_geom.dir2_z);
-    vec3f out_dir3(out_geom.dir3_x, out_geom.dir3_y, out_geom.dir3_z);
+    vec3f out_origin, out_dir1, out_dir2, out_dir3;
+    std::tie(out_origin, out_dir1, out_dir2, out_dir3) = FromCart3dGeom(out_geom);
 
     // allow 3rd axis to be empty if only retrieving a single slice
     if ((out_dir3 == vec3f(0, 0, 0)) && (max_res[2] < 2))
