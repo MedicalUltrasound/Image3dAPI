@@ -350,34 +350,30 @@ namespace TestViewer
 
         private WriteableBitmap GenerateBitmap(Image3d t_img, uint[] t_map)
         {
+            Debug.Assert(t_img.format == ImageFormat.FORMAT_U8);
+
             WriteableBitmap bitmap = new WriteableBitmap(t_img.dims[0], t_img.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
             bitmap.Lock();
-            unsafe
-            {
-                for (int y = 0; y < bitmap.Height; ++y)
-                {
-                    for (int x = 0; x < bitmap.Width; ++x)
-                    {
+            unsafe {
+                for (int y = 0; y < bitmap.Height; ++y) {
+                    for (int x = 0; x < bitmap.Width; ++x) {
                         byte t_val = t_img.data[x + y * t_img.stride0];
+
+                        // lookup tissue color
+                        byte[] channels = BitConverter.GetBytes(t_map[t_val]);
+
+                        // assign red, green & blue
                         byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
-                        SetRGBVal(pixel, t_val, t_map);
+                        pixel[0] = channels[0]; // red
+                        pixel[1] = channels[1]; // green
+                        pixel[2] = channels[2]; // blue
+                        // discard alpha channel
                     }
                 }
             }
             bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
             bitmap.Unlock();
             return bitmap;
-        }
-
-        unsafe static void SetRGBVal(byte* pixel, byte t_val, uint[] t_map)
-        {
-            // split input rgba color into individual channels
-            byte[] channels = BitConverter.GetBytes(t_map[t_val]);
-            // assign red, green & blue
-            pixel[0] = channels[0]; // red
-            pixel[1] = channels[1]; // green
-            pixel[2] = channels[2]; // blue
-            // discard alpha channel
         }
 
         static void SwapVals(ref float v1, ref float v2)
