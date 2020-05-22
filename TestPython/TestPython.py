@@ -5,16 +5,14 @@ import comtypes.client
 import numpy as np
 from utils import SafeArrayToNumpy
 from utils import FrameTo3dArray
+from utils import TypeLibFromObject
+
 
 if __name__=="__main__":
-    # load type library
-    if "32" in platform.architecture()[0]:
-        Image3dAPI = comtypes.client.GetModule("../Win32/Image3dAPI.tlb")
-    else:
-        Image3dAPI = comtypes.client.GetModule("../x64/Image3dAPI.tlb")
-
     # create loader object
     loader = comtypes.client.CreateObject("DummyLoader.Image3dFileLoader")
+    # cast to IImage3dFileLoader interface
+    Image3dAPI = TypeLibFromObject(loader)
     loader = loader.QueryInterface(Image3dAPI.IImage3dFileLoader)
 
     # load file
