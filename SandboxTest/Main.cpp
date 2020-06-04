@@ -32,19 +32,23 @@ private:
 
 
 void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
-    CComSafeArray<uint32_t> color_map;
+    CComSafeArray<uint8_t> color_map;
     {
+        ImageFormat img_format = IMAGE_FORMAT_INVALID;
         SAFEARRAY * tmp = nullptr;
-        CHECK(source.GetColorMap(&tmp));
+        CHECK(source.GetColorMap(TYPE_TISSUE_COLOR, &img_format, &tmp));
+        if (img_format != IMAGE_FORMAT_R8G8B8A8) {
+            std::wcerr << "ERROR: Unexpected color-map format.\n";
+            std::exit(-1);
+        }
         color_map.Attach(tmp);
         tmp = nullptr;
     }
 
     if (verbose) {
         std::cout << "Color-map:\n";
-        for (unsigned int i = 0; i < color_map.GetCount(); i++) {
-            unsigned int color = color_map[(int)i];
-            uint8_t *rgbx = reinterpret_cast<uint8_t*>(&color);
+        for (unsigned int i = 0; i < color_map.GetCount()/4; i++) {
+            uint8_t *rgbx = &color_map[(int)(4*i)];
             std::cout << "  [" << (int)rgbx[0] << "," << (int)rgbx[1] << "," << (int)rgbx[2] << "," << (int)rgbx[3] << "]\n";
         }
     }
@@ -60,14 +64,28 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         std::cout << "  Dir3:   " << bbox.dir3_x   << ", " << bbox.dir3_y   << ", " << bbox.dir3_z   << "\n";
     }
 
+    unsigned int stream_count = 0;
+    CHECK(source.GetStreamCount(&stream_count));
+    if (stream_count == 0) {
+        std::wcerr << "ERROR: No image streams found.\n";
+        std::exit(-1);
+    }
+
+    unsigned short max_res[] = {64, 64, 64};
+    CComPtr<IImage3dStream> stream;
+    CHECK(source.GetStream(0, bbox, max_res, &stream));
+
+    ImageType stream_type = IMAGE_TYPE_INVALID;
+    CHECK(stream->GetType(&stream_type));
+
     unsigned int frame_count = 0;
-    CHECK(source.GetFrameCount(&frame_count));
+    CHECK(stream->GetFrameCount(&frame_count));
     std::wcout << L"Frame count: " << frame_count << L"\n";
 
     CComSafeArray<double> frame_times;
     {
         SAFEARRAY * data = nullptr;
-        CHECK(source.GetFrameTimes(&data));
+        CHECK(stream->GetFrameTimes(&data));
         frame_times.Attach(data);
         data = nullptr;
     }
@@ -82,7 +100,6 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
     }
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
-        unsigned short max_res[] = { 64, 64, 64 };
         if (profile) {
             max_res[0] = 128;
             max_res[1] = 128;
@@ -92,7 +109,7 @@ void ParseSource (IImage3dSource & source, bool verbose, bool profile) {
         // retrieve frame data
         Image3d data;
         PerfTimer timer("GetFrame", profile);
-        CHECK(source.GetFrame(frame, bbox, max_res, &data));
+        CHECK(stream->GetFrame(frame, &data));
 
         if (frame == 0)
             std::cout << "First frame time: " << data.time << "\n";

@@ -14,6 +14,16 @@ library DummyLoader
 
     [
         version(1.2),
+        uuid(78317A0E-56BF-4735-AB5B-FE0751219FE8),
+        helpstring("3D image stream")
+    ]
+    coclass Image3dStream
+    {
+        [default] interface IImage3dStream;
+    };
+
+    [
+        version(1.2),
         uuid(6FA82ED5-6332-4344-8417-DEA55E72098C),
         helpstring("3D image source")
     ]
