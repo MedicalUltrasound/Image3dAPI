@@ -12,7 +12,7 @@ Image3dSource::Image3dSource() {
 
     // One second loop starting at t = 10
     const size_t numFrames = 25;
-    const double duration = 1.0; // Seconds
+    const double duration = 1.0; // ECG duration in seconds (the sum of the duration of individual ECG samples)
     const double startTime = 10.0;
 
     {
