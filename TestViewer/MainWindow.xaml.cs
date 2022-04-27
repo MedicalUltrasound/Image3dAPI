@@ -203,7 +203,7 @@ namespace TestViewer
             try {
                 ecg = m_source.GetECG();
 
-                if (ecg.samples.Length == 0) {
+                if (ecg.samples == null) {
                     ECG.Data = null; // ECG not available
                     return;
                 }
