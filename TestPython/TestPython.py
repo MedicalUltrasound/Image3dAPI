@@ -1,18 +1,16 @@
 ## Sample code to demonstrate how to access Image3dAPI from a python script
-import platform
 import comtypes
 import comtypes.client
 import numpy as np
 from utils import SafeArrayToNumpy
 from utils import FrameTo3dArray
-from utils import TypeLibFromObject
 
 
 if __name__=="__main__":
     # create loader object
     loader = comtypes.client.CreateObject("DummyLoader.Image3dFileLoader")
     # cast to IImage3dFileLoader interface
-    Image3dAPI = TypeLibFromObject(loader)
+    Image3dAPI = comtypes.client.GetModule("Image3dAPI.tlb")
     loader = loader.QueryInterface(Image3dAPI.IImage3dFileLoader)
 
     # load file
