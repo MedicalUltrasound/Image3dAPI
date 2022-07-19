@@ -12,6 +12,8 @@
     <OutputPath>.</OutputPath>
     <Name>TestPython</Name>
     <RootNamespace>TestPython</RootNamespace>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
