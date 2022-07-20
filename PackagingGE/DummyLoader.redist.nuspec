@@ -15,7 +15,7 @@
     <owners>Fredrik Orderud</owners>
     <version><<GIT-VERSION>></version>
     <releaseNotes>changelog in docs/changelog.txt</releaseNotes>
-    <copyright>Copyright 2015-2018</copyright>
+    <copyright>Copyright 2015-2020</copyright>
     
     <dependencies>
         <dependency id="Image3dAPI" version="<<GIT-VERSION>>" />

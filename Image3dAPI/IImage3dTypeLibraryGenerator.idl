@@ -8,7 +8,7 @@ import "IImage3d.idl";
 
 
 [
-    uuid(3ff1aab8-f3d8-33d4-825d-00104b3646c0),
+    uuid(1979020F-3402-49AD-A17C-507A1BBE4D09),
     helpstring("Interface to generate IImage3dAPI.tlb .")
 ]
 library Image3dlib

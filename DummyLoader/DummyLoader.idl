@@ -4,8 +4,8 @@ import "IImage3d.idl";
 
 
 [
-    version(1.2),
-    uuid(67E59584-3F6A-4852-8051-103A4583CA5E),
+    version(2.0),
+    uuid(ED4540BD-07B5-44B0-BCDE-3E2C1D99183B),
     helpstring("DummyLoader module")
 ]
 library DummyLoader
@@ -13,8 +13,8 @@ library DummyLoader
     importlib("stdole2.tlb");
 
     [
-        version(1.2),
-        uuid(6FA82ED5-6332-4344-8417-DEA55E72098C),
+        version(2.0),
+        uuid(50BE330D-F729-4D8F-A1E4-C939E0598EDF),
         helpstring("3D image source")
     ]
     coclass Image3dSource
@@ -23,8 +23,8 @@ library DummyLoader
     };
 
     [
-        version(1.2),
-        uuid(8E754A72-0067-462B-9267-E84AF84828F1),
+        version(2.0),
+        uuid(1326A2C6-7753-4584-B866-CDF3C6E240F1),
         helpstring("3D image file loader")
     ]
     coclass Image3dFileLoader
