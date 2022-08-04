@@ -40,14 +40,13 @@ STDAPI DllGetClassObject(_In_ REFCLSID rclsid, _In_ REFIID riid, _Outptr_ LPVOID
 // DllRegisterServer - Adds entries to the system registry.
 STDAPI DllRegisterServer()
 {
-    // registers object, typelib and all interfaces in typelib
-    return _AtlModule.DllRegisterServer();
+    return _AtlModule.DllRegisterServer(FALSE); // skip TypeLib registration since that is the responsibility of the host
 }
 
 // DllUnregisterServer - Removes entries from the system registry.
 STDAPI DllUnregisterServer()
 {
-    return _AtlModule.DllUnregisterServer();
+    return _AtlModule.DllUnregisterServer(FALSE);  // skip TypeLib unregistration for consistency with DllRegisterServer 
 }
 
 // DllInstall - Adds/Removes entries to the system registry per user per machine.

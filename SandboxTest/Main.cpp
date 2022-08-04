@@ -198,6 +198,21 @@ int wmain(int argc, wchar_t *argv[]) {
         }
     }
 
+    // register type library to enable out-of-proc Image3dAPI calls
+    // only works if running as admin
+    CComPtr<ITypeLib> typelib;
+    HRESULT hr = LoadTypeLibEx(L"Image3dAPI.tlb", REGKIND_REGISTER, &typelib);
+    CHECK(hr);
+
+#if 0
+    // unregister type library
+    TLIBATTR * tlb_attr = nullptr;
+    CHECK(typelib->GetLibAttr(&tlb_attr));
+    hr = UnRegisterTypeLib(tlb_attr->guid, tlb_attr->wMajorVerNum, tlb_attr->wMinorVerNum, tlb_attr->lcid, tlb_attr->syskind);
+    CHECK(hr);
+    typelib->ReleaseTLibAttr(tlb_attr);
+#endif
+
     // create loader in a separate "low integrity" dllhost.exe process
     CComPtr<IImage3dFileLoader> loader;
     CComPtr<IImage3dSource> source;
