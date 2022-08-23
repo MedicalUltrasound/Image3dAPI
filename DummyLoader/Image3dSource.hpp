@@ -16,15 +16,14 @@ public:
 
     /*NOT virtual*/ ~Image3dSource();
 
-    HRESULT STDMETHODCALLTYPE GetFrameCount(/*out*/unsigned int *size) override;
 
-    HRESULT STDMETHODCALLTYPE GetFrameTimes(/*out*/SAFEARRAY * *frame_times) override;
+    HRESULT STDMETHODCALLTYPE GetStreamCount (/*out*/unsigned int * size) override;
 
-    HRESULT STDMETHODCALLTYPE GetFrame(unsigned int index, Cart3dGeom out_geom, unsigned short max_res[3], /*out*/Image3d *data) override;
+    HRESULT STDMETHODCALLTYPE GetStream (unsigned int index, Cart3dGeom out_geom, unsigned short max_resolution[3], /*out*/IImage3dStream ** stream) override;
 
     HRESULT STDMETHODCALLTYPE GetBoundingBox(/*out*/Cart3dGeom *geom) override;
 
-    HRESULT STDMETHODCALLTYPE GetColorMap(/*out*/SAFEARRAY ** map) override;
+    HRESULT STDMETHODCALLTYPE GetColorMap(ColorMapType type, /*out*/ImageFormat * format, /*out*/SAFEARRAY ** map) override;
 
     HRESULT STDMETHODCALLTYPE GetECG(/*out*/EcgSeries *ecg) override;
 
@@ -41,9 +40,13 @@ public:
 private:
     ProbeInfo                m_probe;
     EcgSeries                m_ecg;
-    std::array<R8G8B8A8,256> m_color_map_tissue;
-    Cart3dGeom               m_img_geom = {};
-    std::vector<Image3d>     m_frames;
+
+    std::array<R8G8B8A8,256>     m_color_map_tissue;
+    std::array<R8G8B8A8,256*256> m_color_map_flow;
+    std::array<uint8_t,256*256>  m_flow_arb;
+
+    Cart3dGeom               m_bbox = {};
+    std::vector<ImageType>   m_stream_types;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(Image3dSource), Image3dSource)

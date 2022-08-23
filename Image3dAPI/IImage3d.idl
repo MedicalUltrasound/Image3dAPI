@@ -23,12 +23,32 @@ enum Image3dAPIVersion {
 
 
 typedef [
+    v1_enum, // 32bit enum size
+    helpstring("Enum of supported image types (extended upon demand).")]
+enum ImageType {
+    IMAGE_TYPE_INVALID   = 0, ///< make sure that "cleared" state is invalid
+    IMAGE_TYPE_TISSUE    = 1, ///< grayscale B-mode image
+    IMAGE_TYPE_BLOOD_VEL = 2, ///< blood velocities (color-flow) (rel. to probe)
+} ImageType;
+
+typedef [
   v1_enum, // 32bit enum size
-  helpstring("Enum of supported image formats (extended upon demand).")]
+  helpstring("Enum of supported image formats (extended upon demand). Multi-channel formats are documented in byte order.")]
 enum ImageFormat {
-    FORMAT_INVALID  = 0, ///< make sure that "cleared" state is invalid
-    FORMAT_U8       = 1, ///< unsigned 8bit grayscale
+    IMAGE_FORMAT_INVALID   = 0, ///< make sure that "cleared" state is invalid
+    IMAGE_FORMAT_U8        = 1, ///< unsigned 8bit grayscale
+    IMAGE_FORMAT_FREQ8POW8 = 2, ///< 16bit color-flow format (8bit signed frequency value, 8bit unsigned power/bandwidth value)
+    IMAGE_FORMAT_R8G8B8A8  = 3, ///< 32bit RGBA (alpha channel ignored)
 } ImageFormat;
+
+typedef [
+    v1_enum, // 32bit enum size
+    helpstring("Enum of supported color-map formats (extended upon demand).")]
+enum ColorMapType {
+    TYPE_TISSUE_COLOR, ///< tisse color-map; type=R8G8B8A8, size=256     (for slicing)
+    TYPE_FLOW_COLOR,   ///< flow color-map;  type=R8G8B8A8, size=256*256 (for slicing, in freq&bw space)
+    TYPE_FLOW_ARB,     ///< flow arbitration; type=uint8_t, size=256*256 (for deciding if tissue or flow shall be shown)
+} ColorMapType;
 
 
 typedef [
@@ -96,7 +116,7 @@ cpp_quote("} // extern \"C\"")
 cpp_quote("")
 cpp_quote("struct Image3d {")
 cpp_quote("    double         time    = 0;")
-cpp_quote("    ImageFormat    format  = FORMAT_INVALID;")
+cpp_quote("    ImageFormat    format  = IMAGE_FORMAT_INVALID;")
 cpp_quote("    unsigned short dims[3] = {0,0,0};")
 cpp_quote("    unsigned int   stride0 = 0;")
 cpp_quote("    unsigned int   stride1 = 0;")
@@ -274,25 +294,43 @@ cpp_quote("#else")
 cpp_quote("static_assert(sizeof(EcgSeries) == 2*8+2*4, \"EcgSeries size mismatch\");")
 cpp_quote("#endif")
 
+
+[object,
+    oleautomation, // use "automation" marshaler (oleaut32.dll)
+    uuid(D7D2A41A-F738-41EB-8133-1B06DDA1FF40),
+    helpstring("3D image stream interface. Used to group frames sharing a common type (e.g. tissue or color-flow). All frames within a stream share the same geometry and resolution.")]
+interface IImage3dStream : IUnknown {
+    [helpstring("Get stream type.")]
+    HRESULT GetType ([out, retval] ImageType * type);
+
+    [helpstring("Get the number of frames available")]
+    HRESULT GetFrameCount ([out, retval] unsigned int * size);
+
+    [helpstring("Get the time of all frames (useful for matching frame indices to ECG before retrieving image data) ")]
+    HRESULT GetFrameTimes ([out, retval] SAFEARRAY(double) * frame_times);
+
+    [helpstring("Get image data (const) for a given frame within a specified geometry")]
+    HRESULT GetFrame ([in] unsigned int index, [out, retval] Image3d * data);
+};
+
+
 [ object,
   oleautomation, // use "automation" marshaler (oleaut32.dll)
   uuid(D483D815-52DD-4750-8CA2-5C6C489588B6),
   helpstring("Interface for retrieving 3D image data.")]
 interface IImage3dSource : IUnknown {
-    [helpstring("Get the number of frames available")]
-    HRESULT GetFrameCount ([out,retval] unsigned int * size);
+    [helpstring("Get the number of streams available.")]
+    HRESULT GetStreamCount ([out, retval] unsigned int * size);
 
-    [helpstring("Get the time of all frames (useful for matching frame indices to ECG before retrieving image data) ")]
-    HRESULT GetFrameTimes ([out, retval] SAFEARRAY(double) * frame_times);
+    [helpstring("Get cartesian image stream. The returned frames might have lower resolution than requested.\n"
+                "Clients should therefore check the actual resolution of the retrieved images afterwards.")]
+    HRESULT GetStream ([in] unsigned int index, [in] Cart3dGeom geom, [in] unsigned short max_resolution[3], [out, retval] IImage3dStream ** stream);
 
-    [helpstring("Get image data (const) for a given frame within a specified geometry. The returned frame might have lower resolution than requested.")]
-    HRESULT GetFrame ([in] unsigned int index, [in] Cart3dGeom geom, [in] unsigned short max_resolution[3], [out,retval] Image3d * data);
-
-    [helpstring("Get a bounding box encapsulating all image data. Can be used as intput to GetFrame to avoid cropping.")]
+    [helpstring("Get a bounding box encapsulating all image data. Can be used as intput to GetStream to avoid cropping.")]
     HRESULT GetBoundingBox ([out,retval] Cart3dGeom * geom);
 
-    [helpstring("Retrieve color-map table for mapping image intensities to RGBx values. Length is 256.")]
-    HRESULT GetColorMap ([out,retval] SAFEARRAY(unsigned int) * map);
+    [helpstring("Retrieve color-map table for mapping image samples to RGBx values. Length and format depend on type.")]
+    HRESULT GetColorMap ([in] ColorMapType type, [out] ImageFormat * format, [out,retval] SAFEARRAY(BYTE) * table);
 
     [helpstring("Get ECG data if available [optional]. Shall return S_OK with an empty EcgSeries (all struct members set to 0) if EGC is not available")]
     HRESULT GetECG ([out,retval] EcgSeries * ecg);

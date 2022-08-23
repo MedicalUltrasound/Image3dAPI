@@ -43,9 +43,12 @@ namespace TestViewer
         IImage3dFileLoader m_loader;
         IImage3dSource     m_source;
 
-        Cart3dGeom         m_bboxXY;
-        Cart3dGeom         m_bboxXZ;
-        Cart3dGeom         m_bboxZY;
+        IImage3dStream     m_streamXY;
+        IImage3dStream     m_streamXYcf;
+        IImage3dStream     m_streamXZ;
+        IImage3dStream     m_streamXZcf;
+        IImage3dStream     m_streamZY;
+        IImage3dStream     m_streamZYcf;
 
         public MainWindow()
         {
@@ -68,9 +71,12 @@ namespace TestViewer
             ImageXZ.Source = null;
             ImageZY.Source = null;
 
-            m_bboxXY = new Cart3dGeom();
-            m_bboxXZ = new Cart3dGeom();
-            m_bboxZY = new Cart3dGeom();
+            m_streamXY = null;
+            m_streamXYcf = null;
+            m_streamXZ = null;
+            m_streamXZcf = null;
+            m_streamZY = null;
+            m_streamZYcf = null;
 
             ECG.Data = null;
 
@@ -183,18 +189,19 @@ namespace TestViewer
                 return;
             }
 
+            InitializeSlices();
+
             FrameSelector.Minimum = 0;
-            FrameSelector.Maximum = m_source.GetFrameCount()-1;
+            FrameSelector.Maximum = m_streamXY.GetFrameCount()-1;
             FrameSelector.IsEnabled = true;
             FrameSelector.Value = 0;
 
-            FrameCount.Text = "Frame count: " + m_source.GetFrameCount();
+            FrameCount.Text = "Frame count: " + m_streamXY.GetFrameCount();
             ProbeInfo.Text = "Probe name: "+ m_source.GetProbeInfo().name;
             InstanceUID.Text = "UID: " + m_source.GetSopInstanceUID();
 
-            InitializeSlices();
             DrawSlices(0);
-            DrawEcg(m_source.GetFrameTimes()[0]);
+            DrawEcg(m_streamXY.GetFrameTimes()[0]);
         }
 
         private void DrawEcg (double cur_time)
@@ -267,12 +274,16 @@ namespace TestViewer
         {
             var idx = (uint)FrameSelector.Value;
             DrawSlices(idx);
-            DrawEcg(m_source.GetFrameTimes()[idx]);
+            DrawEcg(m_streamXY.GetFrameTimes()[idx]);
         }
 
         private void InitializeSlices()
         {
             Debug.Assert(m_source != null);
+
+            uint stream_count = m_source.GetStreamCount();
+            if (stream_count < 1)
+                throw new Exception("No image streams found");
 
             Cart3dGeom bbox = m_source.GetBoundingBox();
             if (Math.Abs(bbox.dir3_y) > Math.Abs(bbox.dir2_y)) {
@@ -285,71 +296,120 @@ namespace TestViewer
             // extend bounding-box axes, so that dir1, dir2 & dir3 have equal length
             ExtendBoundingBox(ref bbox);
 
-            // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
-            m_bboxXY = bbox;
-            m_bboxXY.origin_x = m_bboxXY.origin_x + m_bboxXY.dir3_x / 2;
-            m_bboxXY.origin_y = m_bboxXY.origin_y + m_bboxXY.dir3_y / 2;
-            m_bboxXY.origin_z = m_bboxXY.origin_z + m_bboxXY.dir3_z / 2;
-            m_bboxXY.dir3_x = 0;
-            m_bboxXY.dir3_y = 0;
-            m_bboxXY.dir3_z = 0;
-
-            // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
-            m_bboxXZ = bbox;
-            m_bboxXZ.origin_x = m_bboxXZ.origin_x + m_bboxXZ.dir2_x / 2;
-            m_bboxXZ.origin_y = m_bboxXZ.origin_y + m_bboxXZ.dir2_y / 2;
-            m_bboxXZ.origin_z = m_bboxXZ.origin_z + m_bboxXZ.dir2_z / 2;
-            m_bboxXZ.dir2_x = m_bboxXZ.dir3_x;
-            m_bboxXZ.dir2_y = m_bboxXZ.dir3_y;
-            m_bboxXZ.dir2_z = m_bboxXZ.dir3_z;
-            m_bboxXZ.dir3_x = 0;
-            m_bboxXZ.dir3_y = 0;
-            m_bboxXZ.dir3_z = 0;
-
-            // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
-            m_bboxZY = bbox;
-            m_bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
-            m_bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
-            m_bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
-            m_bboxZY.dir1_x = bbox.dir3_x;
-            m_bboxZY.dir1_y = bbox.dir3_y;
-            m_bboxZY.dir1_z = bbox.dir3_z;
-            m_bboxZY.dir2_x = bbox.dir2_x;
-            m_bboxZY.dir2_y = bbox.dir2_y;
-            m_bboxZY.dir2_z = bbox.dir2_z;
-            m_bboxZY.dir3_x = 0;
-            m_bboxZY.dir3_y = 0;
-            m_bboxZY.dir3_z = 0;
-        }
-
-        private void DrawSlices (uint frame)
-        {
-            Debug.Assert(m_source != null);
-
-            uint[] color_map = m_source.GetColorMap();
-
-            // retrieve image slices
             const ushort HORIZONTAL_RES = 256;
             const ushort VERTICAL_RES = 256;
 
             // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
-            Image3d imageXY = m_source.GetFrame(frame, m_bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
-            ImageXY.Source = GenerateBitmap(imageXY, color_map);
+            Cart3dGeom bboxXY = bbox;
+            bboxXY.origin_x = bboxXY.origin_x + bboxXY.dir3_x / 2;
+            bboxXY.origin_y = bboxXY.origin_y + bboxXY.dir3_y / 2;
+            bboxXY.origin_z = bboxXY.origin_z + bboxXY.dir3_z / 2;
+            bboxXY.dir3_x = 0;
+            bboxXY.dir3_y = 0;
+            bboxXY.dir3_z = 0;
+            m_streamXY = m_source.GetStream(0, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            if (stream_count >= 2)
+                m_streamXYcf = m_source.GetStream(1, bboxXY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 }); // assume 2nd stream is color-flow
 
             // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
-            Image3d imageXZ = m_source.GetFrame(frame, m_bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
-            ImageXZ.Source = GenerateBitmap(imageXZ, color_map);
+            Cart3dGeom bboxXZ = bbox;
+            bboxXZ.origin_x = bboxXZ.origin_x + bboxXZ.dir2_x / 2;
+            bboxXZ.origin_y = bboxXZ.origin_y + bboxXZ.dir2_y / 2;
+            bboxXZ.origin_z = bboxXZ.origin_z + bboxXZ.dir2_z / 2;
+            bboxXZ.dir2_x = bboxXZ.dir3_x;
+            bboxXZ.dir2_y = bboxXZ.dir3_y;
+            bboxXZ.dir2_z = bboxXZ.dir3_z;
+            bboxXZ.dir3_x = 0;
+            bboxXZ.dir3_y = 0;
+            bboxXZ.dir3_z = 0;
+            m_streamXZ = m_source.GetStream(0, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            if (stream_count >= 2)
+                m_streamXZcf = m_source.GetStream(1, bboxXZ, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 }); // assume 2nd stream is color-flow
 
             // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
-            Image3d imageZY = m_source.GetFrame(frame, m_bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
-            ImageZY.Source = GenerateBitmap(imageZY, color_map);
+            Cart3dGeom bboxZY = bbox;
+            bboxZY.origin_x = bbox.origin_x + bbox.dir1_x / 2;
+            bboxZY.origin_y = bbox.origin_y + bbox.dir1_y / 2;
+            bboxZY.origin_z = bbox.origin_z + bbox.dir1_z / 2;
+            bboxZY.dir1_x = bbox.dir3_x;
+            bboxZY.dir1_y = bbox.dir3_y;
+            bboxZY.dir1_z = bbox.dir3_z;
+            bboxZY.dir2_x = bbox.dir2_x;
+            bboxZY.dir2_y = bbox.dir2_y;
+            bboxZY.dir2_z = bbox.dir2_z;
+            bboxZY.dir3_x = 0;
+            bboxZY.dir3_y = 0;
+            bboxZY.dir3_z = 0;
+            m_streamZY = m_source.GetStream(0, bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 });
+            if (stream_count >= 2)
+                m_streamZYcf = m_source.GetStream(1, bboxZY, new ushort[] { HORIZONTAL_RES, VERTICAL_RES, 1 }); // assume 2nd stream is color-flow
+        }
+
+        private void DrawSlices(uint frame)
+        {
+            Debug.Assert(m_source != null);
+
+            ImageFormat image_format;
+            byte[] tissue_map = m_source.GetColorMap(ColorMapType.TYPE_TISSUE_COLOR, out image_format);
+            if (image_format != ImageFormat.IMAGE_FORMAT_R8G8B8A8)
+                throw new Exception("Unexpected color-map format");
+
+            byte[] cf_map = m_source.GetColorMap(ColorMapType.TYPE_FLOW_COLOR, out image_format);
+            if (image_format != ImageFormat.IMAGE_FORMAT_R8G8B8A8)
+                throw new Exception("Unexpected color-map format");
+
+            byte[] arb_table = m_source.GetColorMap(ColorMapType.TYPE_FLOW_ARB, out image_format);
+            if (image_format != ImageFormat.IMAGE_FORMAT_U8)
+                throw new Exception("Unexpected color-map format");
+
+            uint cf_frame = 0;
+            if (m_streamXYcf != null) {
+                // find closest corresponding CF frame
+                double t_time = m_streamXY.GetFrame(frame).time;
+                double[] cf_times = m_streamXYcf.GetFrameTimes();
+
+                int closest_idx = 0;
+                for (int i = 1; i < cf_times.Length; ++i) {
+                    if (Math.Abs(cf_times[i] - t_time) < Math.Abs(cf_times[closest_idx] - t_time))
+                        closest_idx = i;
+                }
+
+                cf_frame = (uint)closest_idx;
+            }
+
+            // get XY plane (assumes 1st axis is "X" and 2nd is "Y")
+            Image3d imageXY = m_streamXY.GetFrame(frame);
+            if (m_streamXYcf != null) {
+                Image3d imageXYcf = m_streamXYcf.GetFrame(cf_frame);
+                ImageXY.Source = GenerateBitmap(imageXY, imageXYcf, tissue_map, cf_map, arb_table);
+            } else {
+                ImageXY.Source = GenerateBitmap(imageXY, tissue_map);
+            }
+        
+            // get XZ plane (assumes 1st axis is "X" and 3rd is "Z")
+            Image3d imageXZ = m_streamXZ.GetFrame(frame);
+            if (m_streamXZcf != null) {
+                Image3d imageXZcf = m_streamXZcf.GetFrame(cf_frame);
+                ImageXZ.Source = GenerateBitmap(imageXZ, imageXZcf, tissue_map, cf_map, arb_table);
+            } else {
+                ImageXZ.Source = GenerateBitmap(imageXZ, tissue_map);
+            }
+
+            // get ZY plane (assumes 2nd axis is "Y" and 3rd is "Z")
+            Image3d imageZY = m_streamZY.GetFrame(frame);
+            if (m_streamZYcf != null) {
+                Image3d imageZYcf = m_streamZYcf.GetFrame(cf_frame);
+                ImageZY.Source = GenerateBitmap(imageZY, imageZYcf, tissue_map, cf_map, arb_table);
+            } else {
+                ImageZY.Source = GenerateBitmap(imageZY, tissue_map);
+            }
 
             FrameTime.Text = "Frame time: " + imageXY.time;
         }
 
-        private WriteableBitmap GenerateBitmap(Image3d t_img, uint[] t_map)
+        private WriteableBitmap GenerateBitmap(Image3d t_img, byte[] t_map)
         {
-            Debug.Assert(t_img.format == ImageFormat.FORMAT_U8);
+            Debug.Assert(t_img.format == ImageFormat.IMAGE_FORMAT_U8);
 
             WriteableBitmap bitmap = new WriteableBitmap(t_img.dims[0], t_img.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
             bitmap.Lock();
@@ -359,7 +419,46 @@ namespace TestViewer
                         byte t_val = t_img.data[x + y * t_img.stride0];
 
                         // lookup tissue color
-                        byte[] channels = BitConverter.GetBytes(t_map[t_val]);
+                        byte[] channels = BitConverter.GetBytes(BitConverter.ToUInt32(t_map, 4*t_val));
+
+                        // assign red, green & blue
+                        byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;
+                        pixel[0] = channels[0]; // red
+                        pixel[1] = channels[1]; // green
+                        pixel[2] = channels[2]; // blue
+                        // discard alpha channel
+                    }
+                }
+            }
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            bitmap.Unlock();
+            return bitmap;
+        }
+
+        private WriteableBitmap GenerateBitmap(Image3d t_img, Image3d cf_img, byte[] t_map,  byte[] cf_map, byte[] arb_table)
+        {
+            Debug.Assert(t_img.dims.SequenceEqual(cf_img.dims));
+            Debug.Assert(t_img.format == ImageFormat.IMAGE_FORMAT_U8);
+            Debug.Assert(cf_img.format == ImageFormat.IMAGE_FORMAT_FREQ8POW8);
+
+            WriteableBitmap bitmap = new WriteableBitmap(t_img.dims[0], t_img.dims[1], 96.0, 96.0, PixelFormats.Rgb24, null);
+            bitmap.Lock();
+            unsafe {
+                for (int y = 0; y < bitmap.Height; ++y) {
+                    for (int x = 0; x < bitmap.Width; ++x) {
+                        byte t_val = t_img.data[x + y * t_img.stride0];
+                        ushort cf_val = BitConverter.ToUInt16(cf_img.data, 2*x + y*(int)cf_img.stride0);
+
+                        uint rgba = 0;
+                        if (arb_table[cf_val] > t_val) {
+                            // display color-flow overlay
+                            rgba = BitConverter.ToUInt32(cf_map, 4*cf_val);
+                        } else {
+                            // display tissue underlay
+                            rgba = BitConverter.ToUInt32(t_map, 4*t_val);
+                        }
+
+                        byte[] channels = BitConverter.GetBytes(rgba);
 
                         // assign red, green & blue
                         byte* pixel = (byte*)bitmap.BackBuffer + x * (bitmap.Format.BitsPerPixel / 8) + y * bitmap.BackBufferStride;

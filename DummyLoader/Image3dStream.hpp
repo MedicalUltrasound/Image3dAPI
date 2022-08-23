@@ -38,7 +38,9 @@ struct R8G8B8A8 {
 /** Determine the sample size [bytes] for a given image format. */
 static unsigned int ImageFormatSize(ImageFormat format) {
     switch (format) {
-    case FORMAT_U8: return 1;
+    case IMAGE_FORMAT_U8:        return 1;
+    case IMAGE_FORMAT_FREQ8POW8: return 2;
+    case IMAGE_FORMAT_R8G8B8A8:  return 4;
     }
 
     abort(); // should never be reached
@@ -64,3 +66,46 @@ static Image3d CreateImage3d (double time, ImageFormat format, const unsigned sh
 
     return img;
 }
+
+
+class ATL_NO_VTABLE Image3dStream :
+    public CComObjectRootEx<CComMultiThreadModel>,
+    public CComCoClass<Image3dStream, &__uuidof(Image3dStream)>,
+    public IImage3dStream {
+public:
+    Image3dStream();
+
+    /*NOT virtual*/ ~Image3dStream();
+
+    void Initialize (ImageType type, Cart3dGeom img_geom, Cart3dGeom out_geom, unsigned short max_resolution[3]);
+
+    HRESULT STDMETHODCALLTYPE  GetType (/*out*/ImageType * type) override {
+        if (!type)
+            return E_INVALIDARG;
+
+        *type = m_type;
+        return S_OK;
+    }
+
+    HRESULT STDMETHODCALLTYPE GetFrameCount(/*out*/unsigned int *size) override;
+
+    HRESULT STDMETHODCALLTYPE GetFrameTimes(/*out*/SAFEARRAY * *frame_times) override;
+
+    HRESULT STDMETHODCALLTYPE GetFrame(unsigned int index, /*out*/Image3d *data) override;
+
+    DECLARE_REGISTRY_RESOURCEID(IDR_Image3dStream)
+
+    BEGIN_COM_MAP(Image3dStream)
+        COM_INTERFACE_ENTRY(IImage3dStream)
+    END_COM_MAP()
+
+private:
+    ImageType                m_type = IMAGE_TYPE_INVALID;
+    Cart3dGeom               m_img_geom = {};
+    std::vector<Image3d>     m_frames;
+
+    Cart3dGeom               m_out_geom = {};
+    unsigned short           m_max_res[3];
+};
+
+OBJECT_ENTRY_AUTO(__uuidof(Image3dStream), Image3dStream)

@@ -5,10 +5,15 @@
 
 
 void ParseSource (IImage3dSource & source) {
-    CComSafeArray<uint32_t> color_map;
+    CComSafeArray<uint8_t> color_map;
     {
+        ImageFormat img_format = IMAGE_FORMAT_INVALID;
         SAFEARRAY * tmp = nullptr;
-        CHECK(source.GetColorMap(&tmp));
+        CHECK(source.GetColorMap(TYPE_TISSUE_COLOR, &img_format, &tmp));
+        if (img_format != IMAGE_FORMAT_R8G8B8A8) {
+            std::wcerr << "ERROR: Unexpected color-map format.\n";
+            std::exit(-1);
+        }
         color_map.Attach(tmp);
         tmp = nullptr;
     }
@@ -16,16 +21,28 @@ void ParseSource (IImage3dSource & source) {
     Cart3dGeom bbox = {};
     CHECK(source.GetBoundingBox(&bbox));
 
+    unsigned int stream_count = 0;
+    CHECK(source.GetStreamCount(&stream_count));
+    if (stream_count == 0) {
+        std::wcerr << "ERROR: No image streams found.\n";
+        std::exit(-1);
+    }
+
+    unsigned short max_res[] = {64, 64, 64};
+    CComPtr<IImage3dStream> stream;
+    CHECK(source.GetStream(0, bbox, max_res, &stream));
+
+    ImageType stream_type = IMAGE_TYPE_INVALID;
+    CHECK(stream->GetType(&stream_type));
+
     unsigned int frame_count = 0;
-    CHECK(source.GetFrameCount(&frame_count));
+    CHECK(stream->GetFrameCount(&frame_count));
     std::wcout << L"Frame count: " << frame_count << L"\n";
 
     for (unsigned int frame = 0; frame < frame_count; ++frame) {
-        unsigned short max_res[] = {64, 64, 64};
-
         // retrieve frame data
         Image3d data;
-        CHECK(source.GetFrame(frame, bbox, max_res, &data));
+        CHECK(stream->GetFrame(frame, &data));
     }
 }
 
