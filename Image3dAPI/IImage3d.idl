@@ -274,6 +274,22 @@ cpp_quote("#else")
 cpp_quote("static_assert(sizeof(EcgSeries) == 2*8+2*4, \"EcgSeries size mismatch\");")
 cpp_quote("#endif")
 
+
+[object,
+ oleautomation, // use "automation" marshaler (oleaut32.dll)
+ uuid(DCAC585F-3EC1-4440-96B6-83090408B027),
+ helpstring("Interface for retrieving the default slice/rendering 'views' of the 3D data.")]
+interface IPresentationState : IUnknown {
+    [helpstring("Get number of default slice/rendering views.\n"
+                "Shall return 0 if no default views are available.")]
+    HRESULT GetViewCount ([out, retval] unsigned int * count);
+
+    [helpstring("Get slice/rendering view by index.\n"
+                "The views shall by sorted by 'importance'. Clients unable to display all views should therefore display the first 'N' views.\n"
+                "Slices are indicated by the 'dir3' vector being empty, whereas it is non-empty for renderings.")]
+    HRESULT GetView ([in] unsigned int index, [out, retval] Cart3dGeom * view);
+};
+
 [ object,
   oleautomation, // use "automation" marshaler (oleaut32.dll)
   uuid(D483D815-52DD-4750-8CA2-5C6C489588B6),
@@ -296,6 +312,9 @@ interface IImage3dSource : IUnknown {
 
     [helpstring("Get ECG data if available [optional]. Shall return S_OK with an empty EcgSeries (all struct members set to 0) if EGC is not available")]
     HRESULT GetECG ([out,retval] EcgSeries * ecg);
+
+    [helpstring("Get presentation state corresponding to the 'views' shown on screen when the data was originally stored [optional].")]
+    HRESULT GetPresentationState (IPresentationState * pstate);
 
     [helpstring("")]
     HRESULT GetProbeInfo ([out,retval] ProbeInfo * probe);

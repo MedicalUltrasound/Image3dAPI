@@ -32,6 +32,10 @@ public:
 
     HRESULT STDMETHODCALLTYPE GetSopInstanceUID(/*out*/BSTR *uid_str) override;
 
+    HRESULT STDMETHODCALLTYPE GetPresentationState(IPresentationState *) override {
+        return E_NOTIMPL;
+    }
+
     DECLARE_REGISTRY_RESOURCEID(IDR_Image3dSource)
 
     BEGIN_COM_MAP(Image3dSource)
