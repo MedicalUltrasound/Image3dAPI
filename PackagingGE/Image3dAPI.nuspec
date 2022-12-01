@@ -34,8 +34,8 @@
         <file src="../Image3dAPI/IImage3d_p.c"   target="build/native/include/Image3dAPI/" />
         
         <!-- COM type libraries -->
-        <file src="../x64/Release/Image3dAPI.tlb"   target="build/native/lib/x64/" />
-        <file src="../Win32/Release/Image3dAPI.tlb" target="build/native/lib/Win32/" />
+        <file src="../x64/Release/Image3dAPI.tlb"   target="build/native/bin/x64/" />
+        <file src="../Win32/Release/Image3dAPI.tlb" target="build/native/bin/Win32/" />
         <!-- .NET type libraries -->
         <file src="../x64/Release/Image3dAPI.dll"   target="build/native/lib/x64/" />
         <file src="../Win32/Release/Image3dAPI.dll" target="build/native/lib/Win32/" />
